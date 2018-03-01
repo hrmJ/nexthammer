@@ -13,13 +13,9 @@ require_once '../interface_functions.php';
 
 $dbname = "pest_inter";
 $con_corpus = open_connection($dbname);
-$result = pg_query_params($con_corpus, "SELECT DISTINCT title FROM librarysrc WHERE lang = $1",Array($_GET["lang"]));
-$langs = pg_fetch_all($result);
-$langs_arr = Array();
-foreach($langs as $lang){
- $langs_arr[] = $lang["title"];
-}
-echo json_encode($langs_arr);
+$result = pg_query_params($con_corpus, "SELECT DISTINCT title, code FROM librarysrc WHERE lang = $1",Array($_GET["lang"]));
+$texts = pg_fetch_all($result);
+echo json_encode($texts);
 
 
 ?>

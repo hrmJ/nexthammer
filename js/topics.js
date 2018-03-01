@@ -19,8 +19,8 @@ $(document).ready(function(){
         $.getJSON("get_texts.php",{"lang":thislang},function(textlist){
             $ul = $("<ul>");
             $.each(textlist,function(idx,el){
-                var $gal = $("<span><input type='checkbox'></span>");
-                var $name = $("<span>" + el + "</span>");
+                var $gal = $("<span><input type='checkbox' value='" + el.code + "'></input></span>");
+                var $name = $("<span>" + el.title + "</span>");
                 var $li = $("<li>").append($gal).append($name);
                 $ul.append($li);
             });
