@@ -12,7 +12,8 @@ $(document).ready(function(){
     });
 
 
-
+    //Attach events
+    $("#topiclauncher").click(function(){ PickTexts(); });
 
     //Fetch the list of texts in this lang and print it as
     function GetTexts(thislang){
@@ -24,7 +25,14 @@ $(document).ready(function(){
                 var $li = $("<li>").append($gal).append($name);
                 $ul.append($li);
             });
-            $ul.appendTo($(".textlist_container").html(""));
+            $ul.appendTo($(".textlist_container").html("")).hide().slideDown();
+        });
+    }
+
+    //Picks the texts for thge analysis
+    function PickTexts(){
+        $(".textlist_container input:checked").each(function(idx, el){
+            console.log(el.getAttribute("value"));
         });
     }
 
