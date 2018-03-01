@@ -31,8 +31,18 @@ $(document).ready(function(){
 
     //Picks the texts for thge analysis
     function PickTexts(){
+        var codes = [];
         $(".textlist_container input:checked").each(function(idx, el){
-            console.log(el.getAttribute("value"));
+            codes.push(el.getAttribute("value"));
+            //console.log(el.getAttribute("value"));
+        });
+        var params = {"lang":$(".langlist_container select").val(),"codes":codes};
+        var $table = $("<table></table>");
+        $.getJSON("get_frequency_list.php",params,function(data){
+            $.each(data,function(idx, el){
+                $table.append($(`<tr><td>${el.lemma}</td><td>${el.count}</td></tr>`));
+            });
+            $table.appendTo($(".textlist_container").html("")).hide().fadeIn();
         });
     }
 
