@@ -1,11 +1,11 @@
 //FUnctions related to the topics functionality
 $(document).ready(function(){
 
-    /*
 
     //Create list of languages
     $.getJSON("get_langs.php",{},function(langlist){
         var $sel = $("<select><option>Choose language</option></select>");
+        //When the language is selected, print a list of the texts
         $sel.on("change",function(){ GetTexts($(this).val());});
         $.each(langlist,function(idx,el){
             $sel.append("<option>" + el + "</option>");
@@ -13,12 +13,9 @@ $(document).ready(function(){
         $sel.appendTo($(".langlist_container"));
     });
 
-    */
-
-
     //Attach events
-    //$("#topiclauncher").click(function(){ PickTexts(); });
-    $("#topiclauncher").click(function(){ TestCgi(); });
+    $("#topiclauncher").click(function(){ PickTexts(); });
+    //$("#topiclauncher").click(function(){ TestCgi(); });
 
     //Fetch the list of texts in this lang and print it as
     function GetTexts(thislang){

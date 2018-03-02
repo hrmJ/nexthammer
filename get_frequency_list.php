@@ -44,13 +44,13 @@ foreach($_GET["codes"] as $code){
 }
 $valuelist = implode(', ', $codes);
 $query = "SELECT startaddr, finaddr FROM librarysrc WHERE code IN ($valuelist)";
-$conn = open_connection($dbname);
+$conn = open_connection($dbname, "../../config.ini");
 $result = pg_query($query) or die(pg_last_error());
 $addresses = pg_fetch_all($result);
 pg_close($conn);
 
 
-$con_corpus = open_connection($dbname);
+$con_corpus = open_connection($dbname, "../../config.ini");
 
 #$words = Array();
 
@@ -70,7 +70,7 @@ foreach($addresses as $address){
 
 
 //Make the frequency table
-$conn = open_connection($dbname);
+$conn = open_connection($dbname, "../../config.ini");
 $idstring = implode(', ', $all_ids);
 $query = "SELECT lemma, count(*) FROM $lemma_table WHERE linktotext IN ($idstring) Group By lemma ORDER BY count DESC";
 $result = pg_query($query) or die(pg_last_error());
