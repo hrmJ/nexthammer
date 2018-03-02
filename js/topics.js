@@ -1,6 +1,8 @@
 //FUnctions related to the topics functionality
 $(document).ready(function(){
 
+    /*
+
     //Create list of languages
     $.getJSON("get_langs.php",{},function(langlist){
         var $sel = $("<select><option>Choose language</option></select>");
@@ -11,9 +13,12 @@ $(document).ready(function(){
         $sel.appendTo($(".langlist_container"));
     });
 
+    */
+
 
     //Attach events
-    $("#topiclauncher").click(function(){ PickTexts(); });
+    //$("#topiclauncher").click(function(){ PickTexts(); });
+    $("#topiclauncher").click(function(){ TestCgi(); });
 
     //Fetch the list of texts in this lang and print it as
     function GetTexts(thislang){
@@ -29,7 +34,7 @@ $(document).ready(function(){
         });
     }
 
-    //Picks the texts for thge analysis
+    //Picks the texts for the analysis
     function PickTexts(){
         var codes = [];
         $(".textlist_container input:checked").each(function(idx, el){
@@ -43,6 +48,13 @@ $(document).ready(function(){
                 $table.append($(`<tr><td>${el.lemma}</td><td>${el.count}</td></tr>`));
             });
             $table.appendTo($(".textlist_container").html("")).hide().fadeIn();
+        });
+    }
+
+    function TestCgi(){
+        console.log("trying..");
+        $.getJSON("../../cgi-bin/test.py",{"lang":"sv","codes":["aa","bb","cc","äööölkjlдлодлоло"]},function(data){
+            console.log(data);
         });
     }
 
