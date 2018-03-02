@@ -27,6 +27,18 @@ function PickNoun($lang){
     }
 }
 
+function FilterSymbols($lemma){
+    //Filter unwanted symbols from word
+    return preg_replace("(\.|,|!|:|;|-|—|\?)", "", $lemma);
+}
+
+function FilterThisWord($this_word){
+    $lemma = FilterSymbols($this_word["lemma"]);
+    if(mb_strlen($lemma, 'UTF-8') < 3 and $lemma!= "år"){
+        return false;
+    }
+    return true;
+}
 
 function CreatePgInPattern($vals, $startno){
     $prepared = Array();
@@ -93,9 +105,11 @@ $fail_score = 0.05;
 //Count naive bayes
 $freq_table = Array();
 foreach($all_words as $this_word){
-    $freq_table[] = Array("lemma"=>$this_word["lemma"],
-                          "freq"=>$this_word["count"],
-                          "nb"=>NaiveBayes($sum, $this_word["count"],  $coef_of_succes, $fail_score));
+    if (FilterThisWord($this_word)){ 
+        $freq_table[] = Array("lemma"=>$this_word["lemma"],
+                              "freq"=>$this_word["count"],
+                              "nb"=>NaiveBayes($sum, $this_word["count"],  $coef_of_succes, $fail_score));
+    }
 }
 
 echo json_encode($freq_table);
