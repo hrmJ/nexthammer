@@ -37,6 +37,12 @@ function CreatePgInPattern($vals, $startno){
     return $prepared;
 }
 
+function NaiveBayes($total_word_freq, $freq, $coef_of_succes, $fail_score){
+
+    return log($coef_of_succes * $freq) / (log($coef_of_succes * $freq )+ log($fail_score * ($total_word_freq  - $freq)));
+
+}
+
 $dbname = "pest_inter";
 $codes = Array();
 foreach($_GET["codes"] as $code){
@@ -74,10 +80,25 @@ $conn = open_connection($dbname, "../../config.ini");
 $idstring = implode(', ', $all_ids);
 $query = "SELECT lemma, count(*) FROM $lemma_table WHERE linktotext IN ($idstring) Group By lemma ORDER BY count DESC";
 $result = pg_query($query) or die(pg_last_error());
-$freqs = pg_fetch_all($result);
+$all_words = pg_fetch_all($result);
+//Get total frequency of words 
+$query = "select  sum(q.count) FROM (SELECT lemma, count(*) FROM $lemma_table WHERE linktotext IN ($idstring) Group By lemma ORDER BY count DESC) as q";
+$result = pg_query($query) or die(pg_last_error());
+$sum = pg_fetch_row($result)[0];
 pg_close($conn);
 
-echo json_encode($freqs);
+$coef_of_succes = 0.95;
+$fail_score = 0.05;
+
+//Count naive bayes
+$freq_table = Array();
+foreach($all_words as $this_word){
+    $freq_table[] = Array("lemma"=>$this_word["lemma"],
+                          "freq"=>$this_word["count"],
+                          "nb"=>NaiveBayes($sum, $this_word["count"],  $coef_of_succes, $fail_score));
+}
+
+echo json_encode($freq_table);
 
 
 ?>

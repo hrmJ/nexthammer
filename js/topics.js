@@ -14,8 +14,8 @@ $(document).ready(function(){
     });
 
     //Attach events
-    //$("#topiclauncher").click(function(){ PickTexts(); });
-    $("#topiclauncher").click(function(){ TestCgi(); });
+    $("#topiclauncher").click(function(){ PickTexts(); });
+    //$("#topiclauncher").click(function(){ TestCgi(); });
 
     //Fetch the list of texts in this lang and print it as
     function GetTexts(thislang){
@@ -40,17 +40,28 @@ $(document).ready(function(){
         });
         var params = {"lang":$(".langlist_container select").val(),"codes":codes};
         var $table = $("<table></table>");
+        var $head = $("<thead></thead>");
+        $head.append($("<tr><td>Lemma</td><td>Freq</td><td>NB</td></tr>"));
+        $table.append($head);
+        var $body = $("<tbody></tbody>");
         $.getJSON("get_frequency_list.php",params,function(data){
             $.each(data,function(idx, el){
-                $table.append($(`<tr><td>${el.lemma}</td><td>${el.count}</td></tr>`));
+                $body.append($(`<tr><td>${el.lemma}</td><td>${el.freq}</td><td>${el.nb}</td></tr>`));
             });
+            $body.appendTo($table);
             $table.appendTo($(".textlist_container").html("")).hide().fadeIn();
         });
     }
 
     function TestCgi(){
-        console.log("trying..");
-        $.getJSON("../../cgi-bin/test.py",{"lang":"sv","codes":["aa","bb","cc","äööölkjlдлодлоло"]},function(data){
+        var codes = [];
+        $(".textlist_container input:checked").each(function(idx, el){
+            codes.push(el.getAttribute("value"));
+            //console.log(el.getAttribute("value"));
+        });
+        var params = {"lang":$(".langlist_container select").val(),"codes":codes};
+        var $table = $("<table></table>");
+        $.getJSON("../../cgi-bin/get_frequency_list.py",params,function(data){
             console.log(data);
         });
     }
