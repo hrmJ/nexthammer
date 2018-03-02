@@ -14,8 +14,8 @@ $(document).ready(function(){
     });
 
     //Attach events
-    $("#topiclauncher").click(function(){ PickTexts(); });
-    //$("#topiclauncher").click(function(){ TestCgi(); });
+    //$("#topiclauncher").click(function(){ PickTexts(); });
+    $("#topiclauncher").click(function(){ TestCgi(); });
 
     //Fetch the list of texts in this lang and print it as
     function GetTexts(thislang){
