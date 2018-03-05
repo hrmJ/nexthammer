@@ -21,6 +21,11 @@ $(document).ready(function(){
     function GetTexts(thislang){
         $.getJSON("get_texts.php",{"lang":thislang},function(textlist){
             $ul = $("<ul>");
+            var $select_all = $("<a href='javascript:void(0)'>Select all</a>");
+            $select_all.click(function(){
+                $(".textlist_container [type='checkbox']").click();
+            })
+            $ul.append($select_all);
             $.each(textlist,function(idx,el){
                 var $gal = $("<span><input type='checkbox' value='" + el.code + "'></input></span>");
                 var $name = $("<span>" + el.title + "</span>");
@@ -41,12 +46,17 @@ $(document).ready(function(){
         var params = {"lang":$(".langlist_container select").val(),"codes":codes};
         var $table = $("<table></table>");
         var $head = $("<thead></thead>");
-        $head.append($("<tr><td>Lemma</td><td>Freq</td><td>NB</td></tr>"));
+        $head.append($("<tr><td>No.</td><td>Lemma</td><td>Freq</td><td>NB</td></tr>"));
         $table.append($head);
         var $body = $("<tbody></tbody>");
         $.getJSON("get_frequency_list.php",params,function(data){
             $.each(data,function(idx, el){
-                $body.append($(`<tr><td>${el.lemma}</td><td>${el.freq}</td><td>${el.nb}</td></tr>`));
+                $body.append($(`<tr>
+                    <td>${idx + 1}</td>
+                    <td>${el.lemma}</td>
+                    <td>${el.freq}</td>
+                    <td>${el.nb}</td>
+                    </tr>`));
             });
             $body.appendTo($table);
             $table.appendTo($(".textlist_container").html("")).hide().fadeIn();
