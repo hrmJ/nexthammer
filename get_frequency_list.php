@@ -10,6 +10,7 @@ require_once '../string_functions.php';
 require_once '../corpus_functions.php';
 require_once '../session_functions.php';
 require_once '../interface_functions.php';
+require_once 'statistical_functions_for_topics.php';
 
 function PickNoun($lang){
     //Select the correct tag representing nouns
@@ -49,11 +50,6 @@ function CreatePgInPattern($vals, $startno){
     return $prepared;
 }
 
-function NaiveBayes($total_word_freq, $freq, $coef_of_succes, $fail_score){
-
-    return log($coef_of_succes * $freq) / (log($coef_of_succes * $freq )+ log($fail_score * ($total_word_freq  - $freq)));
-
-}
 
 $dbname = "pest_inter";
 $codes = Array();
@@ -67,9 +63,7 @@ $result = pg_query($query) or die(pg_last_error());
 $addresses = pg_fetch_all($result);
 pg_close($conn);
 
-
-$con_corpus = open_connection($dbname, "../../config.ini");
-
+$con_corpus = open_connection($dbname, "../../config.ini"); 
 #$words = Array();
 
 //GET the nouns from the texts
@@ -104,11 +98,15 @@ $fail_score = 0.05;
 
 //Count naive bayes
 $freq_table = Array();
-foreach($all_words as $this_word){
+foreach($all_words as $row_number=> $this_word){
     if (FilterThisWord($this_word)){ 
+        $frequency_of_next_word = ($row_number + 1 <= sizeof($all_words) ? $all_words[$row_number + 1]["count"] : 0);
         $freq_table[] = Array("lemma"=>$this_word["lemma"],
                               "freq"=>$this_word["count"],
-                              "nb"=>NaiveBayes($sum, $this_word["count"],  $coef_of_succes, $fail_score));
+                              "nb"=>NaiveBayes($sum, $this_word["count"],  $coef_of_succes, $fail_score),
+                              #"vsm"=> Vsm($this_word["count"], $frequency_of_next_word)
+                              "vsm"=> $frequency_of_next_word
+                          );
     }
 }
 

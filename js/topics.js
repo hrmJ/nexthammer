@@ -6,7 +6,7 @@ $(document).ready(function(){
     $.getJSON("get_langs.php",{},function(langlist){
         var $sel = $("<select><option>Choose language</option></select>");
         //When the language is selected, print a list of the texts
-        $sel.on("change",function(){ GetTexts($(this).val());});
+        $sel.on("change",function(){ GetTexts($(this));});
         $.each(langlist,function(idx,el){
             $sel.append("<option>" + el + "</option>");
         });
@@ -14,11 +14,20 @@ $(document).ready(function(){
     });
 
     //Attach events
-    $("#topiclauncher").click(function(){ PickTexts(); });
-    //$("#topiclauncher").click(function(){ TestCgi(); });
+    $(".topiclauncher").click(function(){ PickTexts($(this)); });
+    $("#language_comparison_adder").click(function(){ AddLanguageForComparison(); });
+
+    //Add another language on the same screen
+    function AddLanguageForComparison(){
+        var $new_comparison = $("#comparisons > div:last-of-type").clone(true);
+        $new_comparison.find(".textlist_container").html("");
+        $("#comparisons").append($new_comparison);
+    }
 
     //Fetch the list of texts in this lang and print it as
-    function GetTexts(thislang){
+    function GetTexts($launcher){
+        var thislang = $launcher.val();
+        var $this_container = $launcher.parents(".item_for_comparison");
         $.getJSON("get_texts.php",{"lang":thislang},function(textlist){
             $ul = $("<ul>");
             var $select_all = $("<a href='javascript:void(0)'>Select all</a>");
@@ -32,21 +41,22 @@ $(document).ready(function(){
                 var $li = $("<li>").append($gal).append($name);
                 $ul.append($li);
             });
-            $ul.appendTo($(".textlist_container").html("")).hide().slideDown();
+            $ul.appendTo($this_container.find(".textlist_container").html("")).hide().slideDown();
         });
     }
 
     //Picks the texts for the analysis
-    function PickTexts(){
+    function PickTexts($launcher){
+        var $parent_div = $launcher.parents(".item_for_comparison");
         var codes = [];
-        $(".textlist_container input:checked").each(function(idx, el){
+        $parent_div.find(".textlist_container input:checked").each(function(idx, el){
             codes.push(el.getAttribute("value"));
             //console.log(el.getAttribute("value"));
         });
-        var params = {"lang":$(".langlist_container select").val(),"codes":codes};
+        var params = {"lang":$parent_div.find(".langlist_container select").val(),"codes":codes};
         var $table = $("<table></table>");
         var $head = $("<thead></thead>");
-        $head.append($("<tr><td>No.</td><td>Lemma</td><td>Freq</td><td>NB</td></tr>"));
+        $head.append($("<tr><td>No.</td><td>Lemma</td><td>Freq</td><td>NB</td><td>VSM</td></tr>"));
         $table.append($head);
         var $body = $("<tbody></tbody>");
         $.getJSON("get_frequency_list.php",params,function(data){
@@ -56,10 +66,11 @@ $(document).ready(function(){
                     <td>${el.lemma}</td>
                     <td>${el.freq}</td>
                     <td>${el.nb}</td>
+                    <td>${el.vsm}</td>
                     </tr>`));
             });
             $body.appendTo($table);
-            $table.appendTo($(".textlist_container").html("")).hide().fadeIn();
+            $table.appendTo($parent_div.find(".textlist_container").html("")).hide().fadeIn();
         });
     }
 

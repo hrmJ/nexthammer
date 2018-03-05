@@ -1,3 +1,17 @@
-.contentlist div + div{
+.item_for_comparison div + div{
     margin-top:2em;
+}
+
+.rowcontainer{
+    display:flex;
+    flex-flow:row nowrap;
+}
+.rowcontainer > *{
+    margin-right:1em;
+    border-right:1px solid black;
+    padding-right: 1em;
+    padding-left: 1em;
+}
+.with-margin{
+    margin:2em;
 }
