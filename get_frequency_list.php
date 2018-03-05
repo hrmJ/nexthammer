@@ -15,7 +15,7 @@ function PickNoun($lang){
     //Select the correct tag representing nouns
     switch($lang){
         case "fi":
-            return Array("Noun");
+            return Array("NOUN");
         case "sv":
             return Array("NN");
         case "fr":
