@@ -51,7 +51,6 @@ $(document).ready(function(){
         var codes = [];
         $parent_div.find(".textlist_container input:checked").each(function(idx, el){
             codes.push(el.getAttribute("value"));
-            //console.log(el.getAttribute("value"));
         });
         var params = {"lang":$parent_div.find(".langlist_container select").val(),"codes":codes};
         var $table = $("<table></table>");

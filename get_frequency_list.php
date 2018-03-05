@@ -101,12 +101,15 @@ $freq_table = Array();
 foreach($all_words as $row_number=> $this_word){
     if (FilterThisWord($this_word)){ 
         $frequency_of_next_word = ($row_number + 1 <= sizeof($all_words) ? $all_words[$row_number + 1]["count"] : 0);
-        $freq_table[] = Array("lemma"=>$this_word["lemma"],
-                              "freq"=>$this_word["count"],
-                              "nb"=>NaiveBayes($sum, $this_word["count"],  $coef_of_succes, $fail_score),
-                              #"vsm"=> Vsm($this_word["count"], $frequency_of_next_word)
-                              "vsm"=> $frequency_of_next_word
-                          );
+        $nb = NaiveBayes($sum, $this_word["count"],  $coef_of_succes, $fail_score);
+        if($nb > 0){
+            //filter out the ones with negative NB
+            $freq_table[] = Array("lemma"=>$this_word["lemma"],
+                                  "freq"=>$this_word["count"],
+                                  "nb"=>$nb,
+                                  "vsm"=> Vsm($this_word["count"], $frequency_of_next_word)
+                              );
+        }
     }
 }
 
