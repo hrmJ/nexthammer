@@ -20,7 +20,7 @@ function NaiveBayes($total_word_freq, $freq, $coef_of_succes, $fail_score){
  * @param $frequency_B frequency of the next word in the frequency list
  *
  */
-function Vsm($frequency_A, $frequency_B){
+function Tf_idf($frequency_A, $frequency_B){
     if($frequency_A and $frequency_B){
         return 2 * $frequency_B * log($frequency_B/$frequency_A);
     }

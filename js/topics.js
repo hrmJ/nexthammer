@@ -76,7 +76,7 @@ $(document).ready(function(){
         var params = {"lang":$parent_div.find(".langlist_container select").val(),"codes":codes};
         var $table = $("<table></table>");
         var $head = $("<thead></thead>");
-        $head.append($("<tr><td>No.</td><td>Lemma</td><td>Freq</td><td>NB</td><td>VSM</td></tr>"));
+        $head.append($("<tr><td>No.</td><td>Lemma</td><td>Freq</td><td>NB</td><td>TF_IDF</td></tr>"));
         $table.append($head);
         var $body = $("<tbody></tbody>");
         $.getJSON("get_frequency_list.php",params,function(data){
@@ -86,7 +86,7 @@ $(document).ready(function(){
                     <td>${el.lemma}</td>
                     <td>${el.freq}</td>
                     <td>${el.nb}</td>
-                    <td>${el.vsm}</td>
+                    <td>${el.tf_idf}</td>
                     </tr>`));
             });
             $body.appendTo($table);

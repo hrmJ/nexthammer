@@ -28,6 +28,42 @@ function PickNoun($lang){
     }
 }
 
+
+
+//Combine lemma2 to lemma1
+function CombineWords($lemma_array, $lemma1, $lemma2){
+    //1. Find the freq of one of the lemmas
+    $add_freq = 0;
+    foreach($lemma_array as $idx => $thislemma){
+        if($thislemma["lemma"] == $lemma2 ){
+            $add_freq = $thislemma["count"];
+            break;
+        }
+    }
+    if($add_freq > 0){
+        //Remove the second lemma from the word list
+        unset($lemma_array[$idx]);
+        $lemma_array = array_values($lemma_array);
+        foreach($lemma_array as $idx => $thislemma){
+            if($thislemma["lemma"] == $lemma1 ){
+                $lemma_array[$idx]["count"] += $add_freq;
+                break;
+            }
+        }
+    }
+
+    foreach ($lemma_array as $key => $row) {
+        $count[$key]  = $row['count'];
+    }
+
+    // Sort the data with volume descending, edition ascending
+    // Add $data as the last parameter, to sort by the common key
+    array_multisort($count, SORT_DESC, $lemma_array);
+
+    return $lemma_array;
+}
+
+
 function FilterSymbols($lemma){
     //Filter unwanted symbols from word
     return preg_replace("(\.|,|!|:|;|-|—|\?)", "", $lemma);
@@ -102,10 +138,16 @@ if(!$stopwords_arr){
 $query = "SELECT lemma, count(*) FROM $lemma_table WHERE linktotext IN ($idstring) AND lemma NOT IN ($stopword_string) Group By lemma ORDER BY count DESC";
 $result = pg_query($query) or die(pg_last_error());
 $all_words = pg_fetch_all($result);
-//Get total frequency of words 
-$query = "select  sum(q.count) FROM (SELECT lemma, count(*) FROM $lemma_table WHERE linktotext IN ($idstring) Group By lemma ORDER BY count DESC) as q";
+//get total frequency of words 
+$query = "select  sum(q.count) from (select lemma, count(*) from $lemma_table where linktotext in ($idstring) group by lemma order by count desc) as q";
 $result = pg_query($query) or die(pg_last_error());
 $sum = pg_fetch_row($result)[0];
+
+//MANUAL FIXES:--->
+//get total frequency of membres
+$query = "select sum(q.count) from (select lemma, count(*) from $lemma_table where linktotext in ($idstring) AND lemma IN('membres','membre') group by lemma order by count desc) as q";
+$result = pg_query($query) or die(pg_last_error());
+$membresum = pg_fetch_row($result)[0];
 pg_close($conn);
 
 $coef_of_succes = 0.95;
@@ -113,18 +155,23 @@ $fail_score = 0.05;
 
 //Count naive bayes
 $freq_table = Array();
+
+if($_GET["lang"] == "fr"){
+    $all_words = CombineWords($all_words, "membre","membres");
+}
+
 foreach($all_words as $row_number=> $this_word){
     if (FilterThisWord($this_word)){ 
         $frequency_of_next_word = ($row_number + 1 <= sizeof($all_words) ? $all_words[$row_number + 1]["count"] : 0);
         $nb = NaiveBayes($sum, $this_word["count"],  $coef_of_succes, $fail_score);
-        if($nb > 0){
+        //if($nb > 0){
             //filter out the ones with negative NB
             $freq_table[] = Array("lemma"=>$this_word["lemma"],
                                   "freq"=>$this_word["count"],
                                   "nb"=>$nb,
-                                  "vsm"=> Vsm($this_word["count"], $frequency_of_next_word)
+                                  "tf_idf"=> Tf_idf($this_word["count"], $frequency_of_next_word)
                               );
-        }
+        //}
     }
 }
 
