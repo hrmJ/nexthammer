@@ -18,8 +18,12 @@ $(document).ready(function(){
         $.getJSON("get_stopwords.php",{"do":"read"},function(wordlist){
             var $ul  = $("<ul>");
             $.each(wordlist,function(idx,el){
-                console.log(el);
-                $ul.append($("<li>" + el + "</li>"));
+                var $el =  $("<span>" + el + "</span>");
+                var $a = $("<a href='javascript:void(0)' class='rm-link'>Remove</a>");
+                $a.click(function(){RemoveStopWord($(this).parents("li").find("span").text())});
+                var $li =  $("<li></li>");
+                $li.append($el).append($a);
+                $ul.append($li);
             });
             $("#stopwords-list").find("ul").remove()
             $ul.appendTo($("#stopwords-list"));
@@ -107,6 +111,12 @@ $(document).ready(function(){
     //Add a new stopword
     function AddStopWord(){
         $.get("get_stopwords.php",{"do":"add","newlemma":$("[name='sw_adder']").val()},function(){
+            CreateStopWordList();
+        });
+    }
+    //Remove a stopword
+    function RemoveStopWord(word){
+        $.get("get_stopwords.php",{"do":"remove","newlemma":word},function(){
             CreateStopWordList();
         });
     }

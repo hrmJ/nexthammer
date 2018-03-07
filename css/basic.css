@@ -19,3 +19,7 @@
 #stopwords-list{
     display:none;
 }
+
+#stopwords-list span{
+    margin-right:2em;
+}

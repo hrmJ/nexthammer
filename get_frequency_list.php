@@ -96,6 +96,9 @@ foreach($addresses as $address){
 $conn = open_connection($dbname, "../../config.ini");
 $idstring = implode(', ', $all_ids);
 $stopword_string = implode(', ', $stopwords_arr);
+if(!$stopwords_arr){
+    $stopword_string = "'laksjfdlasdo9auraoioijflakjflaskjf'";
+}
 $query = "SELECT lemma, count(*) FROM $lemma_table WHERE linktotext IN ($idstring) AND lemma NOT IN ($stopword_string) Group By lemma ORDER BY count DESC";
 $result = pg_query($query) or die(pg_last_error());
 $all_words = pg_fetch_all($result);
