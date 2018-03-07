@@ -15,3 +15,7 @@
 .with-margin{
     margin:2em;
 }
+
+#stopwords-list{
+    display:none;
+}

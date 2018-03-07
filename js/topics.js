@@ -13,9 +13,26 @@ $(document).ready(function(){
         $sel.appendTo($(".langlist_container"));
     });
 
+    //Create list of stop words
+    function CreateStopWordList(){
+        $.getJSON("get_stopwords.php",{"do":"read"},function(wordlist){
+            var $ul  = $("<ul>");
+            $.each(wordlist,function(idx,el){
+                console.log(el);
+                $ul.append($("<li>" + el + "</li>"));
+            });
+            $("#stopwords-list").find("ul").remove()
+            $ul.appendTo($("#stopwords-list"));
+        });
+    }
+
+    CreateStopWordList();
+
     //Attach events
     $(".topiclauncher").click(function(){ PickTexts($(this)); });
     $("#language_comparison_adder").click(function(){ AddLanguageForComparison(); });
+    $("#launch_swlist").click(function(){$(this).parents("div,section").next("section,div").slideToggle()});
+    $("#add_stopword").click(function(){ AddStopWord()});
 
     //Add another language on the same screen
     function AddLanguageForComparison(){
@@ -85,5 +102,14 @@ $(document).ready(function(){
             console.log(data);
         });
     }
+
+
+    //Add a new stopword
+    function AddStopWord(){
+        $.get("get_stopwords.php",{"do":"add","newlemma":$("[name='sw_adder']").val()},function(){
+            CreateStopWordList();
+        });
+    }
+
 
 });

@@ -51,6 +51,17 @@ function CreatePgInPattern($vals, $startno){
 }
 
 
+//Get  list of stopwords
+$dbname = "dbmain";
+$con_corpus = open_connection($dbname, "../../config.ini");
+$result = pg_query_params($con_corpus, "SELECT DISTINCT lemma FROM topicwords_stopwords",Array());
+$stopwords = pg_fetch_all($result);
+$stopwords_arr = Array();
+foreach($stopwords as $lang){
+     $stopwords_arr[] = "'{$lang["lemma"]}'";
+}
+
+
 $dbname = "pest_inter";
 $codes = Array();
 foreach($_GET["codes"] as $code){
@@ -84,7 +95,8 @@ foreach($addresses as $address){
 //Make the frequency table
 $conn = open_connection($dbname, "../../config.ini");
 $idstring = implode(', ', $all_ids);
-$query = "SELECT lemma, count(*) FROM $lemma_table WHERE linktotext IN ($idstring) Group By lemma ORDER BY count DESC";
+$stopword_string = implode(', ', $stopwords_arr);
+$query = "SELECT lemma, count(*) FROM $lemma_table WHERE linktotext IN ($idstring) AND lemma NOT IN ($stopword_string) Group By lemma ORDER BY count DESC";
 $result = pg_query($query) or die(pg_last_error());
 $all_words = pg_fetch_all($result);
 //Get total frequency of words 
