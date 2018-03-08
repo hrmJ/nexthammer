@@ -85,7 +85,7 @@ class Document extends CorpusObject{
         $stopword_string = implode(', ', CreatePgInPattern($stopwords, 3 + sizeof($noun_patterns)));
         $query = "SELECT lemma, count(*) FROM lemma_{$this->lang} 
                   WHERE linktotext IN 
-                      (SELECT linktotext FROM pos_en 
+                      (SELECT linktotext FROM pos_{$this->lang}
                           WHERE pos IN ($noun_string) 
                           AND ID between $1 AND $2)
                   AND lemma NOT IN ($stopword_string)
@@ -98,7 +98,7 @@ class Document extends CorpusObject{
         foreach($freqs as $row){
             if (FilterThisWord($row["lemma"]) or !$filtershort){ 
                 //Filtering out short words and other unwanted words
-                $this->noun_frequencies[$row["lemma"]] = $row["count"];
+                $this->noun_frequencies[$row["lemma"]] = $row["count"]*1;
             }
         }
         return $this;
@@ -129,9 +129,9 @@ class Document extends CorpusObject{
                 if (array_key_exists($fix["wrong"], $this->noun_frequencies)
                     and array_key_exists($fix["right"], $this->noun_frequencies)){
                     //Increase the frequency of the "right" lemma
-                    $this->noun_frequencies[$fix["right"]] += $this->noun_frequencies[$fix["right"]];
-                    //Set the frequency of the other lemma to zero
-                    $this->noun_frequencies[$fix["wrong"]] = 0;
+                    $this->noun_frequencies[$fix["right"]] += $this->noun_frequencies[$fix["wrong"]];
+                    //Remove the other lemma 
+                    unset($this->noun_frequencies[$fix["wrong"]]);
                     //Rearrange the array
                     arsort($this->noun_frequencies);
                 }
