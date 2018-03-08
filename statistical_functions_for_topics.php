@@ -14,10 +14,10 @@ function NaiveBayes($total_word_freq, $freq, $coef_of_succes, $fail_score){
 
 /**
  *
- * Count vector semantic model
+ * отдельно для каждого текста
  *
- * @param $frequency_A frequency of THIS word
- * @param $frequency_B frequency of the next word in the frequency list
+ * @param freq1 frequency of the word in the text
+ * @param total_freq1 number of words in the text
  *
  */
 function Tf_idf($frequency_A, $frequency_B){
@@ -27,8 +27,27 @@ function Tf_idf($frequency_A, $frequency_B){
     else{
         return "failed";
     }
+
+    #$freq_of_word / $words_in_text * log($number_of_texts / $tets_with_this_word)
+
+
 }
 
+
+/**
+ *
+ * Ко всему корпусу:
+ *
+ *
+ * НО:
+ *
+ * 1. remove in all langs 2 most freq words
+ * 2. remove all NB < 0
+ *
+ * @param number of documents
+ * @param number of documents where this word occurs
+ *
+ */
 
 
 
