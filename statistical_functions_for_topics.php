@@ -16,14 +16,15 @@ function NaiveBayes($total_word_freq, $freq, $coef_of_succes, $fail_score){
  *
  * отдельно для каждого текста
  *
- * @param integer $freq_of_word the frequency of this particular word in the whole corpus
- * @param integer $words_in_text total number
+ * @param integer $freq_of_word_in_this_text the frequency of this particular word in this particular document
+ * @param integer $words_in_text total number of words in this text
+ * @param integer $number_of_texts_in_corpus total number of documents in the whole corpus
  * @param integer $texts_with_this_word number of texts where this word occures
  *
  */
-function Tf_idf($freq_of_word, $words_in_text, $number_of_texts, $texts_with_this_word){
+function Tf_idf($freq_of_word_in_this_text, $words_in_text, $number_of_texts_in_corpus, $texts_with_this_word){
 
-    #$freq_of_word / $words_in_text * log($number_of_texts / $texts_with_this_word)
+    return $freq_of_word_in_this_text / $words_in_text * log($number_of_texts_in_corpus / $texts_with_this_word);
 
 }
 

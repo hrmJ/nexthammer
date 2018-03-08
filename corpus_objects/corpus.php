@@ -5,7 +5,7 @@
  * A collection of multiple texts
  *
  * @param integer $total_words
- * @param Array $documents individual documents in this collection of texts
+ * @param Array $documents individual documents in this collection of texts. THe keys of this array are the codes of the documents.
  * @param Array $noun_frequencies individual lemmas in this collection of texts and their frequencies in the whole corpus
  *
  */
@@ -14,16 +14,26 @@ class Corpus extends CorpusObject{
     protected $total_words = 0;
     protected $documents = Array();
     protected $noun_frequencies = Array();
-    protected $data = null;
 
-    /**
-     * 
-     * Adds a new document to this corpus
-     * 
-     */
+        /**
+        * 
+        * Adds a new document to this corpus
+        * 
+        */
         public function AddDocument($doc){
-            $this->documents[] = $doc;
+            $this->documents[$doc->GetCode()] = $doc;
             return $this;
+        }
+
+        /**
+        * 
+        * Gets a document from the list of documents by code
+        *
+        * @param string $code the Code of the document to be retrieved
+        * 
+        */
+        public function GetDocument($code){
+            return $this->documents[$code];
         }
 
         /**
@@ -123,14 +133,13 @@ class Corpus extends CorpusObject{
         }
     }
 
-
     /**
      * 
-     * Outputs the data peoduced in json format
+     * Get the list of stopwords
      * 
      */
-    public function OutputJson(){
-        echo json_encode($this->data);
+    public function GetStopWords(){
+        return $this->stopwords;
     }
 
 }

@@ -8,6 +8,7 @@
  * @param $total_words
  * @param string $code the code of the text in the database
  * @param Array $noun_frequencies individual lemmas in this document and their frequencies
+ * @param Corpus $corpus Reference to the parent corpus of the text
  *
  */
 class Document extends CorpusObject{
@@ -16,6 +17,7 @@ class Document extends CorpusObject{
     protected $code = "";
     protected $lang = "";
     protected $addr = Array();
+    protected $corpus = null;
     protected $noun_frequencies = Array();
 
     /**
@@ -30,10 +32,31 @@ class Document extends CorpusObject{
 
     /**
      * 
+     * Sets the code of the texts
      * 
      */
     public function SetCode($code){
         $this->code = $code;
+        return $this;
+    }
+
+    /**
+     * 
+     * Gets the code of the texts
+     * 
+     */
+    public function GetCode(){
+        return $this->code;
+    }
+
+    /**
+     * 
+     * Sets the corpus of the text
+     * 
+     * @param Corpus $corpus the parent corpus object
+     */
+    public function SetParentCorpus($corpus){
+        $this->corpus = $corpus;
         return $this;
     }
 
@@ -79,19 +102,19 @@ class Document extends CorpusObject{
      * @param boolean $filtershort Whether or not to filter out short words
      * 
      */
-    public function SetNounFrequencyByLemma($stopwords, $filtershort=true){
-        $noun_patterns = PickNoun($this->lang);
-        $noun_string = implode(', ', CreatePgInPattern($noun_patterns, 3));
-        $stopword_string = implode(', ', CreatePgInPattern($stopwords, 3 + sizeof($noun_patterns)));
+    public function SetNounFrequencyByLemma($filtershort=true){
+        $noun_pattern = new InPattern(PickNoun($this->lang), 3);
+        $stopword_pattern = new InPattern($this->corpus->GetStopwords(), 
+            3 + sizeof($noun_pattern->list));
         $query = "SELECT lemma, count(*) FROM lemma_{$this->lang} 
                   WHERE linktotext IN 
                       (SELECT linktotext FROM pos_{$this->lang}
-                          WHERE pos IN ($noun_string) 
+                          WHERE pos IN ({$noun_pattern->GetPattern()}) 
                           AND ID between $1 AND $2)
-                  AND lemma NOT IN ($stopword_string)
+                  AND lemma NOT IN ({$stopword_pattern->GetPattern()}) 
                   GROUP BY lemma ORDER BY count DESC";
         $result = pg_query_params($this->con, $query, 
-            array_merge($this->address, $noun_patterns, $stopwords));
+            array_merge($this->address, $noun_pattern->list, $stopword_pattern->list));
         $freqs = pg_fetch_all($result);
 
         $this->noun_frequencies = Array();
@@ -139,6 +162,29 @@ class Document extends CorpusObject{
         }
         return $this;
     }
+
+
+    /**
+     * 
+     * Creates a frequency list for outputting.
+     * 
+     */
+    public function CreateFrequencyTableForTopicWords(){
+        foreach($this->noun_frequencies as $lemma => $freq){
+            #$tf_idf = Tf_idf($freq, 
+            #    $this->total_words,
+            #    $number_of_texts_in_corpus
+            #);
+            #function Tf_idf($freq_of_word_in_this_text, $words_in_text, $number_of_texts_in_corpus, $texts_with_this_word){
+            $this->data[] = Array(
+                "lemma" => $lemma,
+                "freq" => $freq,
+                "tf_idf" => 0
+            );
+        }
+        return $this;
+    }
+
 
 
 }
