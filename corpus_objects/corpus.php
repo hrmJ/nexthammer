@@ -21,35 +21,35 @@ class Corpus extends CorpusObject{
      * Adds a new document to this corpus
      * 
      */
-    public function AddDocument($doc){
-        $this->documents[] = $doc;
-        return $this;
-    }
-
-    /**
-     * 
-     * Adds a connection to the dbmain database
-     * 
-     */
-    public function SetConnectionToMain($con){
-        $this->maincon = $con;
-        return $this;
-    }
-
-
-    /**
-     * 
-     * Counts the total number of words in this collection
-     * 
-     */
-    public function CountAllWords(){
-        $total = 0;
-        foreach($this->documents as $doc){
-            $doc->SetTotalWords();
-            $total += $doc->GetTotalWords();
+        public function AddDocument($doc){
+            $this->documents[] = $doc;
+            return $this;
         }
-        $this->total_words = $total;
-        return $this;
+
+        /**
+         * 
+         * Adds a connection to the dbmain database
+         * 
+         */
+        public function SetConnectionToMain($con){
+            $this->maincon = $con;
+            return $this;
+        }
+
+
+        /**
+         * 
+         * Counts the total number of words in this collection
+         * 
+         */
+        public function CountAllWords(){
+            $total = 0;
+            foreach($this->documents as $doc){
+                $doc->SetTotalWords();
+                $total += $doc->GetTotalWords();
+            }
+            $this->total_words = $total;
+            return $this;
     }
 
     /**

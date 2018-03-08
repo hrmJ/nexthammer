@@ -37,11 +37,9 @@ class Document extends CorpusObject{
         return $this;
     }
 
-
-
     /**
      *
-     * get the address of the text in the database
+     * sets the address of the text in the database
      * 
      */
     public function setaddr(){
@@ -50,21 +48,23 @@ class Document extends CorpusObject{
         return $this;
     }
 
-
     /**
      * 
      *  Fetches the total number of words in this document
      */
     public function SetTotalWords(){
         if($this->total_words === 0){
-            $result = pg_query_params($this->con, "select count(*) FROM txt_{$this->lang} WHERE id BETWEEN $1 AND $2",
-                array($this->address[0],$this->address[1]));
+            $result = pg_query_params($this->con,
+                "select count(*) FROM txt_{$this->lang} 
+                WHERE id BETWEEN $1 AND $2
+                AND funct = $3",
+                array($this->address[0],$this->address[1], "word"));
             $this->total_words = pg_fetch_row($result)[0]*1;
         }
     }
 
     /**
-     *  Get the number of words
+     *  Gets the number of words
      */
     public function GetTotalWords(){
         return $this->total_words;
