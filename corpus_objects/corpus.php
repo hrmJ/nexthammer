@@ -36,15 +36,6 @@ class Corpus extends CorpusObject{
             return $this->documents[$code];
         }
 
-        /**
-         * 
-         * Adds a connection to the dbmain database
-         * 
-         */
-        public function SetConnectionToMain($con){
-            $this->maincon = $con;
-            return $this;
-        }
 
 
         /**
@@ -61,6 +52,31 @@ class Corpus extends CorpusObject{
             $this->total_words = $total;
             return $this;
     }
+
+    /**
+     * 
+     * Gets the number of texts in the corpus. If $word specified, gets
+     * only the texts where the specified word occurs.
+     *
+     * @param string $word Count only the number of texts with this word
+     * 
+     */
+    public function GetNumberOfTexts($word=""){
+        if($word){
+            $no = 0;
+            foreach($this->documents as $code => $doc){
+                $doc->SetNounFrequencyByLemma();
+                if(array_key_exists($word, $doc->GetNounFrequencyByLemma())){
+                    $no++;
+                }
+            }
+            return $no;
+        }
+        else{
+            return sizeof($this->documents);
+        }
+    }
+
 
     /**
      * 

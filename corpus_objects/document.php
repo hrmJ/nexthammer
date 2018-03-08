@@ -84,6 +84,8 @@ class Document extends CorpusObject{
                 array($this->address[0],$this->address[1], "word"));
             $this->total_words = pg_fetch_row($result)[0]*1;
         }
+
+        return $this;
     }
 
     /**
@@ -103,25 +105,27 @@ class Document extends CorpusObject{
      * 
      */
     public function SetNounFrequencyByLemma($filtershort=true){
-        $noun_pattern = new InPattern(PickNoun($this->lang), 3);
-        $stopword_pattern = new InPattern($this->corpus->GetStopwords(), 
-            3 + sizeof($noun_pattern->list));
-        $query = "SELECT lemma, count(*) FROM lemma_{$this->lang} 
-                  WHERE linktotext IN 
-                      (SELECT linktotext FROM pos_{$this->lang}
-                          WHERE pos IN ({$noun_pattern->GetPattern()}) 
-                          AND ID between $1 AND $2)
-                  AND lemma NOT IN ({$stopword_pattern->GetPattern()}) 
-                  GROUP BY lemma ORDER BY count DESC";
-        $result = pg_query_params($this->con, $query, 
-            array_merge($this->address, $noun_pattern->list, $stopword_pattern->list));
-        $freqs = pg_fetch_all($result);
+        if(!$this->noun_frequencies){
+            $noun_pattern = new InPattern(PickNoun($this->lang), 3);
+            $stopword_pattern = new InPattern($this->corpus->GetStopwords(), 
+                3 + sizeof($noun_pattern->list));
+            $query = "SELECT lemma, count(*) FROM lemma_{$this->lang} 
+                      WHERE linktotext IN 
+                          (SELECT linktotext FROM pos_{$this->lang}
+                              WHERE pos IN ({$noun_pattern->GetPattern()}) 
+                              AND ID between $1 AND $2)
+                      AND lemma NOT IN ({$stopword_pattern->GetPattern()}) 
+                      GROUP BY lemma ORDER BY count DESC";
+            $result = pg_query_params($this->con, $query, 
+                array_merge($this->address, $noun_pattern->list, $stopword_pattern->list));
+            $freqs = pg_fetch_all($result);
 
-        $this->noun_frequencies = Array();
-        foreach($freqs as $row){
-            if (FilterThisWord($row["lemma"]) or !$filtershort){ 
-                //Filtering out short words and other unwanted words
-                $this->noun_frequencies[$row["lemma"]] = $row["count"]*1;
+            $this->noun_frequencies = Array();
+            foreach($freqs as $row){
+                if (FilterThisWord($row["lemma"]) or !$filtershort){ 
+                    //Filtering out short words and other unwanted words
+                    $this->noun_frequencies[$row["lemma"]] = $row["count"]*1;
+                }
             }
         }
         return $this;
@@ -171,21 +175,19 @@ class Document extends CorpusObject{
      */
     public function CreateFrequencyTableForTopicWords(){
         foreach($this->noun_frequencies as $lemma => $freq){
-            #$tf_idf = Tf_idf($freq, 
-            #    $this->total_words,
-            #    $number_of_texts_in_corpus
-            #);
-            #function Tf_idf($freq_of_word_in_this_text, $words_in_text, $number_of_texts_in_corpus, $texts_with_this_word){
+            $tf_idf = Tf_idf($freq, 
+                $this->total_words,
+                $this->corpus->GetNumberOfTexts(),
+                $this->corpus->GetNumberOfTexts($lemma)
+            );
             $this->data[] = Array(
                 "lemma" => $lemma,
                 "freq" => $freq,
-                "tf_idf" => 0
+                "tf_idf" => $tf_idf
             );
         }
         return $this;
     }
-
-
 
 }
 

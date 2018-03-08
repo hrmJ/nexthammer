@@ -51,14 +51,15 @@ $(document).ready(function(){
         var $this_container = $launcher.parents(".item_for_comparison");
         $.getJSON("get_texts.php",{"lang":thislang},function(textlist){
             $ul = $("<ul>");
-            var $select_all = $("<a href='javascript:void(0)'>Select all</a>");
-            $select_all.click(function(){
-                $(".textlist_container [type='checkbox']").click();
-            })
-            $ul.append($select_all);
+            //var $select_all = $("<a href='javascript:void(0)'>Select all</a>");
+            //$select_all.click(function(){
+            //    $(".textlist_container [type='checkbox']").click();
+            //})
+            //$ul.append($select_all);
             $.each(textlist,function(idx,el){
-                var $gal = $("<span><input type='checkbox' value='" + el.code + "'></input></span>");
-                var $name = $("<span>" + el.title + "</span>");
+                var $gal = $("<span><input type='hidden' value='" + el.code + "'></input></span>");
+                var $name = $("<a href='javascript:void(0)' class='document_link'>" + el.title + "</a>");
+                $name.click(function(){console.log("prooo");});
                 var $li = $("<li>").append($gal).append($name);
                 $ul.append($li);
             });

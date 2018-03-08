@@ -12,14 +12,6 @@ class CorpusObject{
 
     protected $data = Array();
 
-    /**
-     * @param Connection $con connection to psql database of the corpus in question
-     */
-    public function __construct($con){
-        $this->con = $con;
-        return $this;
-    }
-
 
     /**
      * 
@@ -30,5 +22,35 @@ class CorpusObject{
         echo json_encode($this->data);
     }
 
+    /**
+     * 
+     * Gets the data of this object
+     * 
+     */
+    public function GetData(){
+        return $this->data;
+    }
+
+    /**
+     * 
+     * Sets a connection to the corpus-specific database
+     * 
+     */
+    public function SetConnectionToCorpus($con){
+        $this->con = $con;
+        return $this;
+    }
+
+    /**
+     * 
+     * Adds a connection to the dbmain database
+     * 
+     */
+    public function SetConnectionToMain($con){
+        $this->maincon = $con;
+        return $this;
+    }
+
 }
+
 ?>
