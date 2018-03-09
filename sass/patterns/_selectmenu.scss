@@ -1,0 +1,14 @@
+//Jqueryn selectmenu-elementtiin liittyviä säätöjä
+
+.other-option{
+    justify-content:space-between;
+    input{
+        max-width:100px;
+        margin-right:5px;
+    }
+}
+
+.ui-selectmenu-menu,.ui-selectmenu-button{
+
+    font-size:0.8em;
+}

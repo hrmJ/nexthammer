@@ -1,0 +1,16 @@
+@charset "utf-8";
+//Hallintaikkunassa näytettävä viesti-ikkuna
+
+.msgbox{
+    display:none;
+    font-size:0.72em;
+    background: $navfg;
+    color:$navbg;
+    border-radius:2px;
+    @include shadow;
+    padding: 2em;
+    position:absolute;
+    top:1em;
+    left:1em;
+    z-index:9999;
+}

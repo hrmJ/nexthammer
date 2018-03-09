@@ -1,0 +1,11 @@
+// lightbox-tyyppinen ikkuna
+.my-lightbox{
+    position:absolute;
+    background:$lightbg;
+    margin-left:2em;
+    margin-top:1.5em;
+    z-index:1;
+    @include shadow;
+    padding:1em;
+    display:none;
+}

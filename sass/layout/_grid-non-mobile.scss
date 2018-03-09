@@ -1,0 +1,13 @@
+// Perusasettelu ja elementtien rivitys suuremmille näytöille
+
+@media only screen and (min-width: 920px){
+    header{
+        display:block;
+    }
+
+
+    main {
+        padding-left:$contpadding;
+    }
+
+}

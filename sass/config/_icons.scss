@@ -1,0 +1,24 @@
+
+@mixin hamburger-icon($color, $size){
+    // Inspiration from https://css-tricks.com/three-line-menu-navicon/
+
+    .hamburger-icon {
+      @include pointer;
+      border:0px;
+      position: relative;
+      margin-left:10px;
+      padding-left: 1.25*$size;
+    }
+
+    .hamburger-icon:before {
+      content: "";
+      position: absolute;
+      top: 0.25*$size;
+      left: 0;
+      width: $size;
+      height: 0.125*$size;
+      border-top: 0.375*$size double $color;
+      border-bottom: 0.125*$size solid $color;
+    }
+
+}

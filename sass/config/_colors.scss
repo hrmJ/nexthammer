@@ -1,0 +1,21 @@
+
+$navbg: #ffffff;
+$navfg: lighten(black,15%);
+
+$lightbg: #eeebe9;
+$contbg: #ffffff;
+
+$rowstripe:grey;
+$datarowbg: darken(#f3f3f3,10%);
+$blurcolor:rgba(128, 128, 128, 0.8);
+
+$lyricscellbg: #A4B6AA;
+$lightboxbg: white;
+$layout_editor_font: #655c5c;
+
+$commentheaderbg: $datarowbg;
+
+@mixin datahiglight{
+    background: lighten($navbg,10%);
+    color: $navfg;
+}

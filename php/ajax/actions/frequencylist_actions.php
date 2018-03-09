@@ -13,8 +13,7 @@
 function DocumentStats($corpus, $codes, $picked_code, $lang){
     foreach($codes as $code){
         $doc = new Document();
-        $doc->SetConnectionToCorpus($corpus->con)
-            ->SetParentCorpus($corpus)
+        $doc->SetParentCorpus($corpus)
             ->SetCode($code)
             ->SetLang($lang)
             ->SetAddr();

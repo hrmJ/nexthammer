@@ -1,0 +1,77 @@
+//Navigointipalkin ulkoasu
+
+nav{
+    position:relative;
+    height: $navheight;
+    width:100%;
+    background:$navbg;
+    color: $navfg;
+    border-bottom: 1px solid lighten($navfg, 50%);
+    padding-bottom: 1em;
+    margin-bottom:0;
+
+    .dropdown{
+        margin-top: $navheight;
+        display: none;
+    }
+
+    li{
+        list-style-type:none;
+        a{
+            color: $navfg;
+        }
+    }
+}
+
+.menubelow{
+    display: none;
+    width: 100vw;
+    min-height: 20vh;
+    padding: 1em;
+    margin-top:0;
+    background: $lightbg;
+
+    li{
+        list-style-type:none;
+    }
+
+    a{
+        color: $navfg;
+        text-decoration:none;
+
+        &:hover{
+            text-decoration:underline;
+            @include pointer;
+        }
+    }
+}
+
+
+//@include hamburger-icon($navfg, $navheight - 5px);
+
+
+@media only screen and (min-width: 520px){
+
+
+    nav{
+
+
+        .hamburger{
+            display:none;
+        }
+
+        li {
+            //Näytä menu avattuna vaakasuunnassa, jos näyttö tarpeeksi iso
+            display: inline;
+        }
+
+        li + li {
+            margin-left: 10px;
+        }
+
+        .dropdown{
+            margin-top:0px;
+            display: block;
+        }
+    }
+}

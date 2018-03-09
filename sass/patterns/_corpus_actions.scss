@@ -1,0 +1,37 @@
+
+.text_examiner{
+
+    li{
+        margin-top:0.4em;
+    }
+
+    li.text_details{
+        margin-left:2em;
+        display:none;
+        list-style-type:none;
+    }
+
+
+    li.actionlist{
+        list-style-type:none;
+
+        color: $navfg;
+        text-decoration:none;
+
+        &:hover{
+            text-decoration:underline;
+            @include pointer;
+        }
+
+        &::before{
+            content: '\25BA';
+        }
+
+        &.opened::before{
+            content: '\25BC';
+        }
+
+    }
+
+
+}

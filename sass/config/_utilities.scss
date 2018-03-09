@@ -1,0 +1,27 @@
+$rootpath: '../';
+$paths: ('icons':$rootpath + "assets/images/icons/",
+         'bg':$rootpath + "assets/images/bg/",
+         );
+
+$hamburger: map-get($paths,"icons") + "hamburger.svg";
+$contpadding: 3em;
+
+.hidden{
+    display:none;
+}
+
+@mixin pointer{
+    cursor: pointer;
+}
+
+@mixin shadow{
+  -moz-box-shadow:    2px 2px 3px 4px #5f5f5f;
+  -webkit-box-shadow: 2px 2px 3px 4px #5f5f5f;
+  box-shadow:         2px 2px 3px 4px #5f5f5f;
+}
+
+@mixin shadow{
+  -moz-box-shadow:    2px 2px 8px 4px #5f5f5f;
+  -webkit-box-shadow: 2px 2px 8px 4px #5f5f5f;
+  box-shadow:         2px 2px 8px 4px #5f5f5f;
+}

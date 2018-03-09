@@ -1,0 +1,10 @@
+//Diojen esikatseluikkuna
+
+.preview-window{
+    position:absolute;
+    z-index:3;
+    border:none;
+    @include shadow;
+    padding:1em;
+    background:white;
+}

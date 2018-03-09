@@ -1,0 +1,56 @@
+// Perusasettelu ja elementtien rivitys mobile first -periaatteella
+
+body{
+    padding:0px;
+    margin:0px;
+    background: #ffffff;
+}
+
+
+header{
+    display:none;
+}
+
+main{
+    display: flex;
+    flex-flow: column;
+    align-items: stretch;
+    //> * {
+    //    width:100%;
+    //    display:flex;
+    //    justify-content: center;
+    //}
+
+}
+
+
+.container{
+    display: flex;
+    flex-flow: column wrap;
+    width:100%;
+    margin-left: auto;
+    margin-right: auto;
+    background: $contbg;
+    padding-bottom:3em;
+}
+
+
+.innercontent{
+    display: flex;
+    flex-flow: column wrap;
+    align-items:stretch;
+    flex: 0 0 $tablewidth;
+    width:95%;
+}
+
+.basic-flex{
+    display:flex;
+    > div {
+        margin-right:1em;
+    }
+}
+
+.data_picker{
+    font-size:0.8em;
+}
+

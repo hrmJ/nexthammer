@@ -1,0 +1,15 @@
+//Otsikkotyylit
+
+h1, h2, h3, h4{
+    font-family: $roboto;
+}
+
+h2{
+    padding-bottom:0.5em;
+}
+
+h3{
+    //border-left:3px solid $navbg;
+    //padding-left:1em;
+    color:lighten(black,30%);
+}

@@ -66,7 +66,8 @@ class Document extends CorpusObject{
      * 
      */
     public function setaddr(){
-        $result = pg_query_params($this->con, "select startaddr, finaddr from librarysrc where code = $1",array($this->code));
+        $result = pg_query_params($this->corpus->corpuscon,
+            "select startaddr, finaddr from librarysrc where code = $1",array($this->code));
         $this->address = pg_fetch_row($result);
         return $this;
     }
@@ -77,7 +78,7 @@ class Document extends CorpusObject{
      */
     public function SetTotalWords(){
         if($this->total_words === 0){
-            $result = pg_query_params($this->con,
+            $result = pg_query_params($this->corpus->corpuscon,
                 "select count(*) FROM txt_{$this->lang} 
                 WHERE id BETWEEN $1 AND $2
                 AND funct = $3",
@@ -113,14 +114,15 @@ class Document extends CorpusObject{
                       WHERE linktotext IN 
                           (SELECT linktotext FROM pos_{$this->lang}
                               WHERE pos IN ({$noun_pattern->GetPattern()}) 
-                              AND ID between $1 AND $2)
+                              AND linktotext between $1 AND $2)
                       AND lemma NOT IN ({$stopword_pattern->GetPattern()}) 
                       GROUP BY lemma ORDER BY count DESC";
-            $result = pg_query_params($this->con, $query, 
+            $result = pg_query_params($this->corpus->corpuscon, $query, 
                 array_merge($this->address, $noun_pattern->list, $stopword_pattern->list));
             $freqs = pg_fetch_all($result);
 
             $this->noun_frequencies = Array();
+               
             foreach($freqs as $row){
                 if (FilterThisWord($row["lemma"]) or !$filtershort){ 
                     //Filtering out short words and other unwanted words

@@ -1,0 +1,14 @@
+//Google fonts
+
+@import url('https://fonts.googleapis.com/css?family=Lustria|Noto+Serif');
+
+
+$lustria: 'Lustria', serif;
+$roboto: 'Roboto', sans-serif;
+
+$datafontsize: 1.0em;
+
+body{
+    color:lighten(black,40%);
+    font-family: $roboto;
+}
