@@ -1,6 +1,7 @@
 //Navigointipalkin ulkoasu
 
 nav{
+    font-size:0.9em;
     position:relative;
     height: $navheight;
     width:100%;
@@ -20,23 +21,39 @@ nav{
         a{
             color: $navfg;
         }
+
+        &.menu-launcher{
+            &:hover{
+                @include pointer;
+                text-decoration:underline;
+            }
+        }
     }
+
 }
 
 .menubelow{
+    position:absolute;
+    z-index:10;
     display: none;
     width: 100vw;
     min-height: 20vh;
     padding: 1em;
     margin-top:0;
-    background: $lightbg;
+    background: $actionmenubg;
+
+    h2{
+        font-size:0.9em;
+        color:#eacca4;
+    }
 
     li{
         list-style-type:none;
     }
 
     a{
-        color: $navfg;
+        font-size:0.8em;
+        color: $menulink_color;
         text-decoration:none;
 
         &:hover{
@@ -46,6 +63,28 @@ nav{
     }
 }
 
+
+aside{
+    display:none;
+    height:100%;
+    position:absolute;
+    border-right:1px solid darken($lightbg,20%);
+    padding-left:1em;
+    padding-right:0.5em;
+    background:white;
+
+    h4{
+
+        font-size:0.7em;
+    
+    }
+
+}
+
+
+.over-container{
+    position:relative;
+}
 
 //@include hamburger-icon($navfg, $navheight - 5px);
 

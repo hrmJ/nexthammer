@@ -7,13 +7,151 @@
  */
 var Corpusdesktop = function(){
 
-    function Table(){
 
-        var $table = $("<table></table>");
-        var $head = $("<thead></thead>");
-        var $container = $("<div class='data-table-container'></div>");
-        var $body = $("<tbody></tbody>");
-        var $header = undefined;
+    //Object containing the jquery objects that can be presented
+    //on the corpus desktop. The keys will be unique ids, which
+    //will be linked to the corresponding "add to dekstop " link
+
+    var ElementList = {};
+
+    //This variable reocords, which element is being dragged
+    var CurrentElement = undefined;
+
+    
+    /**
+     *
+     * 
+     *
+     */
+    function AddDesktopEvents(){
+    
+        $(".drop-target")
+            .on("dragover",function(event){
+                event.preventDefault();  
+                event.stopPropagation();
+                console.log("over");
+                //$(this).addClass("drop-highlight").text("Siirrä tähän");
+            })
+            .on("dragleave",function(event){
+                console.log("left");
+                event.preventDefault();  
+                event.stopPropagation();
+                //$(this).text("").removeClass("drop-highlight");
+            })
+            .on("drop",function(event){
+                console.log("moi!");
+                event.preventDefault();  
+                event.stopPropagation();
+                var $cont = $(this).parent();
+                //if(!$cont.find(`div > input[value='${CurrentElement.id}']`).length){
+                    //if this object has not been added yet on the desktop
+                    var $dropped_object = CurrentElement.$container.clone(true);
+                    $dropped_object.append($(`<input type='hidden' value='${CurrentElement.id}'></input>`))
+                    $dropped_object.find(".data-table-menu").remove();
+                    if($cont.find(".data-table-container").length){
+                        $cont.find(".data-table-container:last-of-type").after($dropped_object);
+                    }
+                    else{
+                        $cont.prepend($dropped_object);
+                    }
+                //}
+            });
+    };
+
+
+    /**
+     *
+     * Updates the list of dekstop elements, from which the user 
+     * can choose the elements that will be displayed on the "corpus desktop"
+     * and can be e.g. compared with each other.
+     *
+     */
+    function UpdateVisibleElementList(){
+        $("#desktop_element_list").html("");
+        $.each(ElementList,function(id, element){
+            var $li = 
+                $(`<li draggable='true'>
+                    <input type='hidden' class='desktop_object_id' value='${id}'></input>
+                        ${element.name}
+                    </li>`);
+            $li.on("dragstart",function(){ 
+                        CurrentElement = ElementList[$(this).find(".desktop_object_id").val()];
+            });
+            $("#desktop_element_list").append($li);
+        });
+    
+    }
+
+
+    /**
+     *
+     * Represents a basic building block of the elements that can be saved
+     * as a desktop element. This can be concordance lists, frequency lists etc.
+     *
+     **/
+    function DesktopObject(){
+        var self = this;
+        this.$container = $("<div class='data-table-container'></div>");
+        //Functionality related to data tables and other types of desktop objects:
+        this.id = Utilities.uuidv4();
+        this.$menu = $(`<div class='data-table-menu'>
+            <input type='hidden' class='desktop_object_id' value='${this.id}'></input>`);
+        $a = $("<a href='javascript:void(0)'>Add to desktop</a>");
+        $a.click(function(){ self.AddToDesktop($(this).parent()); });
+        this.$menu.append($a);
+        this.name = "";
+
+        /**
+         *
+         * Sets the name of the table
+         *
+         * @param name the name of the table
+         *
+         */
+        this.SetName = function(name){
+            this.name = name;
+            return this;
+        }
+
+        /**
+         *
+         * Adds this element to the list of desktop objects
+         * @param $parent_el the parent of the link that fired the event
+         *
+         */
+        this.AddToDesktop = function($parent_el){
+            ElementList[this.id] = this;
+            UpdateVisibleElementList();
+            var msg = new Utilities.Message("Added the table to desktop objects", $parent_el);
+            msg.Show(3000);
+            return this;
+        }
+
+    };
+
+
+    /**
+     *
+     * A dekstop element formatted as an html table. Inherits from
+     * DesktopObject.
+     *
+     */
+    function Table(){
+        DesktopObject.call(this);
+        this.$table = $("<table></table>");
+        this.$head = $("<thead></thead>");
+        this.$body = $("<tbody></tbody>");
+        this.$header = undefined;
+
+
+        /**
+         *
+         * Adds the functionality available for each table, such as 
+         * saving for comparison etc.
+         *
+         **/
+        this.AddTableFunctions = function(){
+        };
 
         /**
          *
@@ -21,11 +159,12 @@ var Corpusdesktop = function(){
          *
          **/
         this.SetHeader = function(column_names){
-            self = this;
             var $tr = $("<tr></tr>");
+            $tr.append("<td>No.</td>");
             $.each(column_names,function(idx,column_name){
                 $tr.append($(`<td>${column_name}</td>`));
             });
+            this.$head.append($tr);
             return this;
         };
 
@@ -45,7 +184,7 @@ var Corpusdesktop = function(){
             $.each(data_table,function(row_idx, row){
                 var $tr = $("<tr></tr>");
                 //NOTICE: the first column is always the row indices. By default,
-                $tr.append($(`<td class='row_name'>{idx}</td>`));
+                $tr.append($(`<td class='row_name'>${row_idx + 1}</td>`));
                 $.each(row,function(column, value){
                     $tr.append($(`<td>${value}</td>`));
                 });
@@ -61,7 +200,12 @@ var Corpusdesktop = function(){
          *
          */
         this.BuildOutput = function(){
-            this.$table.append(this.$head).append(this.$body);
+            this.$container
+                .append(this.$menu)
+                .append(this.$table
+                    .append(this.$head)
+                    .append(this.$body)
+                );
             return this;
         };
 
@@ -69,18 +213,14 @@ var Corpusdesktop = function(){
     
     }
 
-    function TopicFrequencyTable(){
+    Table.prototype = Object.create(DesktopObject.prototype);
 
-        Table.call(this);
-    
-    }
-
-
-    TopicFrequencyTable.prototype = Object.create(Table.prototype);
 
 
     return{
         Table,
+        ElementList,
+        AddDesktopEvents
     };
 
 }();

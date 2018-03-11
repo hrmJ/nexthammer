@@ -65,21 +65,9 @@ var CorpusActions = function(){
                 function(data){
                     msg.Destroy();
                     $parent_li.addClass("opened");
-                    var $table = $("<table></table>");
-                    var $head = $("<thead></thead>");
-                    $head.append($("<tr><td>No.</td><td>Lemma</td><td>Freq</td><td>TF_IDF</td></tr>"));
-                    $table.append($head);
-                    var $body = $("<tbody></tbody>");
-                    $.each(data,function(idx, el){
-                        $body.append($(`<tr>
-                            <td>${idx + 1}</td>
-                            <td>${el.lemma}</td>
-                            <td>${el.freq}</td>
-                            <td>${el.tf_idf}</td>
-                            </tr>`));
-                    });
-                    $body.appendTo($table);
-                    $table.appendTo($details_li.hide());
+                    var freqlist = new Corpusdesktop.Table();
+                    freqlist.SetName(picked_code).SetHeader(["Lemma","Freq","TF_IDF"]).SetRows(data).BuildOutput();
+                    freqlist.$container.appendTo($details_li.hide());
                     $details_li.slideDown()
                 }
             );

@@ -12,7 +12,7 @@ $(document).ready(function(){
             Loaders.ListLanguagesInThisCorpus(corpus_name);
         });
     //Displaying the current subcorpus
-    $(".current_subcorpus a").click(function(){$(".textpicker").fadeToggle()});
+    $(".current_subcorpus").click(function(){$(".textpicker").fadeToggle()});
     //Open the actions subwindow
     $(".select_action button").click(function(){
         if(!$("#corpusaction").is(":visible")){
@@ -37,4 +37,11 @@ $(document).ready(function(){
     });
     //Basic lightbox hiding functionality
     $(".boxclose").click(function(){$(this).parents(".my-lightbox").fadeOut()});
+    //Corpus desktop
+    $("#show_desktop_objects_link").click(function(){
+        $("aside").slideToggle();
+    })
+    //Events for the corpus desktop
+    Corpusdesktop.AddDesktopEvents();
+
 });

@@ -1,0 +1,29 @@
+
+.data-table-menu{
+    font-size:0.7em;
+    color: $navfg;
+
+    a{
+        text-decoration:none;
+        font-weight:bold;
+        color:$linknormal;
+
+        &:hover{
+            text-decoration:underline;
+        }
+    }
+
+}
+
+.innercontent{
+
+    .data-table-container{
+        font-size:0.7em;
+    }
+    .data-table-container + .data-table-container{
+        border-left:1px solid $lightbg;
+        margin-left:0.4em;
+        padding-left:0.41em;
+    }
+
+}

@@ -1,6 +1,9 @@
 
 $navbg: #ffffff;
 $navfg: lighten(black,15%);
+$actionmenubg: rgba(130, 124, 124, 0.95);
+
+$menulink_color: #c7d8d8;
 
 $lightbg: #eeebe9;
 $contbg: #ffffff;
@@ -14,6 +17,8 @@ $lightboxbg: white;
 $layout_editor_font: #655c5c;
 
 $commentheaderbg: $datarowbg;
+
+$linknormal: #1c5a90;
 
 @mixin datahiglight{
     background: lighten($navbg,10%);

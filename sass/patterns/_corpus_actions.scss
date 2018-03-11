@@ -1,4 +1,26 @@
 
+li.actionlist{
+    list-style-type:none;
+
+    color: $navfg;
+    text-decoration:none;
+
+    &:hover{
+        text-decoration:underline;
+        @include pointer;
+    }
+
+    &::before{
+        content: '\25BA';
+    }
+
+    &.opened::before{
+        content: '\25BC';
+    }
+
+}
+
+
 .text_examiner{
 
     li{
@@ -12,26 +34,6 @@
     }
 
 
-    li.actionlist{
-        list-style-type:none;
-
-        color: $navfg;
-        text-decoration:none;
-
-        &:hover{
-            text-decoration:underline;
-            @include pointer;
-        }
-
-        &::before{
-            content: '\25BA';
-        }
-
-        &.opened::before{
-            content: '\25BC';
-        }
-
-    }
 
 
 }

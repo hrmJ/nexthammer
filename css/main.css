@@ -18,7 +18,8 @@ header {
 main {
   display: flex;
   flex-flow: column;
-  align-items: stretch; }
+  align-items: stretch;
+  flex: 1 1 auto; }
 
 .container {
   display: flex;
@@ -30,11 +31,7 @@ main {
   padding-bottom: 3em; }
 
 .innercontent {
-  display: flex;
-  flex-flow: column wrap;
-  align-items: stretch;
-  flex: 0 0 90%;
-  width: 95%; }
+  min-height: 100vh; }
 
 .basic-flex {
   display: flex; }
@@ -60,6 +57,7 @@ h3 {
   color: #4d4d4d; }
 
 nav {
+  font-size: 0.9em;
   position: relative;
   height: 40px;
   width: 100%;
@@ -75,22 +73,45 @@ nav {
     list-style-type: none; }
     nav li a {
       color: #262626; }
+    nav li.menu-launcher:hover {
+      cursor: pointer;
+      text-decoration: underline; }
 
 .menubelow {
+  position: absolute;
+  z-index: 10;
   display: none;
   width: 100vw;
   min-height: 20vh;
   padding: 1em;
   margin-top: 0;
-  background: #eeebe9; }
+  background: rgba(130, 124, 124, 0.95); }
+  .menubelow h2 {
+    font-size: 0.9em;
+    color: #eacca4; }
   .menubelow li {
     list-style-type: none; }
   .menubelow a {
-    color: #262626;
+    font-size: 0.8em;
+    color: #c7d8d8;
     text-decoration: none; }
     .menubelow a:hover {
       text-decoration: underline;
       cursor: pointer; }
+
+aside {
+  display: none;
+  height: 100%;
+  position: absolute;
+  border-right: 1px solid #c2b7af;
+  padding-left: 1em;
+  padding-right: 0.5em;
+  background: white; }
+  aside h4 {
+    font-size: 0.7em; }
+
+.over-container {
+  position: relative; }
 
 @media only screen and (min-width: 520px) {
   nav .hamburger {
@@ -102,6 +123,23 @@ nav {
   nav .dropdown {
     margin-top: 0px;
     display: block; } }
+.data-table-menu {
+  font-size: 0.7em;
+  color: #262626; }
+  .data-table-menu a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #1c5a90; }
+    .data-table-menu a:hover {
+      text-decoration: underline; }
+
+.innercontent .data-table-container {
+  font-size: 0.7em; }
+.innercontent .data-table-container + .data-table-container {
+  border-left: 1px solid #eeebe9;
+  margin-left: 0.4em;
+  padding-left: 0.41em; }
+
 .my-lightbox {
   position: absolute;
   background: #eeebe9;
@@ -175,20 +213,21 @@ a.boxclose {
   list-style-type: none;
   margin-bottom: 1em; }
 
+li.actionlist {
+  list-style-type: none;
+  color: #262626;
+  text-decoration: none; }
+  li.actionlist:hover {
+    text-decoration: underline;
+    cursor: pointer; }
+  li.actionlist::before {
+    content: '\25BA'; }
+  li.actionlist.opened::before {
+    content: '\25BC'; }
+
 .text_examiner li {
   margin-top: 0.4em; }
 .text_examiner li.text_details {
   margin-left: 2em;
   display: none;
   list-style-type: none; }
-.text_examiner li.actionlist {
-  list-style-type: none;
-  color: #262626;
-  text-decoration: none; }
-  .text_examiner li.actionlist:hover {
-    text-decoration: underline;
-    cursor: pointer; }
-  .text_examiner li.actionlist::before {
-    content: '\25BA'; }
-  .text_examiner li.actionlist.opened::before {
-    content: '\25BC'; }

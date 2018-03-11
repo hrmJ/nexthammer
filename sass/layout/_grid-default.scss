@@ -15,6 +15,7 @@ main{
     display: flex;
     flex-flow: column;
     align-items: stretch;
+    flex: 1 1 auto;
     //> * {
     //    width:100%;
     //    display:flex;
@@ -36,11 +37,7 @@ main{
 
 
 .innercontent{
-    display: flex;
-    flex-flow: column wrap;
-    align-items:stretch;
-    flex: 0 0 $tablewidth;
-    width:95%;
+    min-height:100vh;
 }
 
 .basic-flex{
