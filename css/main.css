@@ -123,6 +123,9 @@ aside {
   nav .dropdown {
     margin-top: 0px;
     display: block; } }
+thead {
+  font-weight: bold; }
+
 .data-table-menu {
   font-size: 0.7em;
   color: #262626; }

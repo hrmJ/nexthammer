@@ -4,6 +4,7 @@
  *
  **/
 
+
 var Utilities = function(){
 
     /**
@@ -91,3 +92,16 @@ var Utilities = function(){
 
 }();
 
+
+//
+// https://stackoverflow.com/questions/16648076/sort-array-on-key-value
+Array.prototype.sortOn = function(key){
+    this.sort(function(a, b){
+        if(a[key] < b[key]){
+            return -1;
+        }else if(a[key] > b[key]){
+            return 1;
+        }
+        return 0;
+    });
+}

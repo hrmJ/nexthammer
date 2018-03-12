@@ -142,6 +142,10 @@ var Corpusdesktop = function(){
         this.$head = $("<thead></thead>");
         this.$body = $("<tbody></tbody>");
         this.$header = undefined;
+        //Save each column as a separate value to make sorting faster
+        this.columns = {};
+        //IMportant to keep order
+        this.column_names = [];
 
 
         /**
@@ -159,13 +163,44 @@ var Corpusdesktop = function(){
          *
          **/
         this.SetHeader = function(column_names){
+            var self = this;
             var $tr = $("<tr></tr>");
             $tr.append("<td>No.</td>");
             $.each(column_names,function(idx,column_name){
-                $tr.append($(`<td>${column_name}</td>`));
+                var $col_header = $(`<td>${column_name}</td>`);
+                $col_header.click(function(){self.OrderBy($(this))});
+                $tr.append($col_header);
             });
             this.$head.append($tr);
             return this;
+        };
+
+        /**
+         *
+         * Orders the table by a specific column
+         *
+         * @param $launcher the column headerthat fired the event
+         *
+         **/
+        this.OrderBy = function($launcher){
+            var self = this;
+            var data_table = [];
+            var sortby = $launcher.text().toLowerCase();
+            self.columns[sortby].sortOn("value")
+            $.each(self.columns[sortby],function(idx,row){
+                var thisrow = {};
+                $.each(self.column_names,function(colname_idx,colname){
+                    thisrow[colname] = self.columns[colname][idx]
+                })
+                data_table.push(thisrow);
+            });
+            this.SetRows(data_table).BuildOutput;
+            //$launcher.parents(".data-table-container").find("table").remove();
+            //$launcher.parents(".data-table-container").append(self.)
+            //console.log(data_table);
+            //$each(this.$body.find("tr"),function(idx,row){
+            //
+            //});
         };
 
         /**
@@ -186,6 +221,19 @@ var Corpusdesktop = function(){
                 //NOTICE: the first column is always the row indices. By default,
                 $tr.append($(`<td class='row_name'>${row_idx + 1}</td>`));
                 $.each(row,function(column, value){
+                    //Add to the separate column array, too
+                    if(column in  self.columns){
+                    }
+                    else{
+                        self.columns[column] = [];
+                    }
+                    if(column in self.column_names){
+                    }
+                    else{
+                        self.column_names.push(column);
+                    }
+                    self.columns[column].push({"value":value,"idx":row_idx});
+                    //ACtual html representation
                     $tr.append($(`<td>${value}</td>`));
                 });
                 self.$body.append($tr);

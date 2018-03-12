@@ -45,5 +45,11 @@ function Tf_idf($freq_of_word_in_this_text, $words_in_text, $number_of_texts_in_
  */
 
 
+// RESULT
+// 1. Отсекасеми минусовые по NB (?)
+// 2. если tf_idf = 0
+// 3. порог
+//
+//
 
 ?>

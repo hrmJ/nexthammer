@@ -185,7 +185,8 @@ class Document extends CorpusObject{
             $this->data[] = Array(
                 "lemma" => $lemma,
                 "freq" => $freq,
-                "tf_idf" => $tf_idf
+                "tf_idf" => $tf_idf,
+                "nb" => NaiveBayes($this->total_words,$freq, 0.95, 0.05)
             );
         }
         return $this;

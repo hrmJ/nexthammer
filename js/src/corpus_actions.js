@@ -66,7 +66,7 @@ var CorpusActions = function(){
                     msg.Destroy();
                     $parent_li.addClass("opened");
                     var freqlist = new Corpusdesktop.Table();
-                    freqlist.SetName(picked_code).SetHeader(["Lemma","Freq","TF_IDF"]).SetRows(data).BuildOutput();
+                    freqlist.SetName(picked_code).SetHeader(["Lemma","Freq","TF_IDF","NB"]).SetRows(data).BuildOutput();
                     freqlist.$container.appendTo($details_li.hide());
                     $details_li.slideDown()
                 }
