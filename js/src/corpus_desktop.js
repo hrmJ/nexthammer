@@ -74,7 +74,9 @@ var Corpusdesktop = function(){
                     <input type='hidden' class='desktop_object_id' value='${id}'></input>
                         ${element.name}
                     </li>`);
-            $li.on("dragstart",function(){ 
+            $li.on("dragstart",function(event){ 
+                        //For firefox combatibility
+                         event.originalEvent.dataTransfer.setData('text/plain', 'anything');
                         CurrentElement = ElementList[$(this).find(".desktop_object_id").val()];
             });
             $("#desktop_element_list").append($li);
