@@ -6,6 +6,51 @@
 
 var CorpusActions = function(){
 
+    /**
+     *
+     * Basic characteristics about a collection of texts. E.g. frequency lists etc.
+     *
+     **/
+    var SubCorpusCharacteristics = {
+    
+        /**
+         *
+         * Print a frequency list
+         *
+         **/
+        PrintFrequencyList: function(){
+            var self = this;
+            $(".my-lightbox").hide();
+            params = {
+                action:"corpus_frequency_list",
+                codes: Loaders.GetPickedCodes(),
+                lang: Loaders.GetPickedLang()
+            };
+            var msg = new Utilities.Message("Loading...", $(".container"));
+            msg.Show(9999999);
+            $.getJSON("php/ajax/get_frequency_list.php", params,
+                function(data){
+                    msg.Destroy();
+                    var freqlist = new Corpusdesktop.Table();
+                    freqlist
+                        .SetName("Frequencylist (the whole subcorpus)")
+                        .SetHeader(["Lemma","Freq","NB"])
+                        .SetRows(data).BuildOutput();
+                    freqlist.$container.appendTo($("#texts_to_examine").html(""));
+                    $(".text_examiner").fadeIn();
+                }
+            );
+        }
+
+        
+    }
+    
+
+    /**
+     *
+     * Determining what words are typical for  a certain document
+     *
+     **/
     var ExamineTopics = {
 
         /**
@@ -79,6 +124,7 @@ var CorpusActions = function(){
     return {
     
         ExamineTopics,
+        SubCorpusCharacteristics
     
     };
 

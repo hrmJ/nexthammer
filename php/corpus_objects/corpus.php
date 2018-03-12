@@ -33,6 +33,26 @@ class Corpus extends CorpusObject{
 
         /**
         * 
+        * Builds a subcorpus based on document codes
+        *
+        * @param Array $codes  The identifier codes of the documents to be included
+        * @param Array $lang  The language of the 
+        * 
+        */
+        public function SetSubCorpus($codes, $lang){
+            foreach($codes as $code){
+                $doc = new Document();
+                $doc->SetParentCorpus($this)
+                    ->SetCode($code)
+                    ->SetLang($lang)
+                    ->SetAddr();
+                $this->AddDocument($doc);
+            }
+            return $this;
+        }
+
+        /**
+        * 
         * Sets the languages available in the corpus
         *
         * 
@@ -205,12 +225,10 @@ class Corpus extends CorpusObject{
         $fail_score = 0.05;
         foreach($this->noun_frequencies as $lemma => $freq){
             $nb = NaiveBayes($this->total_words, $freq,  $coef_of_succes, $fail_score);
-            $tf_idf = 0;
             $this->data[] = Array(
                 "lemma" => $lemma,
                 "freq" => $freq,
                 "nb" => $nb,
-                "tf_idf" => $tf_idf
             );
         }
         return $this;

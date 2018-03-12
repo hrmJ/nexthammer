@@ -40,6 +40,7 @@
              <h2>Actions available for this (sub)corpus:</h2>
             <ul>
                 <li><a class='ExamineTopics DisplayTexts' href='javascript:void(0);'>Examine topics in individual texts of the selected subcorpus</a></li>
+                <li><a class='SubCorpusCharacteristics PrintFrequencyList' href='javascript:void(0);'>Examine word frequencies in the whole subcorpus</a></li>
             </ul>
         </div>
         

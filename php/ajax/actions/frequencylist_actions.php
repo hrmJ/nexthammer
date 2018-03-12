@@ -1,5 +1,7 @@
 <?php
 
+
+
 /**
  *
  *  Output information about one document
@@ -11,20 +13,27 @@
  *
  */
 function DocumentStats($corpus, $codes, $picked_code, $lang){
-    foreach($codes as $code){
-        $doc = new Document();
-        $doc->SetParentCorpus($corpus)
-            ->SetCode($code)
-            ->SetLang($lang)
-            ->SetAddr();
-        $corpus->AddDocument($doc);
-    }
-
+    $corpus->SetSubCorpus($codes, $lang);
     $corpus->GetDocument($picked_code)
         ->SetTotalWords()
         ->SetNounFrequencyByLemma()
         ->CreateFrequencyTableForTopicWords();
+}
 
+/**
+ *
+ *  Output information about a whole subcorpus
+ *
+ * @param Corpus $corpus the (empty) collection of texts that will be processed
+ * @param string $codes codes of the documents that will build the $corpus 
+ * @param string $lang the language of the subcorpus
+ *
+ */
+function SubcorpusStats($corpus, $codes, $lang){
+    $corpus->SetSubCorpus($codes, $lang);
+    $corpus->SetNounFrequencyByLemma()
+        ->CountAllWords()
+        ->CreateFrequencyTableForTopicWords();
 }
 
 
