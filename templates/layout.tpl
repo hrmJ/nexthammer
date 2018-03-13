@@ -3,11 +3,11 @@
 <head>
 <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
-<link href="css/main.css" rel="stylesheet" type="text/css">
+<link href="css/main.css?id=43053432" rel="stylesheet" type="text/css">
 <link href="../js_libraries/jquery-ui-1.12.1.custom/jquery-ui.min.css" rel="stylesheet" type="text/css">
 <script src="../js_libraries/jquery-3.2.1.min.js"></script>
 <script src="../js_libraries/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
-<script src="js/build/main.js"></script>
+<script src="js/build/main.js?id=43053432"></script>
 </head>
 <body>
 
