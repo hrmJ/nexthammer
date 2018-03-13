@@ -28,6 +28,10 @@ switch($_GET["action"]){
         SubcorpusStats($corpus, $_GET["codes"], $_GET["lang"]);
         $corpus->OutputJson();
         break;
+    case "corpus_ngram_list":
+        Ngrams($corpus, $_GET["codes"], $_GET["lang"], $_GET["n"]);
+        $corpus->OutputJson();
+        break;
 }
 
 

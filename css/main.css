@@ -41,6 +41,9 @@ main {
 .data_picker {
   font-size: 0.8em; }
 
+.some-margin {
+  margin: 1em; }
+
 @media only screen and (min-width: 920px) {
   header {
     display: block; }
@@ -248,8 +251,12 @@ li.actionlist {
     cursor: pointer; }
   li.actionlist::before {
     content: '\25BA'; }
-  li.actionlist.opened::before {
-    content: '\25BC'; }
+
+.closed::before {
+  content: '\25BA'; }
+
+.opened::before {
+  content: '\25BC'; }
 
 .text_examiner li {
   margin-top: 0.4em; }

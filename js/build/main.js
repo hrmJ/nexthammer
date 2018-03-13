@@ -609,13 +609,54 @@ var CorpusActions = function(){
      *
      **/
     var SubCorpusCharacteristics = {
+
+        /**
+         * Show options related to ngrams
+         *
+         */
+        DisplayNgramOptions: function(){
+            $("#ngrams_params_menu").slideToggle();
+            $(".DisplayNgramOptions").toggleClass("opened").toggleClass("closed");
+        },
     
+        /**
+         *
+         * Print an ngram list
+         *
+         */
+        PrintNgramList: function(){
+            $("#corpusaction").hide();
+            var self = this;
+            $(".my-lightbox").hide();
+            params = {
+                action:"corpus_ngram_list",
+                codes: Loaders.GetPickedCodes(),
+                lang: Loaders.GetPickedLang(),
+                n:  $("[name='ngram_n_number']").val()*1 || 2
+            };
+            var msg = new Utilities.Message("Loading...", $(".container"));
+            msg.Show(9999999);
+            $.getJSON("php/ajax/get_frequency_list.php", params,
+                function(data){
+                    msg.Destroy();
+                    var freqlist = new Corpusdesktop.Table();
+                    freqlist
+                        .SetName("Ngrams (the whole subcorpus)")
+                        .SetHeader(["Ngram","Freq"])
+                        .SetRows(data).BuildOutput();
+                    freqlist.$container.appendTo($("#texts_to_examine").html(""));
+                    $(".text_examiner").fadeIn();
+                }
+            );
+        },
+
         /**
          *
          * Print a frequency list
          *
-         **/
+         */
         PrintFrequencyList: function(){
+            $("#corpusaction").hide();
             var self = this;
             $(".my-lightbox").hide();
             params = {
@@ -660,6 +701,7 @@ var CorpusActions = function(){
          **/
         DisplayOptions: function(){
             $("#topic_params_menu").slideToggle();
+            $(".DisplayOptions").toggleClass("opened").toggleClass("closed");
         },
 
         /**
@@ -866,7 +908,8 @@ $(document).ready(function(){
     //Defining possible actions on corpora
     $("#corpusaction a, #corpusaction button").click(function(){
         $(".select_action button").text("Select action");
-        var actions = $(this).attr("class").split(" ");
+        var actions = $(this).attr("class").replace(/ *(opened|closed) */g,"").split(" ");
+        console.log(actions);
         if(actions.length == 2){
             CorpusActions[actions[0]][actions[1]]();
         }

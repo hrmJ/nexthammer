@@ -5,7 +5,6 @@
  *
  * One text in the corpus
  *
- * @param $total_words
  * @param string $code the code of the text in the database
  * @param Array $noun_frequencies individual lemmas in this document and their frequencies
  * @param Corpus $corpus Reference to the parent corpus of the text
@@ -13,12 +12,10 @@
  */
 class Document extends CorpusObject{
 
-    protected $total_words = 0;
     protected $code = "";
     protected $lang = "";
     protected $addr = Array();
     protected $corpus = null;
-    protected $noun_frequencies = Array();
 
     /**
      * 
@@ -96,12 +93,50 @@ class Document extends CorpusObject{
         return $this->total_words;
     }
 
+
+    /**
+     * 
+     * Fetches all the ngrams from the document and counts
+     * their frequency
+     *
+     * @param integer $n which grams (2,3,4,5...)
+     * @param boolean $filtershort Whether or not to filter out short words
+     * 
+     */
+    public function SetNgramFrequency($n, $filtershort=true){
+        $wordcols = Array();
+        $leadwordcols = "token, ";
+        for($i=1;$i<=$n;$i++){
+            $wordcols[] = "n$i";
+            $leadwordcols .= " LEAD(token, $i) OVER() AS n$i, ";
+        };
+        $leadwordcols = trim($leadwordcols," ,");
+        $wordcolstring = implode(" || ' ' || ", $wordcols);
+        $query = "SELECT ngram, count(*) FROM
+             (SELECT $wordcolstring as ngram FROM
+             (SELECT $leadwordcols FROM txt_en WHERE funct = 'word'
+                AND id between $1 AND $2
+             ) AS q)
+             AS ngramq GROUP BY ngram ORDER BY count DESC";
+        $result = pg_query_params($this->corpus->corpuscon, $query, 
+            $this->address);
+
+        $freqs = pg_fetch_all($result);
+        $this->ngram_frequencies = Array();
+           
+        foreach($freqs as $row){
+            $this->ngram_frequencies[$row["ngram"]] = $row["count"]*1;
+        }
+
+        return $this;
+    }
+
+
     /**
      * 
      * Fetches all the lemmas of every noun in the document
      * an counts their frequencies
      *
-     * @param Array $stopwords Array of lemmas that won't be taken into the list
      * @param boolean $filtershort Whether or not to filter out short words
      * 
      */
@@ -131,13 +166,6 @@ class Document extends CorpusObject{
             }
         }
         return $this;
-    }
-
-    /**
-     *  Get the frequency list set by SetNounFrequencyByLemma
-     */
-    public function GetNounFrequencyByLemma(){
-        return $this->noun_frequencies;
     }
 
 

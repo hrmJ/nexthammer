@@ -35,7 +35,8 @@ $(document).ready(function(){
     //Defining possible actions on corpora
     $("#corpusaction a, #corpusaction button").click(function(){
         $(".select_action button").text("Select action");
-        var actions = $(this).attr("class").split(" ");
+        var actions = $(this).attr("class").replace(/ *(opened|closed) */g,"").split(" ");
+        console.log(actions);
         if(actions.length == 2){
             CorpusActions[actions[0]][actions[1]]();
         }

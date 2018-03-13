@@ -14,12 +14,17 @@ li.actionlist{
         content: '\25BA';
     }
 
-    &.opened::before{
-        content: '\25BC';
-    }
 
 }
 
+
+.closed::before{
+    content: '\25BA';
+}
+
+.opened::before{
+    content: '\25BC';
+}
 
 .text_examiner{
 

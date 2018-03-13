@@ -37,5 +37,22 @@ function SubcorpusStats($corpus, $codes, $lang){
 }
 
 
+/**
+ *
+ * List ngrams in a subcorpus / corpus
+ *
+ * @param Corpus $corpus the (empty) collection of texts that will be processed
+ * @param string $codes codes of the documents that will build the $corpus 
+ * @param string $lang the language of the subcorpus
+ * @param integer $n which grams (2,3,4...)
+ *
+ */
+function Ngrams($corpus, $codes, $lang, $n){
+    $corpus->SetSubCorpus($codes, $lang);
+    $corpus->SetNgramFrequency($n)
+        ->CreateNgramTable();
+}
+
+
 ?>
 
