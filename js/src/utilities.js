@@ -95,13 +95,26 @@ var Utilities = function(){
 
 //
 // https://stackoverflow.com/questions/16648076/sort-array-on-key-value
-Array.prototype.sortOn = function(key){
-    this.sort(function(a, b){
-        if(a[key] < b[key]){
-            return -1;
-        }else if(a[key] > b[key]){
-            return 1;
-        }
-        return 0;
-    });
+Array.prototype.sortOn = function(key, direction){
+    var direction = direction || "desc";
+    if (direction == "asc"){
+        this.sort(function(a, b){
+            if(a[key] < b[key]){
+                return -1;
+            }else if(a[key] > b[key]){
+                return 1;
+            }
+            return 0;
+        });
+    }
+    else{
+        this.sort(function(a, b){
+            if(a[key] > b[key]){
+                return -1;
+            }else if(a[key] < b[key]){
+                return 1;
+            }
+            return 0;
+        });
+    }
 }

@@ -95,15 +95,28 @@ var Utilities = function(){
 
 //
 // https://stackoverflow.com/questions/16648076/sort-array-on-key-value
-Array.prototype.sortOn = function(key){
-    this.sort(function(a, b){
-        if(a[key] < b[key]){
-            return -1;
-        }else if(a[key] > b[key]){
-            return 1;
-        }
-        return 0;
-    });
+Array.prototype.sortOn = function(key, direction){
+    var direction = direction || "desc";
+    if (direction == "asc"){
+        this.sort(function(a, b){
+            if(a[key] < b[key]){
+                return -1;
+            }else if(a[key] > b[key]){
+                return 1;
+            }
+            return 0;
+        });
+    }
+    else{
+        this.sort(function(a, b){
+            if(a[key] > b[key]){
+                return -1;
+            }else if(a[key] < b[key]){
+                return 1;
+            }
+            return 0;
+        });
+    }
 }
 
 /**
@@ -256,16 +269,23 @@ var Corpusdesktop = function(){
         this.columns = {};
         //IMportant to keep order
         this.column_names = [];
-
+        this.current_column = undefined;
 
         /**
          *
-         * Adds the functionality available for each table, such as 
-         * saving for comparison etc.
+         * Construct the menu, by which actions can be performed related to one column.
+         * E.g. sorting, highlighting.
          *
          **/
-        this.AddTableFunctions = function(){
-        };
+        this.BuildColumnActionMenu = function(){
+            var self = this;
+            this.$column_action_menu = $("<ul class='column_action_menu'></ul>");
+            this.$column_action_menu.append(
+                $("<li>Order by (ascending)</li>")
+                .click(function(){self.OrderBy("asc")}));
+            this.$column_action_menu.append($("<li>Order by (descending)</li>")
+                .click(function(){self.OrderBy("desc")}));
+        }
 
         /**
          *
@@ -275,36 +295,49 @@ var Corpusdesktop = function(){
         this.SetHeader = function(column_names){
             var self = this;
             var $tr = $("<tr></tr>");
-            $tr.append("<td>No.</td>");
+            $tr.append("<th>No.</th>");
             $.each(column_names,function(idx,column_name){
-                var $col_header = $(`<td>${column_name}</td>`);
-                $col_header.click(function(){self.OrderBy($(this))});
+                var $col_header = $(`<th>${column_name}</th>`);
+                $col_header.click(function(){self.ShowHeaderMenu($(this))});
                 $tr.append($col_header);
             });
             this.$head.append($tr);
             return this;
         };
 
+
+        /**
+         *
+         * Shows a menu of different actions for each column header
+         *
+         **/
+        this.ShowHeaderMenu = function($launcher){
+            this.current_column = $launcher.text().toLowerCase();
+            return this;
+        };
         /**
          *
          * Orders the table by a specific column
          *
-         * @param $launcher the column headerthat fired the event
+         * @param string direction asc or desc
          *
          **/
-        this.OrderBy = function($launcher){
+        this.OrderBy = function(direction){
+            var msg = new Utilities.Message("Loading...", this.$menucontainer);
+            msg.Show(3);
             var self = this;
             var data_table = [];
-            var sortby = $launcher.text().toLowerCase();
-            self.columns[sortby].sortOn("value")
-            $.each(self.columns[sortby],function(idx,row){
-                var thisrow = {};
-                $.each(self.column_names,function(colname_idx,colname){
-                    thisrow[colname] = self.columns[colname][idx]
-                })
-                data_table.push(thisrow);
-            });
-            this.SetRows(data_table).BuildOutput;
+            //self.columns[this.current_column].sortOn("value", direction)
+            //$.each(self.columns[this.current_column],function(idx,row){
+            //    var thisrow = {};
+            //    $.each(self.column_names,function(colname_idx,colname){
+            //        thisrow[colname] = self.columns[colname][idx].value;
+            //    })
+            //    data_table.push(thisrow);
+            //});
+            //this.$body.html("");
+            //this.SetRows(data_table);
+            msg.Destroy();
             //$launcher.parents(".data-table-container").find("table").remove();
             //$launcher.parents(".data-table-container").append(self.)
             //console.log(data_table);
@@ -358,8 +391,10 @@ var Corpusdesktop = function(){
          *
          */
         this.BuildOutput = function(){
+            this.BuildColumnActionMenu();
             this.$container
                 .append(this.$menu)
+                .append(this.$column_action_menu)
                 .append(this.$table
                     .append(this.$head)
                     .append(this.$body)

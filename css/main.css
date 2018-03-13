@@ -125,6 +125,8 @@ aside {
     display: block; } }
 thead {
   font-weight: bold; }
+  thead td {
+    cursor: pointer; }
 
 .data-table-menu {
   font-size: 0.7em;
@@ -135,6 +137,17 @@ thead {
     color: #1c5a90; }
     .data-table-menu a:hover {
       text-decoration: underline; }
+
+.column_action_menu {
+  display: none; }
+  .column_action_menu li {
+    list-style-type: none;
+    display: inline;
+    cursor: pointer; }
+    .column_action_menu li + li {
+      margin-left: 0.2em;
+      padding-left: 0.2em;
+      border-left: 1px solid black; }
 
 .innercontent .data-table-container {
   font-size: 0.7em; }

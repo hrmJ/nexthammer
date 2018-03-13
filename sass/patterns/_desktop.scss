@@ -2,8 +2,13 @@
 thead{
     
     font-weight:bold;
+    td{
+
+        @include pointer;
+    }
 
 }
+
 
 .data-table-menu{
     font-size:0.7em;
@@ -19,6 +24,22 @@ thead{
         }
     }
 
+}
+
+
+.column_action_menu{
+    display:none;
+     li{
+        list-style-type:none;
+        display: inline;
+        @include  pointer;
+
+        & + li{
+            margin-left:0.2em;
+            padding-left:0.2em;
+            border-left: 1px solid black;
+        }
+    }
 }
 
 .innercontent{
