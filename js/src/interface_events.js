@@ -23,6 +23,15 @@ $(document).ready(function(){
         }
         $("#corpusaction").slideToggle()
     });
+    $(".select_other_function button").click(function(){
+        if(!$("#other_functions_menu").is(":visible")){
+            $(this).text("Hide functionmenu");
+        }
+        else{
+            $(this).text("Other functions");
+        }
+        $("#other_functions_menu").slideToggle()
+    });
     //Defining possible actions on corpora
     $("#corpusaction a").click(function(){
         $("#corpusaction").hide();
@@ -33,6 +42,16 @@ $(document).ready(function(){
         }
         else{
             CorpusActions[actions[0]]();
+        }
+    });
+    //Defining possible corpus management actions 
+    $("#other_functions_menu a").click(function(){
+        var actions = $(this).attr("class").split(" ");
+        if(actions.length == 2){
+            CorpusManagementActions[actions[0]][actions[1]]();
+        }
+        else{
+            CorpusManagementActions[actions[0]]();
         }
     });
     //Basic lightbox hiding functionality

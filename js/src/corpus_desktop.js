@@ -20,11 +20,15 @@ var Corpusdesktop = function(){
     
     /**
      *
-     * 
+     *  Attaches events, specifically related to the corpus desktop
      *
      */
     function AddDesktopEvents(){
     
+        $("#clead_dt_link").click(function(){
+            ClearElements();
+        });
+
         $(".drop-target")
             .on("dragover",function(event){
                 event.preventDefault();  
@@ -58,6 +62,17 @@ var Corpusdesktop = function(){
             });
     };
 
+    /**
+     *
+     * Clears the list of desktop elements
+     *
+     **/
+    function ClearElements(){
+        ElementList = {};
+        UpdateVisibleElementList();
+        $(".innercontent .data-table-container").remove();
+    };
+
 
     /**
      *
@@ -77,6 +92,8 @@ var Corpusdesktop = function(){
             $li.on("dragstart",function(event){ 
                         //For firefox combatibility
                          event.originalEvent.dataTransfer.setData('text/plain', 'anything');
+                        //Hide the dekstop menu
+                        //$("aside").slideUp();
                         CurrentElement = ElementList[$(this).find(".desktop_object_id").val()];
             });
             $("#desktop_element_list").append($li);

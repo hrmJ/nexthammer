@@ -249,6 +249,20 @@ class Corpus extends CorpusObject{
         }
     }
 
+
+    /**
+     * 
+     * Adds a lemma that the user wants to exclude from frequency lists
+     * 
+     * @param string $word the word to be added
+     *
+     */
+    public function AddNewStopWord($word){
+        $result = pg_query_params($this->maincon, "INSERT INTO topicwords_stopwords (lemma) VALUES ($1)",
+            Array($word));
+        return $this;
+    }
+
     /**
      * 
      * Get the list of stopwords

@@ -33,6 +33,7 @@ nav{
 }
 
 .menubelow{
+    color:white;
     position:absolute;
     z-index:10;
     display: none;
@@ -71,12 +72,21 @@ aside{
     border-right:1px solid darken($lightbg,20%);
     padding-left:1em;
     padding-right:0.5em;
-    background:white;
+    background:rgba(243, 240, 240, 0.87);
 
     h4{
 
         font-size:0.7em;
     
+    }
+
+    a{
+        font-size:0.61em;
+        color:darken($menulink_color,30%);
+    }
+
+    li{
+        @include pointer;
     }
 
 }

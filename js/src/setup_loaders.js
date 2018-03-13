@@ -122,7 +122,7 @@ var Loaders = function(){
                     $.each(textlist,function(idx,el){
                         var $gal = $("<span><input type='checkbox' checked='true' value='" 
                             + el.code + "'></input></span>");
-                        var $name = $("<span>" + el.title + "</span>");
+                        var $name = $(`<span> <strong>${el.code}:</strong> <span class='el_title'>${el.title}</span> </span>`);
                         var $li = $("<li>").append($gal).append($name);
                         $ul.append($li);
                     });

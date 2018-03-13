@@ -141,11 +141,15 @@ var Corpusdesktop = function(){
     
     /**
      *
-     * 
+     *  Attaches events, specifically related to the corpus desktop
      *
      */
     function AddDesktopEvents(){
     
+        $("#clead_dt_link").click(function(){
+            ClearElements();
+        });
+
         $(".drop-target")
             .on("dragover",function(event){
                 event.preventDefault();  
@@ -179,6 +183,17 @@ var Corpusdesktop = function(){
             });
     };
 
+    /**
+     *
+     * Clears the list of desktop elements
+     *
+     **/
+    function ClearElements(){
+        ElementList = {};
+        UpdateVisibleElementList();
+        $(".innercontent .data-table-container").remove();
+    };
+
 
     /**
      *
@@ -198,6 +213,8 @@ var Corpusdesktop = function(){
             $li.on("dragstart",function(event){ 
                         //For firefox combatibility
                          event.originalEvent.dataTransfer.setData('text/plain', 'anything');
+                        //Hide the dekstop menu
+                        //$("aside").slideUp();
                         CurrentElement = ElementList[$(this).find(".desktop_object_id").val()];
             });
             $("#desktop_element_list").append($li);
@@ -543,7 +560,7 @@ var Loaders = function(){
                     $.each(textlist,function(idx,el){
                         var $gal = $("<span><input type='checkbox' checked='true' value='" 
                             + el.code + "'></input></span>");
-                        var $name = $("<span>" + el.title + "</span>");
+                        var $name = $(`<span> <strong>${el.code}:</strong> <span class='el_title'>${el.title}</span> </span>`);
                         var $li = $("<li>").append($gal).append($name);
                         $ul.append($li);
                     });
@@ -699,6 +716,83 @@ var CorpusActions = function(){
 
 /**
  *
+ * Additional functionality for the interface: managing corpora, adding
+ * stopwords etc.
+ *
+ **/
+
+var CorpusManagementActions = function(){
+
+    /**
+     *
+     * Managing stopwords for frequency lists etc.
+     *
+     **/
+    var ManageStopWords = {
+    
+        /**
+         *
+         * Print a list of the current stopwords
+         *
+         * @param dontslide boolean whether or not to display the slide down animation
+         *
+         **/
+        PrintCurrentStopWords: function(dontslide){
+            var self = this;
+            var dontslide = dontslide || false;
+            $.getJSON("php/ajax/corpus_management.php", {"action":"list_stopwords"},
+                function(stopwords){
+                    var $ul = $("<ul class='datalist'></ul>");
+                    var $add_new = $("<li>");
+                    $add_new.append("<input type='text' placeholder='Add a new stopword'></input>")
+                            .append($("<button> Add </button>")
+                                    .click(function(){
+                                        var stopword = $(this).prev().val();
+                                        self.AddNewStopWord(stopword);
+                                    })
+                                    );
+                    $ul.append($add_new);
+                    $.each(stopwords,function(idx,word){
+                        $ul.append(`<li>${word}</li>`)
+                    });
+                    var $li = $(".PrintCurrentStopWords:eq(0)").parent();
+                    $li.find("ul").remove();
+                    $li.append($ul);
+                    if(!dontslide){
+                        $ul.hide().slideDown();
+                    }
+                }
+            );
+        },
+
+        /**
+         *
+         * Adds a new stopword to the database
+         *
+         * @param stopword the word to be added
+         *
+         **/
+        AddNewStopWord: function(stopword){
+            var self = this;
+            $.get("php/ajax/corpus_management.php",{"action":"insert_stopword","new_word":stopword},
+            function(){
+                self.PrintCurrentStopWords(true);
+            });
+        }
+
+    }
+
+
+
+    return {
+        ManageStopWords,
+    
+    };
+
+}();
+
+/**
+ *
  * Adds the basic functinality to the interface by attaching the relevant events
  *
  **/
@@ -722,6 +816,15 @@ $(document).ready(function(){
         }
         $("#corpusaction").slideToggle()
     });
+    $(".select_other_function button").click(function(){
+        if(!$("#other_functions_menu").is(":visible")){
+            $(this).text("Hide functionmenu");
+        }
+        else{
+            $(this).text("Other functions");
+        }
+        $("#other_functions_menu").slideToggle()
+    });
     //Defining possible actions on corpora
     $("#corpusaction a").click(function(){
         $("#corpusaction").hide();
@@ -732,6 +835,16 @@ $(document).ready(function(){
         }
         else{
             CorpusActions[actions[0]]();
+        }
+    });
+    //Defining possible corpus management actions 
+    $("#other_functions_menu a").click(function(){
+        var actions = $(this).attr("class").split(" ");
+        if(actions.length == 2){
+            CorpusManagementActions[actions[0]][actions[1]]();
+        }
+        else{
+            CorpusManagementActions[actions[0]]();
         }
     });
     //Basic lightbox hiding functionality

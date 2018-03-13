@@ -20,6 +20,7 @@
             <li class="lang_select"></li>
             <li class="current_subcorpus menu-launcher">Current subcorpus: <span class='texts_picked'>0</span> texts</li>
             <li class="menucontainer select_action"><button>Select action</button></li>
+            <li class="menucontainer select_other_function"><button>Other functions</button></li>
         </ul>
     </nav>
 
@@ -37,14 +38,23 @@
 
 
         <div class='menubelow' id="corpusaction">
-             <h2>Actions available for this (sub)corpus:</h2>
+            <h2>Actions available for this (sub)corpus:</h2>
             <ul>
                 <li><a class='ExamineTopics DisplayTexts' href='javascript:void(0);'>Examine topics in individual texts of the selected subcorpus</a></li>
                 <li><a class='SubCorpusCharacteristics PrintFrequencyList' href='javascript:void(0);'>Examine word frequencies in the whole subcorpus</a></li>
             </ul>
         </div>
+
+        <div class='menubelow' id="other_functions_menu">
+            <h2>Other functions</h2>
+            <ul>
+                <li><a class='ManageStopWords PrintCurrentStopWords' href='javascript:void(0);'>Manage stopwords</a></li>
+            </ul>
+        </div>
         
         <aside>
+
+            <p><a href='javascript:void(0)' id='clead_dt_link'>Clear desktop</a></p>
 
             <h4>Elements available in the corpus desktop</h4>
 
