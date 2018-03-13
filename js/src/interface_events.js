@@ -33,8 +33,7 @@ $(document).ready(function(){
         $("#other_functions_menu").slideToggle()
     });
     //Defining possible actions on corpora
-    $("#corpusaction a").click(function(){
-        $("#corpusaction").hide();
+    $("#corpusaction a, #corpusaction button").click(function(){
         $(".select_action button").text("Select action");
         var actions = $(this).attr("class").split(" ");
         if(actions.length == 2){

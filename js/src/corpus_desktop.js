@@ -208,7 +208,7 @@ var Corpusdesktop = function(){
          *
          **/
         this.ShowHeaderMenu = function($launcher){
-            this.current_column = $launcher.text().toLowerCase();
+            this.current_column = $launcher.index();
             return this;
         };
         /**
@@ -219,27 +219,40 @@ var Corpusdesktop = function(){
          *
          **/
         this.OrderBy = function(direction){
-            var msg = new Utilities.Message("Loading...", this.$menucontainer);
-            msg.Show(3);
             var self = this;
-            var data_table = [];
-            //self.columns[this.current_column].sortOn("value", direction)
-            //$.each(self.columns[this.current_column],function(idx,row){
-            //    var thisrow = {};
-            //    $.each(self.column_names,function(colname_idx,colname){
-            //        thisrow[colname] = self.columns[colname][idx].value;
-            //    })
-            //    data_table.push(thisrow);
-            //});
-            //this.$body.html("");
-            //this.SetRows(data_table);
+            var msg = new Utilities.Message("Loading...", this.$menucontainer);
+            msg.Show(333);
+            var rows = this.$body.find("tr").get();
+            rows.sort(function(a,b){
+                var keyA = $(a).children('td').eq(self.current_column).text();
+                var keyB = $(b).children('td').eq(self.current_column).text();
+                if (!isNaN(keyA*1)){
+                    keyA = keyA*1;
+                    keyB = keyB*1;
+                }
+                else{
+                    console.log("alphabetic!");
+                    keyA = $.trim(keyA).toUpperCase();
+                    keyB = $.trim(keyB).toUpperCase();
+                }
+                console.log(keyA + ">>" + keyB);
+                if ( direction == "asc" ){
+                    if( keyA < keyB ) return -1;
+                    if( keyB > keyA ) return 1;
+                }
+                else{
+                    console.log("desc!");
+                    if( keyA < keyB ) return 1;
+                    if( keyB > keyA ) return -1;
+                }
+                console.log("rac")
+                return 0;
+            })
+            $.each(rows,function(idx,row){
+                //jquery guide p. 292: append doesn't clone but moves!
+                self.$table.children('tbody').append(row);
+            });
             msg.Destroy();
-            //$launcher.parents(".data-table-container").find("table").remove();
-            //$launcher.parents(".data-table-container").append(self.)
-            //console.log(data_table);
-            //$each(this.$body.find("tr"),function(idx,row){
-            //
-            //});
         };
 
         /**

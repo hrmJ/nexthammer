@@ -40,13 +40,24 @@
         <div class='menubelow' id="corpusaction">
             <h2>Actions available for this (sub)corpus:</h2>
             <ul>
-                <li><a class='ExamineTopics DisplayTexts' href='javascript:void(0);'>Examine topics in individual texts of the selected subcorpus</a></li>
+                <li> <a class='ExamineTopics DisplayOptions' href='javascript:void(0);'>Examine topics in individual texts of the selected subcorpus</a>
+                    <ul id='topic_params_menu' class='hidden'>
+                        <li class='datalist'>
+                        Baseline for TF_IDF: 
+                        <input name='tf_idf_baseline' type='text' placeholder='Set minimum value'>
+                        </input>
+                        </li>
+                        <li>
+                          <button class='ExamineTopics DisplayTexts'>Launch</button>  
+                        </li>
+                    </ul>
+                </li>
                 <li><a class='SubCorpusCharacteristics PrintFrequencyList' href='javascript:void(0);'>Examine word frequencies in the whole subcorpus</a></li>
             </ul>
         </div>
 
         <div class='menubelow' id="other_functions_menu">
-            <h2>Other functions</h2>
+            <h2>Corpus management</h2>
             <ul>
                 <li><a class='ManageStopWords PrintCurrentStopWords' href='javascript:void(0);'>Manage stopwords</a></li>
             </ul>

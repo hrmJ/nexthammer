@@ -182,12 +182,14 @@ class Document extends CorpusObject{
                 $this->corpus->GetNumberOfTexts(),
                 $this->corpus->GetNumberOfTexts($lemma)
             );
-            $this->data[] = Array(
-                "lemma" => $lemma,
-                "freq" => $freq,
-                "tf_idf" => $tf_idf,
-                "nb" => NaiveBayes($this->total_words,$freq, 0.95, 0.05)
-            );
+            if($tf_idf > 0){
+                $this->data[] = Array(
+                    "lemma" => $lemma,
+                    "freq" => $freq,
+                    "tf_idf" => $tf_idf,
+                    "nb" => NaiveBayes($this->total_words,$freq, 0.95, 0.05)
+                );
+            }
         }
         return $this;
     }

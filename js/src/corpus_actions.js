@@ -53,6 +53,18 @@ var CorpusActions = function(){
      **/
     var ExamineTopics = {
 
+
+        tf_idf_baseline: 0,
+
+        /**
+         *
+         * Give the user a chance to determine parameters for the topic-counting function.
+         *
+         **/
+        DisplayOptions: function(){
+            $("#topic_params_menu").slideToggle();
+        },
+
         /**
          *
          * Display the list of the texts of the current subcorpus as links
@@ -60,6 +72,7 @@ var CorpusActions = function(){
          *
          **/
         DisplayTexts: function(){
+            $("#corpusaction").hide();
             var self = this;
             $(".my-lightbox").hide();
             var $ul = $("<ul>");
@@ -111,7 +124,19 @@ var CorpusActions = function(){
                     msg.Destroy();
                     $parent_li.addClass("opened");
                     var freqlist = new Corpusdesktop.Table();
-                    freqlist.SetName(picked_code).SetHeader(["Lemma","Freq","TF_IDF","NB"]).SetRows(data).BuildOutput();
+                    var normalize = true;
+                    if(normalize){
+                        var newdata = [];
+                        var tf_idf_baseline =  $("[name='tf_idf_baseline']").val()*1  || 0;
+                        console.log(tf_idf_baseline);
+                        $.each(data,function(idx,row){
+                            if(row.nb*1 > 0 
+                             && row.tf_idf >= tf_idf_baseline){
+                                newdata.push(row);
+                            }
+                        });
+                    }
+                    freqlist.SetName(picked_code).SetHeader(["Lemma","Freq","TF_IDF","NB"]).SetRows(newdata).BuildOutput();
                     freqlist.$container.appendTo($details_li.hide());
                     $details_li.slideDown()
                 }
