@@ -55,7 +55,20 @@ $(document).ready(function(){
         }
     });
     //Basic lightbox hiding functionality
-    $(".boxclose").click(function(){$(this).parents(".my-lightbox").fadeOut()});
+    $(".boxclose").click(function(){
+        $(this).parents(".my-lightbox").fadeOut();
+        console.log("closed...");
+        //Attempt: freeing up memory
+        $.each(Corpusdesktop.GarbageList,function(id,el){
+            if (id in Corpusdesktop.ElementList){
+            }
+            else{
+                //If the object hasn't been added to the desktop, delete it
+                Corpusdesktop.GarbageList[id] = undefined;
+                console.log("deleted " + id);
+            }
+        });
+    });
     //Corpus desktop
     $("#show_desktop_objects_link").click(function(){
         $("aside").slideToggle();

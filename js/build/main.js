@@ -134,6 +134,8 @@ var Corpusdesktop = function(){
     //will be linked to the corresponding "add to dekstop " link
 
     var ElementList = {};
+    // Attempt to free up memory
+    var GarbageList = {};
 
     //This variable reocords, which element is being dragged
     var CurrentElement = undefined;
@@ -429,6 +431,8 @@ var Corpusdesktop = function(){
                     .append(this.$head)
                     .append(this.$body)
                 );
+            //Experimental:
+            GarbageList[this.id] = this;
             return this;
         };
 
@@ -443,6 +447,7 @@ var Corpusdesktop = function(){
     return{
         Table,
         ElementList,
+        GarbageList,
         AddDesktopEvents
     };
 
@@ -928,7 +933,20 @@ $(document).ready(function(){
         }
     });
     //Basic lightbox hiding functionality
-    $(".boxclose").click(function(){$(this).parents(".my-lightbox").fadeOut()});
+    $(".boxclose").click(function(){
+        $(this).parents(".my-lightbox").fadeOut();
+        console.log("closed...");
+        //Attempt: freeing up memory
+        $.each(Corpusdesktop.GarbageList,function(id,el){
+            if (id in Corpusdesktop.ElementList){
+            }
+            else{
+                //If the object hasn't been added to the desktop, delete it
+                Corpusdesktop.GarbageList[id] = undefined;
+                console.log("deleted " + id);
+            }
+        });
+    });
     //Corpus desktop
     $("#show_desktop_objects_link").click(function(){
         $("aside").slideToggle();

@@ -13,6 +13,8 @@ var Corpusdesktop = function(){
     //will be linked to the corresponding "add to dekstop " link
 
     var ElementList = {};
+    // Attempt to free up memory
+    var GarbageList = {};
 
     //This variable reocords, which element is being dragged
     var CurrentElement = undefined;
@@ -308,6 +310,8 @@ var Corpusdesktop = function(){
                     .append(this.$head)
                     .append(this.$body)
                 );
+            //Experimental:
+            GarbageList[this.id] = this;
             return this;
         };
 
@@ -322,6 +326,7 @@ var Corpusdesktop = function(){
     return{
         Table,
         ElementList,
+        GarbageList,
         AddDesktopEvents
     };
 

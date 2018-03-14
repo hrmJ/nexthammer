@@ -114,10 +114,11 @@ class Document extends CorpusObject{
         $wordcolstring = implode(" || ' ' || ", $wordcols);
         $query = "SELECT ngram, count(*) FROM
              (SELECT $wordcolstring as ngram FROM
-             (SELECT $leadwordcols FROM txt_en WHERE funct = 'word'
+             (SELECT $leadwordcols FROM txt_{$this->lang} WHERE funct = 'word'
                 AND id between $1 AND $2
-             ) AS q)
-             AS ngramq GROUP BY ngram ORDER BY count DESC";
+             ) AS q) 
+             AS ngramq GROUP BY ngram  HAVING ngramq.count > 2 
+             ORDER BY count DESC LIMIT 1000";
         $result = pg_query_params($this->corpus->corpuscon, $query, 
             $this->address);
 
