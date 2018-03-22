@@ -144,16 +144,17 @@ class Document extends CorpusObject{
      */
     public function SetWordFrequencies(){
         if(!$this->word_frequencies){
-            $query = "SELECT token, count(*) FROM txt_{$this->lang} 
-                      WHERE id between $1 AND $2
-                      GROUP BY token ORDER BY count DESC";
+            $query = "SELECT {$this->corpus->filter->target_col}, count(*) 
+                      FROM {$this->corpus->filter->target_table_prefix}_{$this->lang} 
+                      WHERE {$this->corpus->filter->id_col} between $1 AND $2
+                      GROUP BY {$this->corpus->filter->target_col} ORDER BY count DESC";
             $result = pg_query_params($this->corpus->corpuscon, $query, $this->address);
             $freqs = pg_fetch_all($result);
 
             $this->word_frequencies = Array();
                
             foreach($freqs as $row){
-                $this->word_frequencies[$row["token"]] = $row["count"]*1;
+                $this->word_frequencies[$row[$this->corpus->filter->target_col]] = $row["count"]*1;
             }
         }
         return $this;
