@@ -46,7 +46,7 @@ var CorpusActions = function(){
                     var freqlist = new Corpusdesktop.Table();
                     freqlist
                         .SetName("Ngrams (the whole subcorpus)")
-                        .SetHeader(["Ngram","Freq"])
+                        .SetHeader(["Ngram","Freq", "LL"])
                         .SetRows(data).BuildOutput();
                     freqlist.$container.appendTo($("#texts_to_examine").html(""));
                     $(".text_examiner").fadeIn();

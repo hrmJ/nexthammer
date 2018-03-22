@@ -178,6 +178,28 @@ class Corpus extends CorpusObject{
 
     /**
      * 
+     * Counts the frequencies of individual words in the corpus
+     * 
+     */
+    public function SetWordFrequencies(){
+        foreach($this->documents as $doc){
+            $doc->SetWordFrequencies();
+            foreach($doc->GetWordFrequencies() as $lemma => $freq){
+                if (array_key_exists($lemma, $this->word_frequencies)){
+                    $this->word_frequencies[$lemma] += $freq;
+                }
+                else{
+                    $this->word_frequencies[$lemma] = $freq;
+                }
+            }
+        }
+        //sort descending by freqyencies
+        arsort($this->word_frequencies);
+        return $this;
+    }
+
+    /**
+     * 
      * Fetches all the lemmas of every noun in corpus and saves them into an array,
      * where the lemmas of the words are the keys and frequencies are values;
      * 
@@ -231,11 +253,28 @@ class Corpus extends CorpusObject{
     public function CreateNgramTable(){
         $this->data = Array();
         foreach($this->ngram_frequencies as $ngram => $freq){
+            $words = explode(" ", $ngram);
+            $pats = Array(" " . $words[1], $words[0] . " ");
+            //Count the number of bigrams with nly the first word
+            $without_second = array_sum(array_filter(
+                $this->ngram_frequencies,
+                function ($key) use ($pats) {
+                    if(strpos($key, $pats[1])!==FALSE and strpos($key, $pats[0]) === FALSE){
+                        return true;
+                    }
+                    return false;
+                }, ARRAY_FILTER_USE_KEY));
             $this->data[] = Array(
                 "ngram" => $ngram,
-                "freq" => $freq
+                "freq" => $freq,
+                "LL" => LogLikeLihood($freq,
+                                      $without_second,
+                                      $this->word_frequencies[$words[0]], 
+                                      $this->word_frequencies[$words[1]],
+                                      $this->total_words)
             );
         }
+
         return $this;
     }
 

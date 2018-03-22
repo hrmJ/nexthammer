@@ -29,6 +29,38 @@ function Tf_idf($freq_of_word_in_this_text, $words_in_text, $number_of_texts_in_
 }
 
 
+
+/**
+ *
+ * Calculate log-likelihood for bigrams
+ *
+ * @param integer $freq_of_bigram the frequency of the bigram
+ * @param integer $freq_bigrams_with_first the frequency of those bigrams that have the first word but not the second
+ * @param integer $freq_1 frequency of the first word
+ * @param integer $freq_2 frequency of the second word
+ * @param integer $corpus_size how many words in the corpus
+ *
+ **/
+function LogLikeLihood($freq_of_bigram, $freq_bigrams_with_first, $freq_1, $freq_2, $corpus_size){
+
+    if($freq_of_bigram === 0){
+        $freq_of_bigram =  ($freq_of_bigram + 1) * $freq_bigrams_with_first / ($corpus_size + $freq_bigrams_with_first);
+    }
+
+
+    $numerator = $freq_of_bigram  * ($freq_1 + $freq_2);
+    $denominator = ($freq_of_bigram + $freq_bigrams_with_first);
+    $expected_value = $numerator / $denominator;
+
+
+    $log_likelihood = -1*(2 * $freq_of_bigram  * log($freq_of_bigram / $expected_value));
+
+    return $log_likelihood;
+
+}
+
+
+
 /**
  *
  * Ко всему корпусу:

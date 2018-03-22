@@ -139,6 +139,29 @@ class Document extends CorpusObject{
 
     /**
      * 
+     * Fetches the count of each word in the document
+     *
+     */
+    public function SetWordFrequencies(){
+        if(!$this->word_frequencies){
+            $query = "SELECT token, count(*) FROM txt_{$this->lang} 
+                      WHERE id between $1 AND $2
+                      GROUP BY token ORDER BY count DESC";
+            $result = pg_query_params($this->corpus->corpuscon, $query, $this->address);
+            $freqs = pg_fetch_all($result);
+
+            $this->word_frequencies = Array();
+               
+            foreach($freqs as $row){
+                $this->word_frequencies[$row["token"]] = $row["count"]*1;
+            }
+        }
+        return $this;
+    }
+
+
+    /**
+     * 
      * Fetches all the lemmas of every noun in the document
      * an counts their frequencies
      *
