@@ -105,17 +105,19 @@ class Document extends CorpusObject{
      */
     public function SetNgramFrequency($n, $filtershort=true){
         $wordcols = Array();
-        $leadwordcols = "token, ";
+        $leadwordcols = "{$this->corpus->filter->target_col}, ";
         for($i=1;$i<=$n;$i++){
             $wordcols[] = "n$i";
-            $leadwordcols .= " LEAD(token, $i) OVER() AS n$i, ";
+            $leadwordcols .= " LEAD({$this->corpus->filter->target_col}, $i) OVER() AS n$i, ";
         };
         $leadwordcols = trim($leadwordcols," ,");
         $wordcolstring = implode(" || ' ' || ", $wordcols);
         $query = "SELECT ngram, count(*) FROM
              (SELECT $wordcolstring as ngram FROM
-             (SELECT $leadwordcols FROM txt_{$this->lang} WHERE funct = 'word'
-                AND id between $1 AND $2
+             (SELECT $leadwordcols FROM {$this->corpus->filter->target_table_prefix}_{$this->lang} 
+                WHERE
+                {$this->corpus->filter->target_col_filter}
+                {$this->corpus->filter->id_col} between $1 AND $2
              ) AS q) 
              AS ngramq GROUP BY ngram  HAVING ngramq.count > 2 
              ORDER BY count DESC LIMIT 1000";
@@ -126,7 +128,9 @@ class Document extends CorpusObject{
         $this->ngram_frequencies = Array();
            
         foreach($freqs as $row){
-            $this->ngram_frequencies[$row["ngram"]] = $row["count"]*1;
+            if($row["ngram"]){
+                $this->ngram_frequencies[$row["ngram"]] = $row["count"]*1;
+            }
         }
 
         return $this;

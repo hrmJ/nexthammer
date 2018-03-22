@@ -12,6 +12,7 @@
  * @param string $configpath path to config.ini
  * @param Array $noun_frequencies individual lemmas in this collection of texts / document + their frequencies
  * @param Array $ngram_frequencies ngrams in this collection of texts / document  + their frequencies
+ * @param Filter $filter An object for conbtrolling what will be filtered out from e.g. frequenc lists
  *
  */
 class CorpusObject{
@@ -22,6 +23,7 @@ class CorpusObject{
     protected $total_words = 0;
     protected $noun_frequencies = Array();
     protected $ngram_frequencies = Array();
+    public $filter = null;
 
 
     /**
@@ -74,6 +76,16 @@ class CorpusObject{
      */
     public function SetConnectionToMain(){
         $this->maincon = open_connection("dbmain", $this->configpath);
+        return $this;
+    }
+
+    /**
+     * 
+     * Sets up a filter to limit the results to e.g. lemmas or nouns
+     * 
+     */
+    public function SetFilter(){
+        $this->filter = new Filter();
         return $this;
     }
 

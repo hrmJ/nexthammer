@@ -58,6 +58,9 @@
                         Which grams: (2, 3, 4, ..)
                             <input name='ngram_n_number' type='text' placeholder='2 or higher'> </input>
                         </li>
+                        <li class='datalist'>
+                            <input name='ngram_lemma' type='checkbox'> Search for lemmas </input>
+                        </li>
                         <li class='some-margin'>
                           <button class='SubCorpusCharacteristics PrintNgramList'>Launch</button>  
                         </li>

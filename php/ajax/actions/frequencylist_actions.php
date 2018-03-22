@@ -45,10 +45,18 @@ function SubcorpusStats($corpus, $codes, $lang){
  * @param string $codes codes of the documents that will build the $corpus 
  * @param string $lang the language of the subcorpus
  * @param integer $n which grams (2,3,4...)
+ * @param string $lemmas should we search for lemmas and not tokens (yes/no)
  *
  */
-function Ngrams($corpus, $codes, $lang, $n){
+function Ngrams($corpus, $codes, $lang, $n, $lemmas){
     $corpus->SetSubCorpus($codes, $lang);
+    $corpus->SetFilter();
+    if($lemmas=="yes"){
+        $corpus->filter->Lemmas();
+    }
+    else{
+        $corpus->filter->Tokens();
+    }
     $corpus->SetNgramFrequency($n)
         ->CreateNgramTable();
 }

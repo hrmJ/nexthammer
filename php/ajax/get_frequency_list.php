@@ -8,6 +8,7 @@ require_once '../statistical_functions_for_topics.php'; require_once '../small_u
 require_once '../corpus_objects/corpus_object.php';
 require_once '../corpus_objects/document.php';
 require_once '../corpus_objects/corpus.php';
+require_once '../corpus_objects/Filter.php';
 require_once 'actions/frequencylist_actions.php';
 
 
@@ -29,7 +30,7 @@ switch($_GET["action"]){
         $corpus->OutputJson();
         break;
     case "corpus_ngram_list":
-        Ngrams($corpus, $_GET["codes"], $_GET["lang"], $_GET["n"]);
+        Ngrams($corpus, $_GET["codes"], $_GET["lang"], $_GET["n"], $_GET["lemmas"]);
         $corpus->OutputJson();
         break;
 }

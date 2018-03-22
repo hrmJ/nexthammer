@@ -637,7 +637,8 @@ var CorpusActions = function(){
                 action:"corpus_ngram_list",
                 codes: Loaders.GetPickedCodes(),
                 lang: Loaders.GetPickedLang(),
-                n:  $("[name='ngram_n_number']").val()*1 || 2
+                n:  $("[name='ngram_n_number']").val()*1 || 2,
+                lemmas:  ($("[name='ngram_lemma']").get(0).checked ? "yes" : "no")
             };
             var msg = new Utilities.Message("Loading...", $(".container"));
             msg.Show(9999999);
