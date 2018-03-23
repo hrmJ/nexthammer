@@ -58,6 +58,7 @@ function Ngrams($corpus, $codes, $lang, $n, $lemmas){
         $corpus->filter->Tokens();
     }
     $corpus->SetWordFrequencies()
+           ->CountAllWords()
            ->SetNgramFrequency($n)
            ->CreateNgramTable();
 }

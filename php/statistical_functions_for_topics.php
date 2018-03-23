@@ -63,6 +63,33 @@ function LogLikeLihood($freq_of_bigram, $freq_bigrams_with_first, $freq_1, $freq
 
 /**
  *
+ * Calculate Mutual information for nrams
+ *
+ * @param integer $freq_of_bigram the frequency of the bigram
+ * @param integer $freq_1 frequency of the first word
+ * @param integer $freq_2 frequency of the second word
+ * @param integer $corpus_size how many words in the corpus
+ *
+ **/
+function PMI($freq_of_bigram,  $freq_1, $freq_2, $corpus_size){
+
+    try{
+        $numerator = $freq_of_bigram  * ($freq_of_bigram / $corpus_size);
+        $denominator = ($freq_1 / $corpus_size) * ($freq_2 / $corpus_size);
+        $result = log($numerator / $denominator);
+    }
+    catch(Exception  $e){
+        $result = "bigram as freq of 0!";
+    }
+
+    return  $result;
+
+}
+
+
+
+/**
+ *
  * Ко всему корпусу:
  *
  *

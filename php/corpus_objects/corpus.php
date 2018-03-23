@@ -280,6 +280,10 @@ class Corpus extends CorpusObject{
                 $this->data[] = Array(
                     "ngram" => $ngram,
                     "freq" => $freq,
+                    "PMI" => PMI($freq,
+                                 $this->word_frequencies[$words[0]], 
+                                 $this->word_frequencies[$words[1]],
+                                 $this->total_words),
                     "LL" => LogLikeLihood($freq,
                                           $without_second,
                                           $this->word_frequencies[$words[0]], 
