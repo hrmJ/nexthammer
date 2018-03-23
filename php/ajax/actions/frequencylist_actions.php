@@ -49,15 +49,16 @@ function SubcorpusStats($corpus, $codes, $lang){
  *
  */
 function Ngrams($corpus, $codes, $lang, $n, $lemmas){
-    $corpus->SetSubCorpus($codes, $lang);
-    $corpus->SetFilter();
+    $corpus->SetSubCorpus($codes, $lang)
+           ->SetLang($lang)
+           ->SetFilter();
     if($lemmas=="yes"){
         $corpus->filter->Lemmas();
     }
     else{
         $corpus->filter->Tokens();
     }
-    $corpus->SetWordFrequencies()
+    $corpus->SetWordFrequenciesPerWholeCorpus()
            ->CountAllWords()
            ->SetNgramFrequency($n)
            ->CreateNgramTable();

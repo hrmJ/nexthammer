@@ -8,6 +8,8 @@
  **/
 class InPattern{
 
+    protected $use_glue = false;
+
     /**
      *
      * @param Array $elements Array of the elements that will inside the brackets: IN (x, y, z)
@@ -17,6 +19,15 @@ class InPattern{
     public function __construct($elements, $offset){
         $this->list = $elements;
         $this->first_el_offset = $offset;
+    }
+
+    /**
+     *
+     * Glues the elements of the array with something
+     *
+     **/
+    public function SetGlue(){
+        $this->use_glue = TRUE;
     }
 
 

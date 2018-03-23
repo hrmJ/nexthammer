@@ -39,6 +39,16 @@ class CorpusObject{
 
     /**
      * 
+     * Sets the language;
+     * 
+     */
+    public function SetLang($lang){
+        $this->lang = $lang;
+        return $this;
+    }
+
+    /**
+     * 
      * Sets the path to the config file
      * 
      */

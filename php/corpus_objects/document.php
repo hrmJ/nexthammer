@@ -17,15 +17,6 @@ class Document extends CorpusObject{
     protected $addr = Array();
     protected $corpus = null;
 
-    /**
-     * 
-     * Sets the language;
-     * 
-     */
-    public function SetLang($lang){
-        $this->lang = $lang;
-        return $this;
-    }
 
     /**
      * 
@@ -56,6 +47,17 @@ class Document extends CorpusObject{
         $this->corpus = $corpus;
         return $this;
     }
+
+
+    /**
+     *
+     * gets the address of the text in the database
+     * 
+     */
+    public function GetAddr(){
+        return $this->address;
+    }
+
 
     /**
      *

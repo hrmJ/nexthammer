@@ -178,6 +178,34 @@ class Corpus extends CorpusObject{
 
     /**
      * 
+     * Counts the frequencies of individual words in the
+     * corpus. Doesn't check for each document separately.
+     * 
+     */
+    public function SetWordFrequenciesPerWholeCorpus(){
+        $this->SetAddressesOfAllDocuments();
+        $query = "SELECT {$this->filter->target_col}, count(*) 
+                  FROM {$this->filter->target_table_prefix}_{$this->lang} 
+                  WHERE 
+                  ({$this->document_addresses["str"]})
+                  GROUP BY {$this->filter->target_col} 
+                   ORDER BY count DESC";
+        $result = pg_query_params($this->corpuscon, $query, 
+            $this->document_addresses["arr"]);
+
+        $freqs = pg_fetch_all($result);
+        $this->word_frequencies = Array();
+           
+        foreach($freqs as $row){
+            if($row[$this->filter->target_col]){
+                $this->word_frequencies[$row[$this->filter->target_col]] = $row["count"]*1;
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * 
      * Counts the frequencies of individual words in the corpus
      * 
      */
@@ -249,13 +277,15 @@ class Corpus extends CorpusObject{
      * 
      * Creates an ngram list for outputting. Includes Log-likelihood values for
      * each row.
+     *
+     * @param $how many ngrams will  be printed
      * 
      */
-    public function CreateNgramTable(){
+    public function CreateNgramTable($length_of_table=500){
         $this->data = Array();
         $i = 0;
         foreach($this->ngram_frequencies as $ngram => $freq){
-            if($i>2000)
+            if($i>$length_of_table)
                 break;
             $i++;
             if($freq > 2){
@@ -296,14 +326,82 @@ class Corpus extends CorpusObject{
         return $this;
     }
 
+
+    /**
+     *
+     * Finds out the database addresses of each document and combines them into
+     * an array
+     *
+     **/
+    public function SetAddressesOfAllDocuments(){
+        $this->document_addresses = Array("str" => "","arr" => Array());
+        $i = 1;
+        foreach($this->documents as $doc){
+            $this->document_addresses["arr"] = array_merge($this->document_addresses["arr"], $doc->GetAddr());
+            if ($this->document_addresses["str"]){
+                $this->document_addresses["str"] .=  " OR ";
+            }
+            $next = $i + 1;
+            $this->document_addresses["str"] .=  "({$this->filter->id_col} BETWEEN \$$i AND \$$next)";
+            $i += 2;
+        }
+    }
+
+    
     /**
      * 
-     * Fetches all ngrams and orders them descending by frequency
+     * Fetches all ngrams and orders them descending by frequency.
+     * This is not done separately for each document but rather
+     * for the whole (sub)corpus.
      *
      * @param $n which grams (2,3,4...)
      * 
      */
     public function SetNgramFrequency($n){
+        $this->SetAddressesOfAllDocuments();
+
+        $wordcols = Array();
+        $leadwordcols = "{$this->filter->target_col}, ";
+        for($i=1;$i<=$n;$i++){
+            $wordcols[] = "n$i";
+            $leadwordcols .= " LEAD({$this->filter->target_col}, $i) OVER() AS n$i, ";
+        };
+        $leadwordcols = trim($leadwordcols," ,");
+        $wordcolstring = implode(" || ' ' || ", $wordcols);
+
+        $query = "SELECT ngram, count(*) FROM
+             (SELECT $wordcolstring as ngram FROM
+             (SELECT $leadwordcols FROM {$this->filter->target_table_prefix}_{$this->lang}
+                WHERE
+                {$this->filter->target_col_filter}
+                ({$this->document_addresses["str"]})
+             ) AS q) 
+             AS ngramq GROUP BY ngram  HAVING ngramq.count > 0
+             ORDER BY count DESC";
+        $result = pg_query_params($this->corpuscon, $query, 
+            $this->document_addresses["arr"]);
+
+        $freqs = pg_fetch_all($result);
+        $this->ngram_frequencies = Array();
+           
+        foreach($freqs as $row){
+            if($row["ngram"]){
+                $this->ngram_frequencies[$row["ngram"]] = $row["count"]*1;
+            }
+        }
+        return $this;
+    }
+
+
+    /**
+     * 
+     * Fetches all ngrams and orders them descending by frequency
+     * Does this separately for each document
+     *
+     * @param $n which grams (2,3,4...)
+     * 
+     */
+    public function SetNgramFrequencyForEachDocument($n){
         foreach($this->documents as $doc){
             $doc->SetNgramFrequency($n);
             foreach($doc->GetNgramFrequency($n) as $ngram => $freq){
@@ -317,6 +415,7 @@ class Corpus extends CorpusObject{
         }
 
         arsort($this->ngram_frequencies);
+
 
         //For the most frequent ngrams: get the small frequency ngrams as well
         //with the first word specified
