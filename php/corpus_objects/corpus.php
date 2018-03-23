@@ -292,24 +292,14 @@ class Corpus extends CorpusObject{
                 //Note: only take ngrams with a minimun frequency of 2
                 $words = explode(" ", $ngram);
                 //Count the number of bigrams with nly the first word
-                $without_second = array_sum(array_filter(
-                    $this->ngram_frequencies,
-                    function ($key) use ($words) {
-                        //Using negative lookahead to check for cases without the second word
-                        //TODO utf-8 word boundaries?? Is this still an issue in recdent php versions?
-                        try{
-                            if(preg_match("/{$words[0]} (?!{$words[1]}\b)/iu", $key))
-                                return true;
-                        }
-                        catch(Exception $e){
-                            //E.g. cases where there is a bracket as a "word" in the ngram
-                            return false;
-                        }
-                        return false;
-                    }, ARRAY_FILTER_USE_KEY));
+                $without_second_keys = preg_grep("/{$words[0]} (?!{$words[1]}\b)/iu",
+                    array_keys($this->ngram_frequencies), PREG_GREP_INVERT);
+                $without_second = array_sum(array_intersect_key($this->ngram_frequencies,
+                    array_flip($without_second_keys)));
                 $this->data[] = Array(
                     "ngram" => $ngram,
                     "freq" => $freq,
+                    "ws" => $without_second,
                     "PMI" => PMI($freq,
                                  $this->word_frequencies[$words[0]], 
                                  $this->word_frequencies[$words[1]],
