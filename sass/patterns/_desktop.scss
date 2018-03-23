@@ -13,6 +13,7 @@ thead{
 .data-table-menu{
     font-size:0.7em;
     color: $navfg;
+    position:relative;
 
     a{
         text-decoration:none;
@@ -24,28 +25,46 @@ thead{
         }
     }
 
+
 }
 
 
 .column_action_menu{
     display:none;
+    position:absolute;
+    background:$arrowbg;
+    border:1px solid grey;
+    margin-top:0.6em;
+    padding:0.5em;
+    min-width:250px;
      li{
         list-style-type:none;
         display: inline;
         @include  pointer;
 
         & + li{
-            margin-left:0.2em;
-            padding-left:0.2em;
+            margin-left:0.9em;
+            padding-left:0.8em;
             border-left: 1px solid black;
         }
+
+        &:hover{
+            @include pointer;
+            text-decoration: underline;
+        }
     }
+}
+
+.active_column{
+    background:#e6cebe;
+    padding:0.3em;
 }
 
 .innercontent{
 
     .data-table-container{
         font-size:0.7em;
+
     }
     .data-table-container + .data-table-container{
         border-left:1px solid $lightbg;
@@ -53,4 +72,13 @@ thead{
         padding-left:0.41em;
     }
 
+}
+
+
+th{
+    &:hover{
+        @include pointer;
+        background:grey;
+        color:white;
+    }
 }

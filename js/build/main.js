@@ -166,7 +166,6 @@ var Corpusdesktop = function(){
                 //$(this).text("").removeClass("drop-highlight");
             })
             .on("drop",function(event){
-                console.log("moi!");
                 event.preventDefault();  
                 event.stopPropagation();
                 var $cont = $(this).parent();
@@ -174,7 +173,7 @@ var Corpusdesktop = function(){
                     //if this object has not been added yet on the desktop
                     var $dropped_object = CurrentElement.$container.clone(true);
                     $dropped_object.append($(`<input type='hidden' value='${CurrentElement.id}'></input>`))
-                    $dropped_object.find(".data-table-menu").remove();
+                    $dropped_object.find(".data-table-menu a").remove();
                     if($cont.find(".data-table-container").length){
                         $cont.find(".data-table-container:last-of-type").after($dropped_object);
                     }
@@ -301,9 +300,13 @@ var Corpusdesktop = function(){
             this.$column_action_menu = $("<ul class='column_action_menu'></ul>");
             this.$column_action_menu.append(
                 $("<li>Order by (ascending)</li>")
-                .click(function(){self.OrderBy("asc")}));
+                .click(function(){self.OrderBy("asc",$(this))}));
             this.$column_action_menu.append($("<li>Order by (descending)</li>")
-                .click(function(){self.OrderBy("desc")}));
+                .click(function(){self.OrderBy("desc",$(this))}));
+            this.$column_action_menu.find("li").click(function(){
+                $(this).parents(".data-table-container").find(".column_action_menu").hide();
+                $(".arrow_box").removeClass("arrow_box");
+                });
         }
 
         /**
@@ -332,6 +335,20 @@ var Corpusdesktop = function(){
          **/
         this.ShowHeaderMenu = function($launcher){
             this.current_column = $launcher.index();
+            var $container = $launcher.parents(".data-table-container:eq(0)");
+            $column_action_menu = $container.find(".column_action_menu");
+            if($launcher.hasClass("arrow_box")){
+                $column_action_menu.hide();
+                $(".arrow_box").removeClass("arrow_box");
+                return this;
+            }
+            $column_action_menu
+                .css({
+                    "left": ($launcher.offset().left - $container.offset().left) + "px",
+                    "top": "-" + ($launcher.height() + 9) + "px"})
+                .show();
+            $(".arrow_box").removeClass("arrow_box");
+            $launcher.addClass("arrow_box");
             return this;
         };
         /**
@@ -339,13 +356,13 @@ var Corpusdesktop = function(){
          * Orders the table by a specific column
          *
          * @param string direction asc or desc
+         * @param $launcher the element that fired the event
          *
          **/
-        this.OrderBy = function(direction){
+        this.OrderBy = function(direction, $launcher){
             var self = this;
-            var msg = new Utilities.Message("Loading...", this.$menucontainer);
-            msg.Show(333);
-            var rows = this.$body.find("tr").get();
+            var $table = $launcher.parents(".data-table-container").find("table");
+            var rows = $table.find("tbody tr").get();
             rows.sort(function(a,b){
                 var keyA = $(a).children('td').eq(self.current_column).text();
                 var keyB = $(b).children('td').eq(self.current_column).text();
@@ -354,28 +371,33 @@ var Corpusdesktop = function(){
                     keyB = keyB*1;
                 }
                 else{
-                    console.log("alphabetic!");
                     keyA = $.trim(keyA).toUpperCase();
                     keyB = $.trim(keyB).toUpperCase();
                 }
-                console.log(keyA + ">>" + keyB);
                 if ( direction == "asc" ){
-                    if( keyA < keyB ) return -1;
-                    if( keyB > keyA ) return 1;
+                    if( keyA < keyB ){
+                         return -1;
+                    }
+                    if( keyB < keyA ){
+                         return 1;
+                    }
                 }
                 else{
-                    console.log("desc!");
-                    if( keyA < keyB ) return 1;
-                    if( keyB > keyA ) return -1;
+                    if( keyA < keyB ){
+                         return 1;
+                    }
+                    if( keyB < keyA ) {
+                        return -1;
+                    }
                 }
-                console.log("rac")
                 return 0;
             })
+            //console.log(rows);
             $.each(rows,function(idx,row){
                 //jquery guide p. 292: append doesn't clone but moves!
-                self.$table.children('tbody').append(row);
+                //console.log(row.)
+                $table.children('tbody').append(row);
             });
-            msg.Destroy();
         };
 
         /**
@@ -425,8 +447,7 @@ var Corpusdesktop = function(){
         this.BuildOutput = function(){
             this.BuildColumnActionMenu();
             this.$container
-                .append(this.$menu)
-                .append(this.$column_action_menu)
+                .append(this.$menu.prepend(this.$column_action_menu))
                 .append(this.$table
                     .append(this.$head)
                     .append(this.$body)

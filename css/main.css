@@ -139,7 +139,8 @@ thead {
 
 .data-table-menu {
   font-size: 0.7em;
-  color: #262626; }
+  color: #262626;
+  position: relative; }
   .data-table-menu a {
     text-decoration: none;
     font-weight: bold;
@@ -148,15 +149,28 @@ thead {
       text-decoration: underline; }
 
 .column_action_menu {
-  display: none; }
+  display: none;
+  position: absolute;
+  background: #e6e6e6;
+  border: 1px solid grey;
+  margin-top: 0.6em;
+  padding: 0.5em;
+  min-width: 250px; }
   .column_action_menu li {
     list-style-type: none;
     display: inline;
     cursor: pointer; }
     .column_action_menu li + li {
-      margin-left: 0.2em;
-      padding-left: 0.2em;
+      margin-left: 0.9em;
+      padding-left: 0.8em;
       border-left: 1px solid black; }
+    .column_action_menu li:hover {
+      cursor: pointer;
+      text-decoration: underline; }
+
+.active_column {
+  background: #e6cebe;
+  padding: 0.3em; }
 
 .innercontent .data-table-container {
   font-size: 0.7em; }
@@ -164,6 +178,40 @@ thead {
   border-left: 1px solid #eeebe9;
   margin-left: 0.4em;
   padding-left: 0.41em; }
+
+th:hover {
+  cursor: pointer;
+  background: grey;
+  color: white; }
+
+.arrow_box {
+  position: relative;
+  background: grey;
+  border: 1px solid grey;
+  color: white;
+  font-size: 0.8em; }
+
+.arrow_box:after, .arrow_box:before {
+  bottom: 100%;
+  left: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none; }
+
+.arrow_box:after {
+  border-color: rgba(213, 213, 213, 0);
+  border-bottom-color: grey;
+  border-width: 7px;
+  margin-left: -7px; }
+
+.arrow_box:before {
+  border-color: rgba(255, 255, 255, 0);
+  border-bottom-color: grey;
+  border-width: 8px;
+  margin-left: -8px; }
 
 .my-lightbox {
   position: absolute;
