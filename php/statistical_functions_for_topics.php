@@ -53,7 +53,7 @@ function LogLikeLihood($freq_of_bigram, $freq_bigrams_with_first, $freq_1, $freq
     $expected_value = $numerator / $denominator;
 
 
-    $log_likelihood = -1*(2 * $freq_of_bigram  * log($freq_of_bigram / $expected_value));
+    $log_likelihood = (-2 * $freq_of_bigram  * log($freq_of_bigram / $expected_value));
 
     return $log_likelihood;
 
