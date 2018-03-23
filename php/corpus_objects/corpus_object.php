@@ -47,6 +47,15 @@ class CorpusObject{
         return $this;
     }
 
+
+    /**
+     * Get the corpuscon; just for testing.
+     *
+     **/
+    public function GetCorpusCon(){
+        return $this->corpuscon;
+    }
+
     /**
      * 
      * Gets the data of this object

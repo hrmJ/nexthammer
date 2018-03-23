@@ -119,8 +119,8 @@ class Document extends CorpusObject{
                 {$this->corpus->filter->target_col_filter}
                 {$this->corpus->filter->id_col} between $1 AND $2
              ) AS q) 
-             AS ngramq GROUP BY ngram  HAVING ngramq.count > 0 
-             ORDER BY count DESC";
+             AS ngramq GROUP BY ngram  HAVING ngramq.count > 3
+             ORDER BY count DESC LIMIT 1000";
         $result = pg_query_params($this->corpus->corpuscon, $query, 
             $this->address);
 
@@ -135,6 +135,53 @@ class Document extends CorpusObject{
 
         return $this;
     }
+
+    /**
+     * 
+     * Fetches ngrams where a specific word is present
+     * This is in order to find even the rarer ngrams for the words in the most
+     * frequent ngrams
+     *
+     * @param integer $n which grams (2,3,4,5...)
+     * @param string word the first word in the ngram
+     * 
+     */
+    public function SetNgramFrequencyWithFirstWordSpecified($n, $word){
+        $wordcols = Array();
+        $leadwordcols = "{$this->corpus->filter->target_col}, ";
+        for($i=1;$i<=$n;$i++){
+            $wordcols[] = "n$i";
+            $leadwordcols .= " LEAD({$this->corpus->filter->target_col}, $i) OVER() AS n$i, ";
+        };
+        $leadwordcols = trim($leadwordcols," ,");
+        $wordcolstring = implode(" || ' ' || ", $wordcols);
+        $query = "SELECT ngram, count(*) FROM
+             (SELECT $wordcolstring as ngram FROM
+             (SELECT $leadwordcols FROM {$this->corpus->filter->target_table_prefix}_{$this->lang} 
+                WHERE
+                {$this->corpus->filter->target_col_filter}
+                {$this->corpus->filter->id_col} between $1 AND $2
+             ) AS q 
+                WHERE lower(n1) = $3) AS ngramq 
+             GROUP BY ngram  
+             HAVING ngramq.count > 0 
+             ORDER BY count DESC";
+        $result = pg_query_params($this->corpus->corpuscon, $query, 
+            array_merge($this->address, Array($word)));
+
+        $freqs = pg_fetch_all($result);
+           
+        if($freqs){
+            foreach($freqs as $row){
+                if($row["ngram"]){
+                    $this->ngram_frequencies[$row["ngram"]] = $row["count"]*1;
+                }
+            }
+        }
+
+        return $this;
+    }
+
 
 
     /**

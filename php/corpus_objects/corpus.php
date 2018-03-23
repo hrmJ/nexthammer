@@ -253,7 +253,11 @@ class Corpus extends CorpusObject{
      */
     public function CreateNgramTable(){
         $this->data = Array();
+        $i = 0;
         foreach($this->ngram_frequencies as $ngram => $freq){
+            if($i>2000)
+                break;
+            $i++;
             if($freq > 2){
                 //Note: only take ngrams with a minimun frequency of 2
                 $words = explode(" ", $ngram);
@@ -263,8 +267,14 @@ class Corpus extends CorpusObject{
                     function ($key) use ($words) {
                         //Using negative lookahead to check for cases without the second word
                         //TODO utf-8 word boundaries?? Is this still an issue in recdent php versions?
-                        if(preg_match("/{$words[0]} (?!{$words[1]}\b)/iu", $key))
-                            return true;
+                        try{
+                            if(preg_match("/{$words[0]} (?!{$words[1]}\b)/iu", $key))
+                                return true;
+                        }
+                        catch(Exception $e){
+                            //E.g. cases where there is a bracket as a "word" in the ngram
+                            return false;
+                        }
                         return false;
                     }, ARRAY_FILTER_USE_KEY));
                 $this->data[] = Array(
@@ -299,6 +309,25 @@ class Corpus extends CorpusObject{
                 else{
                     $this->ngram_frequencies[$ngram] = $freq;
                 }
+            }
+        }
+
+        arsort($this->ngram_frequencies);
+
+        //For the most frequent ngrams: get the small frequency ngrams as well
+        //with the first word specified
+        $i = 0;
+        foreach($this->ngram_frequencies as $ngram => $freq){
+            $i++;
+            if($i > 2000){
+                break;
+            }
+            $words = explode(" ", $ngram);
+            $doc->SetNgramFrequencyWithFirstWordSpecified($n, $words[0]);
+        }
+        foreach($doc->GetNgramFrequency($n) as $ngram => $freq){
+            if (!array_key_exists($ngram, $this->ngram_frequencies)){
+                $this->ngram_frequencies[$ngram] = $freq;
             }
         }
 
