@@ -247,32 +247,36 @@ class Corpus extends CorpusObject{
 
     /**
      * 
-     * Creates an ngram list for outputting. 
+     * Creates an ngram list for outputting. Includes Log-likelihood values for
+     * each row.
      * 
      */
     public function CreateNgramTable(){
         $this->data = Array();
         foreach($this->ngram_frequencies as $ngram => $freq){
-            $words = explode(" ", $ngram);
-            $pats = Array(" " . $words[1], $words[0] . " ");
-            //Count the number of bigrams with nly the first word
-            $without_second = array_sum(array_filter(
-                $this->ngram_frequencies,
-                function ($key) use ($pats) {
-                    if(strpos($key, $pats[1])!==FALSE and strpos($key, $pats[0]) === FALSE){
-                        return true;
-                    }
-                    return false;
-                }, ARRAY_FILTER_USE_KEY));
-            $this->data[] = Array(
-                "ngram" => $ngram,
-                "freq" => $freq,
-                "LL" => LogLikeLihood($freq,
-                                      $without_second,
-                                      $this->word_frequencies[$words[0]], 
-                                      $this->word_frequencies[$words[1]],
-                                      $this->total_words)
-            );
+            if($freq > 2){
+                //Note: only take ngrams with a minimun frequency of 2
+                $words = explode(" ", $ngram);
+                //Count the number of bigrams with nly the first word
+                $without_second = array_sum(array_filter(
+                    $this->ngram_frequencies,
+                    function ($key) use ($words) {
+                        //Using negative lookahead to check for cases without the second word
+                        //TODO utf-8 word boundaries?? Is this still an issue in recdent php versions?
+                        if(preg_match("/{$words[0]} (?!{$words[1]}\b)/iu", $key))
+                            return true;
+                        return false;
+                    }, ARRAY_FILTER_USE_KEY));
+                $this->data[] = Array(
+                    "ngram" => $ngram,
+                    "freq" => $freq,
+                    "LL" => LogLikeLihood($freq,
+                                          $without_second,
+                                          $this->word_frequencies[$words[0]], 
+                                          $this->word_frequencies[$words[1]],
+                                          $this->total_words)
+                );
+            }
         }
 
         return $this;

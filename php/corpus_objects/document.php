@@ -119,8 +119,8 @@ class Document extends CorpusObject{
                 {$this->corpus->filter->target_col_filter}
                 {$this->corpus->filter->id_col} between $1 AND $2
              ) AS q) 
-             AS ngramq GROUP BY ngram  HAVING ngramq.count > 2 
-             ORDER BY count DESC LIMIT 1000";
+             AS ngramq GROUP BY ngram  HAVING ngramq.count > 0 
+             ORDER BY count DESC";
         $result = pg_query_params($this->corpus->corpuscon, $query, 
             $this->address);
 
