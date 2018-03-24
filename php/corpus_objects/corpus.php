@@ -7,6 +7,7 @@
  * @param string $name  The name of the corpus
  * @param Array $documents individual documents in this collection of texts. THe keys of this array are the codes of the documents.
  * @param Array $languages the languages available in the corpus
+ * @param string $ngram_separator what sign to use for separating different words in an ngram
  *
  */
 class Corpus extends CorpusObject{
@@ -14,6 +15,7 @@ class Corpus extends CorpusObject{
     protected $languages = Array();
     protected $documents = Array();
     public $corpusname = "";
+    public $ngram_separator = "+";
 
 
         /**
@@ -284,20 +286,24 @@ class Corpus extends CorpusObject{
     public function CreateNgramTable(){
         $this->data = Array();
         foreach($this->ngram_frequencies as $ngram => $freq){
-            $words = explode(" ", $ngram);
-            $without_second = $this->GetWithoutSecond($words);
-            $this->data[] = Array(
-                "ngram" => $ngram,
-                "freq" => $freq,
-                "PMI" => PMI($freq,
-                             $this->word_frequencies[$words[0]], 
-                             $this->word_frequencies[$words[1]],
-                             $this->total_words),
-                "LL" => LogLikeLihood($freq,
+            $words = explode($this->ngram_separator, $ngram);
+            $ll = "(not available yet for n > 2)";
+            if($this->ngram_number == 2){
+                $without_second = $this->GetWithoutSecond($words);
+                $ll = LogLikeLihood($freq,
                                       $without_second,
                                       $this->word_frequencies[$words[0]], 
                                       $this->word_frequencies[$words[1]],
-                                      $this->total_words)
+                                      $this->total_words);
+            }
+            $this->data[] = Array(
+                "ngram" => $ngram,
+                "freq" => $freq,
+                "LL" =>  $ll,
+                "PMI" => PMI($freq,
+                             $this->word_frequencies[$words[0]], 
+                             $this->word_frequencies[$words[1]],
+                             $this->total_words)
             );
         }
 
@@ -313,7 +319,8 @@ class Corpus extends CorpusObject{
      *
      **/
     private function GetWithoutSecond($words){
-            return $this->ngram_frequencies_by_first_word[$words[0]] - $this->ngram_frequencies["$words[0] $words[1]"];
+        return $this->ngram_frequencies_by_first_word[$words[0]] - 
+            $this->ngram_frequencies["$words[0]{$this->ngram_separator}$words[1]"];
     }
 
     /**
@@ -348,6 +355,7 @@ class Corpus extends CorpusObject{
      */
     public function SetNgramFrequency($n){
         $this->SetAddressesOfAllDocuments();
+        $this->ngram_number = $n;
 
         $wordcols = Array();
         $leadwordcols = "lower({$this->filter->target_col}), ";
@@ -356,7 +364,7 @@ class Corpus extends CorpusObject{
             $leadwordcols .= " lower(LEAD({$this->filter->target_col}, $i) OVER()) AS n$i, ";
         };
         $leadwordcols = trim($leadwordcols," ,");
-        $wordcolstring = implode(" || ' ' || ", $wordcols);
+        $wordcolstring = implode(" || '{$this->ngram_separator}' || ", $wordcols);
         $last_index = sizeof($this->document_addresses["arr"]) + 1;
         $query = "SELECT lower(ngram) AS ngram, count(*) FROM
              (SELECT $wordcolstring as ngram FROM
@@ -380,7 +388,7 @@ class Corpus extends CorpusObject{
         foreach($freqs as $row){
             if($row["ngram"]){
                 $this->ngram_frequencies[$row["ngram"]] = $row["count"]*1;
-                $words = explode(" ", $row["ngram"]);
+                $words = explode($this->ngram_separator, $row["ngram"]);
                 if (array_key_exists($words[0], $this->ngram_frequencies_by_first_word)){
                     $this->ngram_frequencies_by_first_word[$words[0]] += $row["count"]*1;
                 }
@@ -425,7 +433,7 @@ class Corpus extends CorpusObject{
             if($i > 2000){
                 break;
             }
-            $words = explode(" ", $ngram);
+            $words = explode($this->ngram_separator, $ngram);
             $doc->SetNgramFrequencyWithFirstWordSpecified($n, $words[0]);
         }
         foreach($doc->GetNgramFrequency($n) as $ngram => $freq){
