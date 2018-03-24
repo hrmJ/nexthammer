@@ -189,7 +189,7 @@ class Corpus extends CorpusObject{
                   FROM {$this->filter->target_table_prefix}_{$this->lang} 
                   WHERE 
                   ({$this->document_addresses["str"]})
-                  GROUP BY {$this->filter->target_col} 
+                  GROUP BY lower({$this->filter->target_col}) 
                    ORDER BY count DESC";
         $result = pg_query_params($this->corpuscon, $query, 
             $this->document_addresses["arr"]);
@@ -279,17 +279,26 @@ class Corpus extends CorpusObject{
      * Creates an ngram list for outputting. Includes Log-likelihood values for
      * each row.
      *
-     * @param $how many ngrams will  be printed
+     * @param $length_of_table how many ngrams will  be printed
+     * @param $start_idx the index of the first ngram to be printed
      * 
      */
-    public function CreateNgramTable($length_of_table=500){
+    public function CreateNgramTable($length_of_table=500, $start_idx=1){
         $this->data = Array();
+        $i = 1;
         foreach($this->ngram_frequencies as $ngram => $freq){
+            if($i < $start_idx)
+                continue;
+            if($i > ($length_of_table + $start_idx))
+                break;
+            $i++;
             $words = explode(" ", $ngram);
             $without_second = $this->GetWithoutSecond($words);
             $this->data[] = Array(
                 "ngram" => $ngram,
                 "freq" => $freq,
+                "w1" => $this->word_frequencies[$words[0]],
+                "w2" => $this->word_frequencies[$words[1]],
                 "ws" => $without_second,
                 "PMI" => PMI($freq,
                              $this->word_frequencies[$words[0]], 
@@ -315,6 +324,9 @@ class Corpus extends CorpusObject{
      *
      **/
     private function GetWithoutSecond($words){
+
+            return $this->ngram_frequencies_by_first_word[$words[0]] - $this->ngram_frequencies["$words[0] $words[1]"];
+
             $without_second = array_sum(array_filter(
                 $this->ngram_frequencies,
                 function ($key) use ($words) {
@@ -374,10 +386,10 @@ class Corpus extends CorpusObject{
         $this->SetAddressesOfAllDocuments();
 
         $wordcols = Array();
-        $leadwordcols = "{$this->filter->target_col}, ";
+        $leadwordcols = "lower({$this->filter->target_col}), ";
         for($i=1;$i<=$n;$i++){
             $wordcols[] = "n$i";
-            $leadwordcols .= " LEAD({$this->filter->target_col}, $i) OVER() AS n$i, ";
+            $leadwordcols .= " lower(LEAD({$this->filter->target_col}, $i) OVER()) AS n$i, ";
         };
         $leadwordcols = trim($leadwordcols," ,");
         $wordcolstring = implode(" || ' ' || ", $wordcols);
@@ -392,17 +404,25 @@ class Corpus extends CorpusObject{
                 WHERE n1 ~ \$$last_index AND -- NOTE: exlcuding if a number present
                 LOWER(n1) ~ '[a-öа-я]'  -- NOTE excluding if no letters
              )  
-             AS ngramq GROUP BY ngram  HAVING ngramq.count > 1
+             AS ngramq GROUP BY lower(ngram)  HAVING ngramq.count > 0
              ORDER BY count DESC";
         $result = pg_query_params($this->corpuscon, $query, 
             array_merge($this->document_addresses["arr"],Array("^[^\d\(\)']+$")));
 
         $freqs = pg_fetch_all($result);
         $this->ngram_frequencies = Array();
+        $this->ngram_frequencies_by_first_word = Array();
            
         foreach($freqs as $row){
             if($row["ngram"]){
                 $this->ngram_frequencies[$row["ngram"]] = $row["count"]*1;
+                $words = explode(" ", $row["ngram"]);
+                if (array_key_exists($words[0], $this->ngram_frequencies_by_first_word)){
+                    $this->ngram_frequencies_by_first_word[$words[0]] += $row["count"]*1;
+                }
+                else{
+                    $this->ngram_frequencies_by_first_word[$words[0]] = $row["count"]*1;
+                }
             }
         }
         return $this;
