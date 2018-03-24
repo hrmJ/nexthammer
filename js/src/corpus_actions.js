@@ -47,7 +47,7 @@ var CorpusActions = function(){
                     freqlist
                         .SetName("Ngrams (the whole subcorpus)")
                         .SetHeader(["Ngram","Freq", "LL","MI"])
-                        .SetRows(data).BuildOutput();
+                        .SetRows(data.slice(0,1000)).BuildOutput();
                     freqlist.$container.appendTo($("#texts_to_examine").html(""));
                     $(".text_examiner").fadeIn();
                 }
