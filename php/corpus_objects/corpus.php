@@ -279,27 +279,16 @@ class Corpus extends CorpusObject{
      * Creates an ngram list for outputting. Includes Log-likelihood values for
      * each row.
      *
-     * @param $length_of_table how many ngrams will  be printed
-     * @param $start_idx the index of the first ngram to be printed
      * 
      */
-    public function CreateNgramTable($length_of_table=500, $start_idx=1){
+    public function CreateNgramTable(){
         $this->data = Array();
-        $i = 1;
         foreach($this->ngram_frequencies as $ngram => $freq){
-            if($i < $start_idx)
-                continue;
-            if($i > ($length_of_table + $start_idx))
-                break;
-            $i++;
             $words = explode(" ", $ngram);
             $without_second = $this->GetWithoutSecond($words);
             $this->data[] = Array(
                 "ngram" => $ngram,
                 "freq" => $freq,
-                "w1" => $this->word_frequencies[$words[0]],
-                "w2" => $this->word_frequencies[$words[1]],
-                "ws" => $without_second,
                 "PMI" => PMI($freq,
                              $this->word_frequencies[$words[0]], 
                              $this->word_frequencies[$words[1]],
@@ -324,32 +313,7 @@ class Corpus extends CorpusObject{
      *
      **/
     private function GetWithoutSecond($words){
-
             return $this->ngram_frequencies_by_first_word[$words[0]] - $this->ngram_frequencies["$words[0] $words[1]"];
-
-            $without_second = array_sum(array_filter(
-                $this->ngram_frequencies,
-                function ($key) use ($words) {
-                    //Using negative lookahead to check for cases without the second word
-                    //TODO utf-8 word boundaries?? Is this still an issue in recdent php versions?
-                    if(stripos($key, "$words[0] ") !== FALSE and stripos($key, " $words[1]") === FALSE){
-                        return true;
-                        if(strlen("$words[0] $words[1]") == strlen($key)){
-                            return true;
-                        }
-                    }
-                    #try{
-                    #    if(preg_match("/{$words[0]} (?!{$words[1]}\b)/iu", $key))
-                    #        return true;
-                    #}
-                    #catch(Exception $e){
-                    #    //E.g. cases where there is a bracket as a "word" in the ngram
-                    #    return false;
-                    #}
-                    return false;
-                }, ARRAY_FILTER_USE_KEY));
-
-            return $without_second;
     }
 
     /**
