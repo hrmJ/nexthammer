@@ -58,10 +58,20 @@ function Ngrams($corpus, $codes, $lang, $n, $lemmas){
     else{
         $corpus->filter->Tokens();
     }
+
     $corpus->SetWordFrequenciesPerWholeCorpus()
-           ->CountAllWords()
-           ->SetNgramFrequency($n)
-           ->CreateNgramTable();
+           ->CountAllWords();
+
+    if($n == 2){
+        $corpus ->SetNgramFrequency($n)
+                ->CreateNgramTable();
+    }
+    else if($n == 3){
+        $corpus ->SetNgramFrequency(2)
+                ->CreateNgramTable(true)
+                ->Count3gramLL();
+    }
+
 }
 
 

@@ -1,6 +1,6 @@
 /**
  *
- * The actual functionality of the interface: what we can do whit the corpora
+ * The actual functionality of the interface: what we can do with the corpora
  *
  **/
 

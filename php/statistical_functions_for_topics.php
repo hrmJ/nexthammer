@@ -105,7 +105,7 @@ function PMI($freq_of_bigram,  $freq_1, $freq_2, $corpus_size){
 
 
 // RESULT
-// 1. Отсекасеми минусовые по NB (?)
+// 1. Отсекаем минусовые по NB (?)
 // 2. если tf_idf = 0
 // 3. порог
 //

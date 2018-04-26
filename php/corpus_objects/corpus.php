@@ -276,15 +276,53 @@ class Corpus extends CorpusObject{
     }
 
 
+
     /**
      * 
-     * Creates an ngram list for outputting. Includes Log-likelihood values for
-     * each row.
-     *
+     * Count LL for trigram
      * 
      */
-    public function CreateNgramTable(){
+    public function Count3gramLL(){
         $this->data = Array();
+        foreach($this->ngramdata as $bigram => $data1){
+            $words = explode($this->ngram_separator, $bigram);
+            $allowed = $words[1] . $this->ngram_separator;
+            $ngrams_with_w2_as_w1 = array_filter(
+                $this->ngramdata,
+                function ($key) use ($allowed) {
+                    return (strpos($key, $allowed) !== false ? true : false);
+                },
+                ARRAY_FILTER_USE_KEY
+            );
+            foreach($ngrams_with_w2_as_w1 as $potential_trigram => $data2){
+                $words2 = explode($this->ngram_separator, $potential_trigram);
+                $trigram = implode($this->ngram_separator, [$bigram, $words2[1]]);
+                $this->data[] = Array(
+                    "ngram" => $trigram,
+                    "freq" => "?",
+                    "LL" =>  $data1["LL"] * $data2["LL"],
+                    "PMI" => "?"
+                );
+            }
+        }
+
+    }
+
+
+    /**
+     * 
+     * Creates an ngram list for outputting. Includes Log-likelihood (LL) and Mutual
+     * information values for
+     * each row.
+     *
+     * @param $save_ngram_keys this is neede for 3grams
+     * 
+     */
+    public function CreateNgramTable($save_ngram_keys=FALSE){
+        $this->data = Array();
+        if ($save_ngram_keys){
+            $this->ngramdata = Array();
+        }
         foreach($this->ngram_frequencies as $ngram => $freq){
             $words = explode($this->ngram_separator, $ngram);
             $ll = "(not available yet for n > 2)";
@@ -296,15 +334,23 @@ class Corpus extends CorpusObject{
                                       $this->word_frequencies[$words[1]],
                                       $this->total_words);
             }
-            $this->data[] = Array(
-                "ngram" => $ngram,
-                "freq" => $freq,
-                "LL" =>  $ll,
-                "PMI" => PMI($freq,
-                             $this->word_frequencies[$words[0]], 
-                             $this->word_frequencies[$words[1]],
-                             $this->total_words)
-            );
+            if ($save_ngram_keys){
+                $this->ngramdata[$ngram] = Array(
+                    "freq" => $freq,
+                    "LL" =>  $ll
+                );
+            }
+            else{
+                $this->data[] = Array(
+                    "ngram" => $ngram,
+                    "freq" => $freq,
+                    "LL" =>  $ll,
+                    "PMI" => PMI($freq,
+                                 $this->word_frequencies[$words[0]], 
+                                 $this->word_frequencies[$words[1]],
+                                 $this->total_words)
+                );
+            }
         }
 
         return $this;

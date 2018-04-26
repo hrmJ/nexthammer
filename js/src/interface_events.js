@@ -1,6 +1,6 @@
 /**
  *
- * Adds the basic functinality to the interface by attaching the relevant events
+ * Adds the basic functionality to the interface by attaching the relevant events
  *
  **/
 $(document).ready(function(){

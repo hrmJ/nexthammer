@@ -623,7 +623,7 @@ var Loaders = function(){
 
 /**
  *
- * The actual functionality of the interface: what we can do whit the corpora
+ * The actual functionality of the interface: what we can do with the corpora
  *
  **/
 
@@ -900,7 +900,7 @@ var CorpusManagementActions = function(){
 
 /**
  *
- * Adds the basic functinality to the interface by attaching the relevant events
+ * Adds the basic functionality to the interface by attaching the relevant events
  *
  **/
 $(document).ready(function(){
