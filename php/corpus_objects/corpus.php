@@ -301,6 +301,9 @@ class Corpus extends CorpusObject{
                     "PMI" => "?"
                 );
             }
+            else{
+                //?
+            }
         }
         return $this;
     }
