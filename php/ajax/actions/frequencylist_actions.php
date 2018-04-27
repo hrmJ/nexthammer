@@ -48,7 +48,7 @@ function SubcorpusStats($corpus, $codes, $lang){
  * @param string $lemmas should we search for lemmas and not tokens (yes/no)
  *
  */
-function Ngrams($corpus, $codes, $lang, $n, $lemmas, $include_word=NULL){
+function Ngrams($corpus, $codes, $lang, $n, $lemmas, $include_word=""){
     $corpus->SetSubCorpus($codes, $lang)
            ->SetLang($lang)
            ->SetFilter();
@@ -63,11 +63,12 @@ function Ngrams($corpus, $codes, $lang, $n, $lemmas, $include_word=NULL){
            ->CountAllWords();
 
     if($n == 2){
-        $corpus ->SetNgramFrequency($n)
+        $corpus ->SetNgramFrequency($n, $include_word)
                 ->CreateNgramTable();
     }
     else if($n == 3){
-        $corpus ->SetNgramFrequency(3, 0)
+        var_dump($include_word);
+        $corpus ->SetNgramFrequency(3, 0, $include_word)
                 ->CreateNgramTable()
                 ->SetNgramFrequency(2, 0)
                 ->CreateNgramTable()

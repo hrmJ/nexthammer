@@ -303,6 +303,7 @@ class Corpus extends CorpusObject{
             }
             else{
                 //?
+                //var_dump($trigram);
             }
         }
         return $this;
@@ -384,6 +385,31 @@ class Corpus extends CorpusObject{
 
     
     /**
+     *
+     * Edits the regular ngramquery to limit the results to those that include 
+     * A certain word in one of the slots
+     *
+     * @param $word string the word / lemma that must be included
+     * @param $last_index index of the last pg_params parameter so far
+     * @param $n which grams
+     *
+     **/
+    public function SetNgramMustIncludeWord($word, $last_index, $n){
+        $w_index = $last_index + 1;
+        $cond = "(";
+        for($i=1;$i<=$n;$i++){
+            if($cond){
+                if($cond !== "("){
+                    $cond .= " OR ";
+                }
+                $cond .= "n$i =  \$$w_index";
+            }
+        }
+        $cond .= ")";
+        return $cond;
+    }
+
+    /**
      * 
      * Fetches all ngrams and orders them descending by frequency.
      * This is not done separately for each document but rather
@@ -391,9 +417,10 @@ class Corpus extends CorpusObject{
      *
      * @param $n which grams (2,3,4...)
      * @param $min_count take only ngrams with minimun frequency of this
+     * @param string $must_include a word / lemma an ngram must include in order to qualify
      * 
      */
-    public function SetNgramFrequency($n, $min_count=0){
+    public function SetNgramFrequency($n, $min_count=0, $must_include=""){
         $this->SetAddressesOfAllDocuments();
         $this->ngram_number = $n;
 
@@ -406,6 +433,10 @@ class Corpus extends CorpusObject{
         $leadwordcols = trim($leadwordcols," ,");
         $wordcolstring = implode(" || '{$this->ngram_separator}' || ", $wordcols);
         $last_index = sizeof($this->document_addresses["arr"]) + 1;
+        $additional_cond = "";
+        if($must_include){
+             $additional_cond = $this->SetNgramMustIncludeWord($must_include, $last_index, $n) . " AND";
+        }
         $query = "SELECT lower(ngram) AS ngram, count(*) FROM
              (SELECT $wordcolstring as ngram FROM
              (SELECT $leadwordcols FROM {$this->filter->target_table_prefix}_{$this->lang}
@@ -414,13 +445,16 @@ class Corpus extends CorpusObject{
                 ({$this->document_addresses["str"]})
              ) AS q
                 WHERE n1 ~ \$$last_index AND -- NOTE: exlcuding if a number present
+                $additional_cond
                 LOWER(n1) ~ '[a-öа-я]'  -- NOTE excluding if no letters
              )  
              AS ngramq GROUP BY lower(ngram)  HAVING ngramq.count > $min_count
              ORDER BY count DESC";
         $result = pg_query_params($this->corpuscon, $query, 
-            array_merge($this->document_addresses["arr"],Array("^[^\d\(\)']+$")));
-
+            array_merge($this->document_addresses["arr"],
+            Array("^[^\d\(\)']+$"),
+            ($additional_cond ? Array($must_include) : Array()))
+        );
         $freqs = pg_fetch_all($result);
         $this->ngram_frequencies = Array();
         $this->ngram_frequencies_by_first_word = Array();
