@@ -19,7 +19,7 @@
             <li class="corpus_select"></li>
             <li class="lang_select"></li>
             <li class="current_subcorpus menu-launcher">Current subcorpus: <span class='texts_picked'>0</span> texts</li>
-            <li class="menucontainer start_rnd"><button>RND</button></li>
+            <li class="menucontainer start_rnd"><button>LRD</button></li>
             <li class="menucontainer select_action"><button>Other actions</button></li>
             <li class="menucontainer select_other_function"><button>Manage</button></li>
         </ul>
@@ -67,7 +67,7 @@
         </div>
 
         <div class='menubelow' id="rnd_action">
-            <h2>RND</h2>
+            <h2>LRD</h2>
             <ul id='topic_params_menu' class=''>
                 <li class='datalist'>
                 Baseline for TF_IDF: 

@@ -761,7 +761,7 @@ var CorpusActions = function(){
          **/
         DisplayTexts: function(){
             $("#rnd_action").hide();
-            $(".start_rnd button").text("RND");
+            $(".start_rnd button").text("LRD");
             var self = this;
             $(".my-lightbox").hide();
             var $ul = $("<ul>");
@@ -970,10 +970,10 @@ $(document).ready(function(){
     });
     $(".start_rnd button").click(function(){
         if(!$("#rnd_action").is(":visible")){
-            $(this).text("Hide RND");
+            $(this).text("Hide LRD");
         }
         else{
-            $(this).text("RND");
+            $(this).text("LRD");
         }
         $("#rnd_action").slideToggle()
     });

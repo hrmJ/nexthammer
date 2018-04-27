@@ -122,7 +122,7 @@ var CorpusActions = function(){
          **/
         DisplayTexts: function(){
             $("#rnd_action").hide();
-            $(".start_rnd button").text("RND");
+            $(".start_rnd button").text("LRD");
             var self = this;
             $(".my-lightbox").hide();
             var $ul = $("<ul>");

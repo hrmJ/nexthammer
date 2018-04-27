@@ -46,6 +46,7 @@ function SubcorpusStats($corpus, $codes, $lang){
  * @param string $lang the language of the subcorpus
  * @param integer $n which grams (2,3,4...)
  * @param string $lemmas should we search for lemmas and not tokens (yes/no)
+ * @param string $include_word only ngrams with this word
  *
  */
 function Ngrams($corpus, $codes, $lang, $n, $lemmas, $include_word=""){
@@ -63,7 +64,7 @@ function Ngrams($corpus, $codes, $lang, $n, $lemmas, $include_word=""){
            ->CountAllWords();
 
     if($n == 2){
-        $corpus ->SetNgramFrequency($n, $include_word)
+        $corpus ->SetNgramFrequency($n, 0, $include_word)
                 ->CreateNgramTable();
     }
     else if($n == 3){
