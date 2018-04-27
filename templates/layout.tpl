@@ -37,6 +37,19 @@
             <div id="text_picker_for_sobcorpus"></div>
         </div>
 
+        <div class='my-lightbox lrd_menu data_picker'>
+             <a class="boxclose"></a>
+            <h2>Choose which n-gram to examine:</h2>
+            <ul>
+                <li class="actionlist" id="ldr-n_2">Bigrams</li>
+                <li class="actionlist" id="ldr-n_3">Trigrams</li>
+                <li class="actionlist" id="ldr-n_4">Tetragrams</li>
+                <li class="actionlist" id="ldr-n_5">Pentagrams</li>
+                <li class="actionlist" id="ldr-n_6">Sextagrams</li>
+                <li class="actionlist" id="ldr-n_7">Septagrams</li>
+                <li class="actionlist" id="ldr-n_8">Octagrams</li>
+            </ul>
+        </div>
 
         <div class='menubelow' id="corpusaction">
             <h2>Actions available for this (sub)corpus:</h2>

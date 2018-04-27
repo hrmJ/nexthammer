@@ -281,68 +281,35 @@ class Corpus extends CorpusObject{
 
     /**
      * 
-     * Count LL for trigrams
+     * Count LL for ngrams with n > 2
      * 
      */
-    public function Count3gramLL(){
+    public function CountGt2gramLL(){
         $this->data = Array();
-        foreach($this->ngramdata[3] as $trigram => $trigramdata){
-            $words = explode($this->ngram_separator, $trigram);
-            $key1 = "{$words[0]}{$this->ngram_separator}{$words[1]}";
-            $key2 = "{$words[1]}{$this->ngram_separator}{$words[2]}";
-            if(array_key_exists($key1,$this->ngramdata[2]) and
-                array_key_exists($key2,$this->ngramdata[2])){
-                $bigram1 = $this->ngramdata[2][$key1];
-                $bigram2 = $this->ngramdata[2][$key2];
+        foreach($this->ngramdata[$this->ngram_number] as $ngram => $ngramdata){
+            $words = explode($this->ngram_separator, $ngram);
+            $log_likelihoods_of_bigrams = [];
+            for($i=0;$i<$this->ngram_number-1;$i++){
+                $thiskey = "{$words[$i]}{$this->ngram_separator}{$words[$i+1]}";
+                if(!array_key_exists($thiskey, $this->ngramdata[2])){
+                    $all_keys_found = false;
+                }
+                else{
+                    $log_likelihoods_of_bigrams[] = $this->ngramdata[2][$thiskey]["LL"];
+                }
+            }
+            if(sizeof($log_likelihoods_of_bigrams) == $this->ngram_number -1 ){
                 $this->data[] = Array(
-                    "ngram" => $trigram,
-                    "freq" => $trigramdata["freq"],
-                    "LL" =>  $bigram1["LL"] + $bigram2["LL"],
+                    "ngram" => $ngram,
+                    "freq" => $ngramdata["freq"],
+                    "LL" =>  array_sum($log_likelihoods_of_bigrams),
                     "PMI" => "?"
                 );
-            }
-            else{
-                //?
-                //var_dump($trigram);
             }
         }
         return $this;
     }
 
-
-    /**
-     * 
-     * Count LL for fourgrams
-     * 
-     */
-    public function Count4gramLL(){
-        $this->data = Array();
-        foreach($this->ngramdata[4] as $trigram => $trigramdata){
-            $words = explode($this->ngram_separator, $trigram);
-            $key1 = "{$words[0]}{$this->ngram_separator}{$words[1]}";
-            $key2 = "{$words[1]}{$this->ngram_separator}{$words[2]}";
-            $key3 = "{$words[2]}{$this->ngram_separator}{$words[3]}";
-            if(array_key_exists($key1,$this->ngramdata[2]) and
-                array_key_exists($key2,$this->ngramdata[2]) and
-                array_key_exists($key3,$this->ngramdata[2]) 
-                ){
-                $bigram1 = $this->ngramdata[2][$key1];
-                $bigram2 = $this->ngramdata[2][$key2];
-                $bigram3 = $this->ngramdata[2][$key3];
-                $this->data[] = Array(
-                    "ngram" => $trigram,
-                    "freq" => $trigramdata["freq"],
-                    "LL" =>  $bigram1["LL"] + $bigram2["LL"] + $bigram3["LL"],
-                    "PMI" => "?"
-                );
-            }
-            else{
-                //?
-                //var_dump($trigram);
-            }
-        }
-        return $this;
-    }
 
 
 

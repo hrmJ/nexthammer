@@ -229,6 +229,9 @@ th:hover {
   font-size: 0.9em;
   font-color: #595959; }
 
+.lrd_menu {
+  z-index: 0; }
+
 .msgbox {
   display: none;
   font-size: 0.72em;

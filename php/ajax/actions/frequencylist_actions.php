@@ -63,23 +63,16 @@ function Ngrams($corpus, $codes, $lang, $n, $lemmas, $include_word=""){
     $corpus->SetWordFrequenciesPerWholeCorpus()
            ->CountAllWords();
 
-    if($n == 2){
+    if($n > 2){
+        $corpus ->SetNgramFrequency(2, 0)
+                ->CreateNgramTable()
+                ->SetNgramFrequency($n, 0, $include_word)
+                ->CreateNgramTable()
+                ->CountGt2gramLL();
+    }
+    else{
         $corpus ->SetNgramFrequency($n, 0, $include_word)
                 ->CreateNgramTable();
-    }
-    else if($n == 3){
-        $corpus ->SetNgramFrequency(3, 0, $include_word)
-                ->CreateNgramTable()
-                ->SetNgramFrequency(2, 0)
-                ->CreateNgramTable()
-                ->Count3gramLL();
-    }
-    else if($n == 4){
-        $corpus ->SetNgramFrequency(4, 0, $include_word)
-                ->CreateNgramTable()
-                ->SetNgramFrequency(2, 0)
-                ->CreateNgramTable()
-                ->Count4gramLL();
     }
 
 }

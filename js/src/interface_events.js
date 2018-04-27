@@ -85,4 +85,15 @@ $(document).ready(function(){
     //Events for the corpus desktop
     Corpusdesktop.AddDesktopEvents();
 
+    //Events for tf_idf
+    $(".lrd_menu li").click(function(){
+        n = $(this).attr("id").replace(/.*_(\d+)/g,"$1") * 1;
+            CorpusActions.SubCorpusCharacteristics.PrintNgramList(
+                CorpusActions.SubCorpusCharacteristics.lrd_lemma,
+                n,
+                "yes",
+                `${n}-grams with ${CorpusActions.SubCorpusCharacteristics.lrd_lemma}`
+            );
+    });
+
 });

@@ -31,10 +31,10 @@ var CorpusActions = function(){
          * @param predifined_lemmas lemmas or not, if defined programmatically
          *
          */
-        PrintNgramList: function(must_include, predifined_n, predifined_lemmas){
+        PrintNgramList: function(must_include, predifined_n, predifined_lemmas, desktop_name){
             var self = this;
             $("#corpusaction").hide();
-            $(".my-lightbox").hide();
+            $(".my-lightbox:not(.lrd_menu)").hide();
             params = {
                 action:"corpus_ngram_list",
                 codes: Loaders.GetPickedCodes(),
@@ -43,7 +43,6 @@ var CorpusActions = function(){
                 lemmas:  predifined_lemmas || ($("[name='ngram_lemma']").get(0).checked ? "yes" : "no"),
                 must_include: must_include || "",
             };
-            console.log(params);
             var msg = new Utilities.Message("Loading...", $(".container"));
             msg.Show(9999999);
             $.getJSON("php/ajax/get_frequency_list.php", params,
@@ -51,7 +50,7 @@ var CorpusActions = function(){
                     msg.Destroy();
                     var freqlist = new Corpusdesktop.Table();
                     freqlist
-                        .SetName("Ngrams (the whole subcorpus)")
+                        .SetName(desktop_name || "Ngrams (the whole subcorpus)")
                         .SetHeader(["Ngram","Freq", "LL","MI"])
                         .SetRows(data.slice(0,1000)).BuildOutput();
                     freqlist.$container.appendTo($("#texts_to_examine").html(""));
@@ -103,6 +102,7 @@ var CorpusActions = function(){
 
 
         tf_idf_baseline: 0,
+        lrd_lemma: "",
 
         /**
          *
@@ -203,7 +203,10 @@ var CorpusActions = function(){
          *
          **/
         ExamineThisRow: function($launcher){
-            CorpusActions.SubCorpusCharacteristics.PrintNgramList($launcher.text(), 3, "yes");
+            var self = this;
+            $(".my-lightbox").hide();
+            $(".lrd_menu").fadeIn();
+            CorpusActions.SubCorpusCharacteristics.lrd_lemma = $launcher.text();
         },
     
     };

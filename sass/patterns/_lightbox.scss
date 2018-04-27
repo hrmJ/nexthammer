@@ -1,4 +1,5 @@
 // lightbox-tyyppinen ikkuna
+
 .my-lightbox{
     position:absolute;
     background:$lightbg;
@@ -13,3 +14,8 @@
     font-size:0.9em;
     font-color:lighten($navfg,20%);
 }
+
+.lrd_menu{
+    z-index:0;
+}
+
