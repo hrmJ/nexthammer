@@ -312,6 +312,42 @@ class Corpus extends CorpusObject{
 
     /**
      * 
+     * Count LL for fourgrams
+     * 
+     */
+    public function Count4gramLL(){
+        $this->data = Array();
+        foreach($this->ngramdata[4] as $trigram => $trigramdata){
+            $words = explode($this->ngram_separator, $trigram);
+            $key1 = "{$words[0]}{$this->ngram_separator}{$words[1]}";
+            $key2 = "{$words[1]}{$this->ngram_separator}{$words[2]}";
+            $key3 = "{$words[2]}{$this->ngram_separator}{$words[3]}";
+            if(array_key_exists($key1,$this->ngramdata[2]) and
+                array_key_exists($key2,$this->ngramdata[2]) and
+                array_key_exists($key3,$this->ngramdata[2]) 
+                ){
+                $bigram1 = $this->ngramdata[2][$key1];
+                $bigram2 = $this->ngramdata[2][$key2];
+                $bigram3 = $this->ngramdata[2][$key3];
+                $this->data[] = Array(
+                    "ngram" => $trigram,
+                    "freq" => $trigramdata["freq"],
+                    "LL" =>  $bigram1["LL"] + $bigram2["LL"] + $bigram3["LL"],
+                    "PMI" => "?"
+                );
+            }
+            else{
+                //?
+                //var_dump($trigram);
+            }
+        }
+        return $this;
+    }
+
+
+
+    /**
+     * 
      * Creates an ngram list for outputting. Includes Log-likelihood (LL) and Mutual
      * information values for
      * each row.
