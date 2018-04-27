@@ -32,8 +32,17 @@ $(document).ready(function(){
         }
         $("#other_functions_menu").slideToggle()
     });
+    $(".start_rnd button").click(function(){
+        if(!$("#rnd_action").is(":visible")){
+            $(this).text("Hide RND");
+        }
+        else{
+            $(this).text("RND");
+        }
+        $("#rnd_action").slideToggle()
+    });
     //Defining possible actions on corpora
-    $("#corpusaction a, #corpusaction button").click(function(){
+    $("#corpusaction a, #corpusaction button, #rnd_action button").click(function(){
         $(".select_action button").text("Select action");
         var actions = $(this).attr("class").replace(/ *(opened|closed) */g,"").split(" ");
         console.log(actions);

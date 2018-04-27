@@ -19,8 +19,9 @@
             <li class="corpus_select"></li>
             <li class="lang_select"></li>
             <li class="current_subcorpus menu-launcher">Current subcorpus: <span class='texts_picked'>0</span> texts</li>
-            <li class="menucontainer select_action"><button>Select action</button></li>
-            <li class="menucontainer select_other_function"><button>Other functions</button></li>
+            <li class="menucontainer start_rnd"><button>RND</button></li>
+            <li class="menucontainer select_action"><button>Other actions</button></li>
+            <li class="menucontainer select_other_function"><button>Manage</button></li>
         </ul>
     </nav>
 
@@ -39,18 +40,7 @@
 
         <div class='menubelow' id="corpusaction">
             <h2>Actions available for this (sub)corpus:</h2>
-            <ul>
-                <li> <a class='ExamineTopics DisplayOptions closed' href='javascript:void(0);'>Examine topics in individual texts of the selected subcorpus</a>
-                    <ul id='topic_params_menu' class='hidden some-margin'>
-                        <li class='datalist'>
-                        Baseline for TF_IDF: 
-                            <input name='tf_idf_baseline' type='text' placeholder='Set minimum value'> </input>
-                        </li>
-                        <li class='some-margin'>
-                          <button class='ExamineTopics DisplayTexts'>Launch</button>  
-                        </li>
-                    </ul>
-                </li>
+            <ul>                                                                                                                                                                                                       
                 <li><a class='SubCorpusCharacteristics PrintFrequencyList closed' href='javascript:void(0);'>Examine word frequencies in the whole subcorpus</a></li>
                 <li> <a class='SubCorpusCharacteristics DisplayNgramOptions closed' href='javascript:void(0);'>Ngrams</a>
                     <ul id='ngrams_params_menu' class='hidden some-margin'>
@@ -75,6 +65,20 @@
                 <li><a class='ManageStopWords PrintCurrentStopWords' href='javascript:void(0);'>Manage stopwords</a></li>
             </ul>
         </div>
+
+        <div class='menubelow' id="rnd_action">
+            <h2>RND</h2>
+            <ul id='topic_params_menu' class=''>
+                <li class='datalist'>
+                Baseline for TF_IDF: 
+                    <input name='tf_idf_baseline' type='text' placeholder='Set minimum value'> </input>
+                </li>
+                <li class='some-margin'>
+                  <button class='ExamineTopics DisplayTexts'>Launch</button>  
+                </li>
+            </ul>
+        </div>
+
         
         <aside>
 

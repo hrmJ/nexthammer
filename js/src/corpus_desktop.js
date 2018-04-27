@@ -168,6 +168,22 @@ var Corpusdesktop = function(){
         this.column_names = [];
         this.current_column = undefined;
 
+
+        /**
+         *
+         * Binds a specific action to the rows of the table.
+         *
+         * @param callback a function that is called when a row of the table is clicked
+         * @param col_idx index of the column tha triggers the event
+         *
+         **/
+        this.AddRowAction = function(callback, col_idx){
+            this.$table.find("tr td:nth-child(" + col_idx + ")").click(function(){
+                //Note: always send the launcher  as the first param
+                callback($(this));
+            });
+        };
+
         /**
          *
          * Construct the menu, by which actions can be performed related to one column.

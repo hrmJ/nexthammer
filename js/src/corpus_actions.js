@@ -115,7 +115,8 @@ var CorpusActions = function(){
          *
          **/
         DisplayTexts: function(){
-            $("#corpusaction").hide();
+            $("#rnd_action").hide();
+            $(".start_rnd button").text("RND");
             var self = this;
             $(".my-lightbox").hide();
             var $ul = $("<ul>");
@@ -147,6 +148,7 @@ var CorpusActions = function(){
          *
          **/
         ExamineThisText: function($parent_li){
+            var self = this;
             picked_code = $parent_li.find("input[name='code']").val();
             params = {
                 action:"examine_text",
@@ -171,7 +173,6 @@ var CorpusActions = function(){
                     if(normalize){
                         var newdata = [];
                         var tf_idf_baseline =  $("[name='tf_idf_baseline']").val()*1  || 0;
-                        console.log(tf_idf_baseline);
                         $.each(data,function(idx,row){
                             if(row.nb*1 > 0 
                              && row.tf_idf >= tf_idf_baseline){
@@ -181,10 +182,23 @@ var CorpusActions = function(){
                     }
                     freqlist.SetName(picked_code).SetHeader(["Lemma","Freq","TF_IDF","NB"]).SetRows(newdata).BuildOutput();
                     freqlist.$container.appendTo($details_li.hide());
+                    freqlist.AddRowAction(self.ExamineThisRow, 2);
                     $details_li.slideDown()
                 }
             );
-        }
+        },
+
+
+        /**
+         *
+         * Examine the row (the lemma) in question. Prints out a list of ngrams containing this word
+         *
+         * @param $launcher the element that fired the event
+         *
+         **/
+        ExamineThisRow: function($launcher){
+            console.log($launcher);
+        },
     
     };
 

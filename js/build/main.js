@@ -289,6 +289,22 @@ var Corpusdesktop = function(){
         this.column_names = [];
         this.current_column = undefined;
 
+
+        /**
+         *
+         * Binds a specific action to the rows of the table.
+         *
+         * @param callback a function that is called when a row of the table is clicked
+         * @param col_idx index of the column tha triggers the event
+         *
+         **/
+        this.AddRowAction = function(callback, col_idx){
+            this.$table.find("tr td:nth-child(" + col_idx + ")").click(function(){
+                //Note: always send the launcher  as the first param
+                callback($(this));
+            });
+        };
+
         /**
          *
          * Construct the menu, by which actions can be performed related to one column.
@@ -738,7 +754,8 @@ var CorpusActions = function(){
          *
          **/
         DisplayTexts: function(){
-            $("#corpusaction").hide();
+            $("#rnd_action").hide();
+            $(".start_rnd button").text("RND");
             var self = this;
             $(".my-lightbox").hide();
             var $ul = $("<ul>");
@@ -770,6 +787,7 @@ var CorpusActions = function(){
          *
          **/
         ExamineThisText: function($parent_li){
+            var self = this;
             picked_code = $parent_li.find("input[name='code']").val();
             params = {
                 action:"examine_text",
@@ -794,7 +812,6 @@ var CorpusActions = function(){
                     if(normalize){
                         var newdata = [];
                         var tf_idf_baseline =  $("[name='tf_idf_baseline']").val()*1  || 0;
-                        console.log(tf_idf_baseline);
                         $.each(data,function(idx,row){
                             if(row.nb*1 > 0 
                              && row.tf_idf >= tf_idf_baseline){
@@ -804,10 +821,23 @@ var CorpusActions = function(){
                     }
                     freqlist.SetName(picked_code).SetHeader(["Lemma","Freq","TF_IDF","NB"]).SetRows(newdata).BuildOutput();
                     freqlist.$container.appendTo($details_li.hide());
+                    freqlist.AddRowAction(self.ExamineThisRow, 2);
                     $details_li.slideDown()
                 }
             );
-        }
+        },
+
+
+        /**
+         *
+         * Examine the row (the lemma) in question. Prints out a list of ngrams containing this word
+         *
+         * @param $launcher the element that fired the event
+         *
+         **/
+        ExamineThisRow: function($launcher){
+            console.log($launcher);
+        },
     
     };
 
@@ -932,8 +962,17 @@ $(document).ready(function(){
         }
         $("#other_functions_menu").slideToggle()
     });
+    $(".start_rnd button").click(function(){
+        if(!$("#rnd_action").is(":visible")){
+            $(this).text("Hide RND");
+        }
+        else{
+            $(this).text("RND");
+        }
+        $("#rnd_action").slideToggle()
+    });
     //Defining possible actions on corpora
-    $("#corpusaction a, #corpusaction button").click(function(){
+    $("#corpusaction a, #corpusaction button, #rnd_action button").click(function(){
         $(".select_action button").text("Select action");
         var actions = $(this).attr("class").replace(/ *(opened|closed) */g,"").split(" ");
         console.log(actions);

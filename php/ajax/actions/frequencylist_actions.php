@@ -48,7 +48,7 @@ function SubcorpusStats($corpus, $codes, $lang){
  * @param string $lemmas should we search for lemmas and not tokens (yes/no)
  *
  */
-function Ngrams($corpus, $codes, $lang, $n, $lemmas){
+function Ngrams($corpus, $codes, $lang, $n, $lemmas, $include_word=NULL){
     $corpus->SetSubCorpus($codes, $lang)
            ->SetLang($lang)
            ->SetFilter();
