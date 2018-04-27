@@ -288,14 +288,19 @@ class Corpus extends CorpusObject{
         $this->data = Array();
         foreach($this->ngramdata[3] as $trigram => $trigramdata){
             $words = explode($this->ngram_separator, $trigram);
-            $bigram1 = $this->ngramdata[2]["{$words[0]}{$this->ngram_separator}{$words[1]}"];
-            $bigram2 = $this->ngramdata[2]["{$words[1]}{$this->ngram_separator}{$words[2]}"];
-            $this->data[] = Array(
-                "ngram" => $trigram,
-                "freq" => $trigramdata["freq"],
-                "LL" =>  $bigram1["LL"] * $bigram2["LL"],
-                "PMI" => "?"
-            );
+            $key1 = "{$words[0]}{$this->ngram_separator}{$words[1]}";
+            $key2 = "{$words[1]}{$this->ngram_separator}{$words[2]}";
+            if(array_key_exists($key1,$this->ngramdata[2]) and
+                array_key_exists($key2,$this->ngramdata[2])){
+                $bigram1 = $this->ngramdata[2][$key1];
+                $bigram2 = $this->ngramdata[2][$key2];
+                $this->data[] = Array(
+                    "ngram" => $trigram,
+                    "freq" => $trigramdata["freq"],
+                    "LL" =>  $bigram1["LL"] * $bigram2["LL"],
+                    "PMI" => "?"
+                );
+            }
         }
         return $this;
     }
