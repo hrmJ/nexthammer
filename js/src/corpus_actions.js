@@ -26,18 +26,24 @@ var CorpusActions = function(){
          *
          * Print an ngram list
          *
+         * @param must_include Ngrams have to include this word or lemma
+         * @param predifined_n if which grams is determined programmatically, then a number (2-5)
+         * @param predifined_lemmas lemmas or not, if defined programmatically
+         *
          */
-        PrintNgramList: function(){
-            $("#corpusaction").hide();
+        PrintNgramList: function(must_include, predifined_n, predifined_lemmas){
             var self = this;
+            $("#corpusaction").hide();
             $(".my-lightbox").hide();
             params = {
                 action:"corpus_ngram_list",
                 codes: Loaders.GetPickedCodes(),
                 lang: Loaders.GetPickedLang(),
-                n:  $("[name='ngram_n_number']").val()*1 || 2,
-                lemmas:  ($("[name='ngram_lemma']").get(0).checked ? "yes" : "no")
+                n:  predifined_n || $("[name='ngram_n_number']").val()*1 || 2,
+                lemmas:  predifined_lemmas || ($("[name='ngram_lemma']").get(0).checked ? "yes" : "no"),
+                must_include: must_include || "",
             };
+            console.log(params);
             var msg = new Utilities.Message("Loading...", $(".container"));
             msg.Show(9999999);
             $.getJSON("php/ajax/get_frequency_list.php", params,
@@ -197,7 +203,7 @@ var CorpusActions = function(){
          *
          **/
         ExamineThisRow: function($launcher){
-            console.log($launcher);
+            CorpusActions.SubCorpusCharacteristics.PrintNgramList($launcher.text(), 3, "yes");
         },
     
     };

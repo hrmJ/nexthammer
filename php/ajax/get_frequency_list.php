@@ -30,7 +30,13 @@ switch($_GET["action"]){
         $corpus->OutputJson();
         break;
     case "corpus_ngram_list":
-        Ngrams($corpus, $_GET["codes"], $_GET["lang"], $_GET["n"], $_GET["lemmas"]);
+        Ngrams($corpus,
+            $_GET["codes"], 
+            $_GET["lang"],
+            $_GET["n"],
+            $_GET["lemmas"],
+            (isset($_GET["must_include"]) ? $_GET["must_include"] : "")
+        );
         $corpus->OutputJson();
         break;
 }
