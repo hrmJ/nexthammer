@@ -297,7 +297,7 @@ class Corpus extends CorpusObject{
                 $this->data[] = Array(
                     "ngram" => $trigram,
                     "freq" => $trigramdata["freq"],
-                    "LL" =>  $bigram1["LL"] * $bigram2["LL"],
+                    "LL" =>  $bigram1["LL"] + $bigram2["LL"],
                     "PMI" => "?"
                 );
             }
