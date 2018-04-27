@@ -7,6 +7,7 @@
  * @param string $name  The name of the corpus
  * @param Array $documents individual documents in this collection of texts. THe keys of this array are the codes of the documents.
  * @param Array $languages the languages available in the corpus
+ * @param Array $ngramdata An array for storing ngrams for furhter use in calculating LL etc. Format: [2=>[["this+bigram"]=>["freq"=>x],["another+bigram"]=>["freq"=>x]]]
  * @param string $ngram_separator what sign to use for separating different words in an ngram
  *
  */
@@ -16,6 +17,7 @@ class Corpus extends CorpusObject{
     protected $documents = Array();
     public $corpusname = "";
     public $ngram_separator = "+";
+    public $ngramdata = Array();
 
 
         /**
@@ -279,33 +281,23 @@ class Corpus extends CorpusObject{
 
     /**
      * 
-     * Count LL for trigram
+     * Count LL for trigrams
      * 
      */
     public function Count3gramLL(){
         $this->data = Array();
-        foreach($this->ngramdata as $bigram => $data1){
-            $words = explode($this->ngram_separator, $bigram);
-            $allowed = $words[1] . $this->ngram_separator;
-            $ngrams_with_w2_as_w1 = array_filter(
-                $this->ngramdata,
-                function ($key) use ($allowed) {
-                    return (strpos($key, $allowed) !== false ? true : false);
-                },
-                ARRAY_FILTER_USE_KEY
+        foreach($this->ngramdata[3] as $trigram => $trigramdata){
+            $words = explode($this->ngram_separator, $trigram);
+            $bigram1 = $this->ngramdata[2]["{$words[0]}{$this->ngram_separator}{$words[1]}"];
+            $bigram2 = $this->ngramdata[2]["{$words[1]}{$this->ngram_separator}{$words[2]}"];
+            $this->data[] = Array(
+                "ngram" => $trigram,
+                "freq" => $trigramdata["freq"],
+                "LL" =>  $bigram1["LL"] * $bigram2["LL"],
+                "PMI" => "?"
             );
-            foreach($ngrams_with_w2_as_w1 as $potential_trigram => $data2){
-                $words2 = explode($this->ngram_separator, $potential_trigram);
-                $trigram = implode($this->ngram_separator, [$bigram, $words2[1]]);
-                $this->data[] = Array(
-                    "ngram" => $trigram,
-                    "freq" => "?",
-                    "LL" =>  $data1["LL"] * $data2["LL"],
-                    "PMI" => "?"
-                );
-            }
         }
-
+        return $this;
     }
 
 
@@ -315,14 +307,11 @@ class Corpus extends CorpusObject{
      * information values for
      * each row.
      *
-     * @param $save_ngram_keys this is neede for 3grams
      * 
      */
-    public function CreateNgramTable($save_ngram_keys=FALSE){
+    public function CreateNgramTable(){
         $this->data = Array();
-        if ($save_ngram_keys){
-            $this->ngramdata = Array();
-        }
+        $this->ngramdata[$this->ngram_number] = Array();
         foreach($this->ngram_frequencies as $ngram => $freq){
             $words = explode($this->ngram_separator, $ngram);
             $ll = "(not available yet for n > 2)";
@@ -334,23 +323,19 @@ class Corpus extends CorpusObject{
                                       $this->word_frequencies[$words[1]],
                                       $this->total_words);
             }
-            if ($save_ngram_keys){
-                $this->ngramdata[$ngram] = Array(
-                    "freq" => $freq,
-                    "LL" =>  $ll
-                );
-            }
-            else{
-                $this->data[] = Array(
-                    "ngram" => $ngram,
-                    "freq" => $freq,
-                    "LL" =>  $ll,
-                    "PMI" => PMI($freq,
-                                 $this->word_frequencies[$words[0]], 
-                                 $this->word_frequencies[$words[1]],
-                                 $this->total_words)
-                );
-            }
+            $this->ngramdata[$this->ngram_number][$ngram] = Array(
+                "freq" => $freq,
+                "LL" =>  $ll
+            );
+            $this->data[] = Array(
+                "ngram" => $ngram,
+                "freq" => $freq,
+                "LL" =>  $ll,
+                "PMI" => PMI($freq,
+                             $this->word_frequencies[$words[0]], 
+                             $this->word_frequencies[$words[1]],
+                             $this->total_words)
+            );
         }
 
         return $this;
@@ -397,9 +382,10 @@ class Corpus extends CorpusObject{
      * for the whole (sub)corpus.
      *
      * @param $n which grams (2,3,4...)
+     * @param $min_count take only ngrams with minimun frequency of this
      * 
      */
-    public function SetNgramFrequency($n){
+    public function SetNgramFrequency($n, $min_count=0){
         $this->SetAddressesOfAllDocuments();
         $this->ngram_number = $n;
 
@@ -422,7 +408,7 @@ class Corpus extends CorpusObject{
                 WHERE n1 ~ \$$last_index AND -- NOTE: exlcuding if a number present
                 LOWER(n1) ~ '[a-öа-я]'  -- NOTE excluding if no letters
              )  
-             AS ngramq GROUP BY lower(ngram)  HAVING ngramq.count > 0
+             AS ngramq GROUP BY lower(ngram)  HAVING ngramq.count > $min_count
              ORDER BY count DESC";
         $result = pg_query_params($this->corpuscon, $query, 
             array_merge($this->document_addresses["arr"],Array("^[^\d\(\)']+$")));

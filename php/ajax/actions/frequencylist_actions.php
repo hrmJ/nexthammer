@@ -67,8 +67,10 @@ function Ngrams($corpus, $codes, $lang, $n, $lemmas){
                 ->CreateNgramTable();
     }
     else if($n == 3){
-        $corpus ->SetNgramFrequency(2)
-                ->CreateNgramTable(true)
+        $corpus ->SetNgramFrequency(3, 2)
+                ->CreateNgramTable()
+                ->SetNgramFrequency(2, 0)
+                ->CreateNgramTable()
                 ->Count3gramLL();
     }
 
