@@ -6,7 +6,7 @@ tf-idf-klikatut ngrammit
 - [ ] Nappi, josta saa tulostettuu
     - ensin normalisoitu
 - [ ] Ei-lemmatisoitu lista 
-- [ ] Otsikko tf_idf-klikatulle n-grammille
+- [X] Otsikko tf_idf-klikatulle n-grammille
 
 Muut 
 -----
