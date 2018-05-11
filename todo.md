@@ -75,13 +75,13 @@ VERSIO 2
 3gramm
 ------
 
-1. P + D + N
-2. A + N + N
-3. N + A + N
-4. N + N + N
-5. A + A + N
-6. P + N + P
-7. N + P + N
+["P", "D", "N"] 
+["A", "N", "N"]
+["N", "A", "N"]
+["N", "N", "N"]
+["A", "A", "N"]
+["P", "N", "P"]
+["N", "P", "N"]
 
 Muut ngrammit näiden yhdistelmiä
 
@@ -101,7 +101,3 @@ Muut ngrammit näiden yhdistelmiä
 
 1. N + V + C(onj)
 2. V + P + N
-Со шведским мне нужна твоя помощь, там все запутанно очень для меня
-ФИЛЬТРЫ РАСШИФРОВКА.txt
-1 КБ
-

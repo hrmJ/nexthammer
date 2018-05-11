@@ -86,6 +86,9 @@ $(document).ready(function(){
     Corpusdesktop.AddDesktopEvents();
 
     //Events for tf_idf
-    $(".lrd_menu li").click(CorpusActions.ExamineTopics.PrintNgrams);
+    $(".lrd_menu li").click(function() {
+            CorpusActions.ExamineTopics.ChooseParadigm($(this));
+        }
+    );
 
 });

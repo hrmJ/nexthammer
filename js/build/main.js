@@ -743,6 +743,7 @@ var CorpusActions = function(){
 
         tf_idf_baseline: 0,
         lrd_lemma: "",
+        current_n:2,
 
         /**
          *
@@ -828,7 +829,7 @@ var CorpusActions = function(){
                     }
                     freqlist.SetName(picked_code).SetHeader(["Lemma","Freq","TF_IDF","NB"]).SetRows(newdata).BuildOutput();
                     freqlist.$container.appendTo($details_li.hide());
-                    freqlist.AddRowAction(self.ExamineThisRow, 2);
+                    freqlist.AddRowAction(self.ExamineThisRow.bind(self), 2);
                     $details_li.slideDown()
                 }
             );
@@ -846,26 +847,57 @@ var CorpusActions = function(){
             var self = this;
             $(".my-lightbox").hide();
             $(".lrd_menu").fadeIn();
-            CorpusActions.SubCorpusCharacteristics.lrd_lemma = $launcher.text();
+            this.lrd_lemma = $launcher.text();
         },
 
 
         /**
          *
-         * Print ngram lists based on the words defined by tf_idf
+         * Choose, whether to use a verb-centered or a noun centered set of filters for ngrams
+         *
+         * @param $launcher the list element that fired the event
          *
          **/
-        PrintNgrams: function(){
-            n = $(this).attr("id").replace(/.*_(\d+)/g,"$1") * 1;
+        ChooseParadigm: function($launcher){
+            this.current_n = $launcher.attr("id").replace(/.*_(\d+)/g,"$1") * 1;
+            var $menu = $launcher.find("ul");
+            if(!$menu.length){
+                var $ul = $(`
+                    <ul>
+                        <li>Noun-centered</li>
+                        <li>Verb-centered</li>
+                    </ul>`);
+                //$nounli.click()
+                $ul.appendTo($launcher).hide().slideDown();
+                var self = this;
+                $ul.find("li").click(function(){
+                    self.PrintNgrams($(this).text());
+                });
+            
+            }else
+            {
+                $menu.slideToggle();
+            }
+            
+        },
+
+        /**
+         *
+         * Print ngram lists based on the words defined by tf_idf
+         *
+         * @param paradigm Noun-centered or Verb-centered
+         *
+         **/
+        PrintNgrams: function(paradigm){
             CorpusActions.SubCorpusCharacteristics.PrintNgramList(
                 {
-                    n:n,
+                    n:this.current_n,
                     lemmas:"no",
-                    must_include: CorpusActions.SubCorpusCharacteristics.lrd_lemma,
+                    must_include: this.lrd_lemma,
                     included_word_lemma: true,
-                    filter_patterns: CorpusActions.ExamineTopics.ngram_patterns["noun-centered"][n+""],
+                    filter_patterns: this.ngram_patterns[paradigm][this.current_n+""],
                 },
-                `${n}-grams with ${CorpusActions.SubCorpusCharacteristics.lrd_lemma}`
+                `${this.current_n}-grams with ${this.lrd_lemma}`
             );
         },
 
@@ -878,7 +910,7 @@ var CorpusActions = function(){
          **/
         ngram_patterns: {
 
-            "noun-centered" : {
+            "Noun-centered" : {
                 "2":[
                         ["A", "N"],
                         ["N", "A"],
@@ -894,6 +926,19 @@ var CorpusActions = function(){
                         ["P", "N", "P"],
                         ["N", "P", "N"]
                     ],
+            },
+
+            "Verb-centered" : {
+                "2":[
+                        ["V", "N"],
+                        ["N", "V"],
+                        ["V", "P"],
+                        ["P", "V"]
+                    ],
+                "3":[
+                        ["N", "V", "C"],
+                        ["V", "P", "N"]
+                    ],
             }        
         },
     
@@ -907,7 +952,7 @@ var CorpusActions = function(){
     
     };
 
-}();
+    }();
 
 /**
  *
@@ -1074,6 +1119,9 @@ $(document).ready(function(){
     Corpusdesktop.AddDesktopEvents();
 
     //Events for tf_idf
-    $(".lrd_menu li").click(CorpusActions.ExamineTopics.PrintNgrams);
+    $(".lrd_menu li").click(function() {
+            CorpusActions.ExamineTopics.ChooseParadigm($(this));
+        }
+    );
 
 });
