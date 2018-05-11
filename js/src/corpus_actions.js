@@ -31,18 +31,18 @@ var CorpusActions = function(){
          * @param predifined_lemmas lemmas or not, if defined programmatically
          *
          */
-        PrintNgramList: function(must_include, predifined_n, predifined_lemmas, desktop_name){
+        PrintNgramList: function(params, desktop_name){
             var self = this;
             $("#corpusaction").hide();
             $(".my-lightbox:not(.lrd_menu)").hide();
-            params = {
-                action:"corpus_ngram_list",
-                codes: Loaders.GetPickedCodes(),
-                lang: Loaders.GetPickedLang(),
-                n:  predifined_n || $("[name='ngram_n_number']").val()*1 || 2,
-                lemmas:  predifined_lemmas || ($("[name='ngram_lemma']").get(0).checked ? "yes" : "no"),
-                must_include: must_include || "",
-            };
+            params = params || {
+                //Default ajax parameters for ngrams
+                n:   $("[name='ngram_n_number']").val()*1 || 2,
+                lemmas:  ($("[name='ngram_lemma']").get(0).checked ? "yes" : "no"),
+            }
+            params.action = "corpus_ngram_list";
+            params.codes = Loaders.GetPickedCodes();
+            params.lang = Loaders.GetPickedLang();
             var msg = new Utilities.Message("Loading...", $(".container"));
             msg.Show(9999999);
             $.getJSON("php/ajax/get_frequency_list.php", params,

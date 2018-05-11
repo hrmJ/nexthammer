@@ -89,9 +89,12 @@ $(document).ready(function(){
     $(".lrd_menu li").click(function(){
         n = $(this).attr("id").replace(/.*_(\d+)/g,"$1") * 1;
             CorpusActions.SubCorpusCharacteristics.PrintNgramList(
-                CorpusActions.SubCorpusCharacteristics.lrd_lemma,
-                n,
-                "yes",
+                {
+                    n:n,
+                    lemmas:"no",
+                    must_include: CorpusActions.SubCorpusCharacteristics.lrd_lemma,
+                    included_word_lemma: true,
+                },
                 `${n}-grams with ${CorpusActions.SubCorpusCharacteristics.lrd_lemma}`
             );
     });
