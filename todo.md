@@ -19,3 +19,43 @@ Muut
 - [ ] synonyms with wiktionary
 - [ ] log-likelihood + ngrams
 
+
+Filtteröidään LRD:stä saatuja listoja, niin että lopputuloksena:
+
+2gramm:
+-------
+
+1. A + N
+2. N + A
+3. P + N
+4. N + N
+
+3gramm
+------
+
+1. P + D + N
+2. A + N + N
+3. N + A + N
+4. N + N + N
+5. A + A + N
+6. P + N + P
+7. N + P + N
+
+Muut ngrammit näiden yhdistelmiä
+
+2. функцинаольная (verb centered)
+=================
+
+2gramm
+------
+
+1. V + N
+2. N + V
+3. V + P
+
+3gramm
+------
+
+1. N + V + C(onj)
+2. V + P + N
+

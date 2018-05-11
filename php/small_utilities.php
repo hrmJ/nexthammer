@@ -75,6 +75,45 @@ function PickNoun($lang){
 }
 
 
+/**
+ *
+ * Get the right tags denoting a specific POS in a specific language
+ *
+ * @param string $lang the language
+ * @param string $pos the POS
+ *
+ **/
+function PickPosTags($lang, $pos){
+    switch($lang){
+        case "fi":
+            switch($pos){
+                case "N":
+                    return Array("NOUN");
+            }
+        case "sv":
+            switch($pos){
+                case "N":
+                    return Array("NN");
+            }
+        case "fr":
+            switch($pos){
+                case "N":
+                    return Array("NC");
+            }
+        case "ru":
+            switch($pos){
+                case "N":
+                    return Array("N");
+            }
+        case "en":
+            switch($pos){
+                case "N":
+                    return Array("NNP","NN");
+            }
+    }
+}
+
+
 //Combine lemma2 to lemma1
 function CombineWords($lemma_array, $lemma1, $lemma2){
     //1. Find the freq of one of the lemmas

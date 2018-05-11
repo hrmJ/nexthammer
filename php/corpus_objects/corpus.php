@@ -413,6 +413,37 @@ class Corpus extends CorpusObject{
     }
 
     /**
+     *
+     * Filters the ngram to restrict the selection to only ngrams
+     * with a specific structure, e.g. N+N+A
+     *
+     * @param Array $filter_array [0 => "noun", 1 => "adjective", 2 => "noun", 3 => ...]
+     *
+     *
+     *
+     *
+     **/
+    public function SetNgramFilterByPos($filter_array){
+
+        $s = "";
+        for($i=1;$i<=$this->ngram_number;$i++){
+            //Get the tags for this specific pos
+            //TODO: make this query prepared, too
+            $tags = PickPosTags($filter_array[$i-1]);
+            $pos_string = "(";
+            foreach($tags as $tag){
+                $pos_string .= "'$tag', ";
+            }
+            $pos_string = trim($pos_string," ,") . ")";
+            $s .=  " AND id$i IN 
+                    SELECT  linktotext FROM pos_{$this->lang} 
+                    WHERE pos IN $pos_string ";
+        }
+        var_dump(s);
+    }
+
+
+    /**
      * 
      * Fetches all ngrams and orders them descending by frequency.
      * This is not done separately for each document but rather
@@ -420,47 +451,73 @@ class Corpus extends CorpusObject{
      *
      * @param $n which grams (2,3,4...)
      * @param $min_count take only ngrams with minimun frequency of this
-     * @param string $must_include a word / lemma an ngram must include in order to qualify
+     * @param string $filter_by_pos a word / lemma an ngram must include in order to qualify
+     * @param Array $pos_array array of parts of speech that must be included
      * 
      */
-    public function SetNgramFrequency($n, $min_count=0, $must_include=""){
+    public function SetNgramFrequency($n, $min_count=0, $include_word="", $pos_array=Array()){
         $this->SetAddressesOfAllDocuments();
         $this->ngram_number = $n;
 
+        //Construct the LEAD queries for the ngrams
         $wordcols = Array();
         $leadwordcols = "lower({$this->filter->target_col}), ";
+        $leadwordids = $this->filter->id_col . ", ";
         for($i=1;$i<=$n;$i++){
             $wordcols[] = "n$i";
             $leadwordcols .= " lower(LEAD({$this->filter->target_col}, $i) OVER()) AS n$i, ";
+            $leadwordids .= " LEAD({$this->filter->id_col}, $i) OVER() AS id$i, ";
         };
         $leadwordcols = trim($leadwordcols," ,");
+        $leadwordids = trim($leadwordids," ,");
         $wordcolstring = implode(" || '{$this->ngram_separator}' || ", $wordcols);
         $last_index = sizeof($this->document_addresses["arr"]) + 1;
-        $additional_cond = "";
-        if($must_include){
-             $additional_cond = $this->SetNgramMustIncludeWord($must_include, $last_index, $n) . " AND";
+
+        $filter_by_pos = "";
+        $filter_by_word = "";
+        if($include_word){
+             $filter_by_word = $this->SetNgramMustIncludeWord($include_word, $last_index, $n) . " AND";
         }
+        if($pos_array){
+             $filter_by_pos = $this->SetNgramFilterByPos($pos_array);
+        }
+
+        $nounmarks = PickNoun($this->lang);
+        $nounstr = "(";
+        foreach($nounmarks as $nounmark){
+            $nounstr .= "'$nounmark', ";
+        }
+        $nounstr = trim($nounstr," ,") . ")";
+
+        //Prepare the query
         $query = "SELECT lower(ngram) AS ngram, count(*) FROM
              (SELECT $wordcolstring as ngram FROM
-             (SELECT $leadwordcols FROM {$this->filter->target_table_prefix}_{$this->lang}
+             (SELECT $leadwordcols, $leadwordids FROM {$this->filter->target_table_prefix}_{$this->lang}
                 WHERE
                 {$this->filter->target_col_filter}
                 ({$this->document_addresses["str"]})
              ) AS q
                 WHERE n1 ~ \$$last_index AND -- NOTE: exlcuding if a number present
-                $additional_cond
+                $filter_by_word
                 LOWER(n1) ~ '[a-öа-я]'  -- NOTE excluding if no letters
+                $filter_by_pos
              )  
              AS ngramq GROUP BY lower(ngram)  HAVING ngramq.count > $min_count
              ORDER BY count DESC";
+
+
+        //Run the query
         $result = pg_query_params($this->corpuscon, $query, 
             array_merge($this->document_addresses["arr"],
             Array("^[^\d\(\)']+$"),
-            ($additional_cond ? Array($must_include) : Array()))
+            ($include_word ? Array($include_word) : Array()))
         );
+
+        //Process the results
         $freqs = pg_fetch_all($result);
         $this->ngram_frequencies = Array();
         $this->ngram_frequencies_by_first_word = Array();
+
            
         foreach($freqs as $row){
             if($row["ngram"]){
