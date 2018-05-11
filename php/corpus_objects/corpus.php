@@ -420,26 +420,41 @@ class Corpus extends CorpusObject{
      * @param Array $filter_array [0 => "noun", 1 => "adjective", 2 => "noun", 3 => ...]
      *
      *
-     *
-     *
      **/
     public function SetNgramFilterByPos($filter_array){
 
-        $s = "";
-        for($i=1;$i<=$this->ngram_number;$i++){
-            //Get the tags for this specific pos
-            //TODO: make this query prepared, too
-            $tags = PickPosTags($filter_array[$i-1]);
-            $pos_string = "(";
-            foreach($tags as $tag){
-                $pos_string .= "'$tag', ";
+        $s = "\nAND\n(\n";
+
+        foreach($filter_array as $pattern){
+
+            if($s !== "\nAND\n(\n")
+                $s .= "OR ";
+
+            $s .= "\n(\n";
+            $pattern_string = "";
+            foreach($pattern as $token_no => $pos){
+
+                $tags = PickPosTags($this->lang, $pos);
+                $pos_string = "(";
+                foreach($tags as $tag){
+                    $pos_string .= "'$tag', ";
+                }
+                $pos_string = trim($pos_string," ,") . ")";
+
+                if($pattern_string)
+                    $pattern_string .= " AND ";
+
+                $token_no++;
+                $pattern_string .=  "pos_$token_no IN $pos_string ";
             }
-            $pos_string = trim($pos_string," ,") . ")";
-            $s .=  " AND id$i IN 
-                    SELECT  linktotext FROM pos_{$this->lang} 
-                    WHERE pos IN $pos_string ";
+            $s .= "$pattern_string\n)\n";
+        
         }
-        var_dump(s);
+
+        $s .= "\n)\n";
+
+        return $s;
+
     }
 
 
@@ -461,16 +476,23 @@ class Corpus extends CorpusObject{
 
         //Construct the LEAD queries for the ngrams
         $wordcols = Array();
-        $leadwordcols = "lower({$this->filter->target_col}), ";
-        $leadwordids = $this->filter->id_col . ", ";
+        $leadwordcols = "lower({$this->filter->target_col}) as n1,";
+        $leadposcols = "postab.pos as pos_1,";
         for($i=1;$i<=$n;$i++){
+            $n_idx = $i + 1;
             $wordcols[] = "n$i";
-            $leadwordcols .= " lower(LEAD({$this->filter->target_col}, $i) OVER()) AS n$i, ";
-            $leadwordids .= " LEAD({$this->filter->id_col}, $i) OVER() AS id$i, ";
+            if($i<$n){
+                $leadwordcols .= " lower(LEAD({$this->filter->target_col}, $i) OVER()) AS n$n_idx,";
+                $leadposcols .= " LEAD(postab.pos, $i) OVER() AS pos_$n_idx,";
+            }
         };
         $leadwordcols = trim($leadwordcols," ,");
-        $leadwordids = trim($leadwordids," ,");
+        $leadposcols = trim($leadposcols," ,");
+        var_dump($leadwordcols);
+        var_dump($leadposcols);
+
         $wordcolstring = implode(" || '{$this->ngram_separator}' || ", $wordcols);
+        var_dump($wordcolstring);
         $last_index = sizeof($this->document_addresses["arr"]) + 1;
 
         $filter_by_pos = "";
@@ -489,13 +511,16 @@ class Corpus extends CorpusObject{
         }
         $nounstr = trim($nounstr," ,") . ")";
 
+        $addr_condition = str_replace("id", "tokentab.id", $this->document_addresses["str"]);
+
         //Prepare the query
         $query = "SELECT lower(ngram) AS ngram, count(*) FROM
              (SELECT $wordcolstring as ngram FROM
-             (SELECT $leadwordcols, $leadwordids FROM {$this->filter->target_table_prefix}_{$this->lang}
-                WHERE
-                {$this->filter->target_col_filter}
-                ({$this->document_addresses["str"]})
+             (SELECT $leadwordcols, \n $leadposcols
+                FROM {$this->filter->target_table_prefix}_{$this->lang} tokentab
+                LEFT JOIN pos_{$this->lang} postab ON 
+                tokentab.id = postab.linktotext  
+                WHERE {$this->filter->target_col_filter} ($addr_condition)
              ) AS q
                 WHERE n1 ~ \$$last_index AND -- NOTE: exlcuding if a number present
                 $filter_by_word
@@ -505,6 +530,9 @@ class Corpus extends CorpusObject{
              AS ngramq GROUP BY lower(ngram)  HAVING ngramq.count > $min_count
              ORDER BY count DESC";
 
+        if($pos_array){
+            #var_dump($query);
+        }
 
         //Run the query
         $result = pg_query_params($this->corpuscon, $query, 
@@ -512,6 +540,22 @@ class Corpus extends CorpusObject{
             Array("^[^\d\(\)']+$"),
             ($include_word ? Array($include_word) : Array()))
         );
+
+        $test = "
+             SELECT $leadwordcols, \n $leadposcols
+                FROM {$this->filter->target_table_prefix}_{$this->lang} tokentab
+                LEFT JOIN pos_{$this->lang} postab ON 
+                tokentab.id = postab.linktotext  
+                WHERE {$this->filter->target_col_filter} ($addr_condition)
+            ";
+
+        #if($pos_array){
+        #    //Run the query
+        #    $result2 = pg_query_params($this->corpuscon, $test, 
+        #        $this->document_addresses["arr"]);
+        #    $testres = pg_fetch_all($result2);
+        #    var_dump($testres);
+        #}
 
         //Process the results
         $freqs = pg_fetch_all($result);

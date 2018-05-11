@@ -104,6 +104,8 @@ function PickPosTags($lang, $pos){
             switch($pos){
                 case "N":
                     return Array("N");
+                case "A":
+                    return Array("calksjdsaN");
             }
         case "en":
             switch($pos){

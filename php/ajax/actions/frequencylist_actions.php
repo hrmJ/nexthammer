@@ -47,9 +47,10 @@ function SubcorpusStats($corpus, $codes, $lang){
  * @param integer $n which grams (2,3,4...)
  * @param string $lemmas should we search for lemmas and not tokens (yes/no)
  * @param string $include_word only ngrams with this word
+ * @param Array $pos_array restrict the ngrams to include only the ones with POS patterns specified in this array
  *
  */
-function Ngrams($corpus, $codes, $lang, $n, $lemmas, $include_word=""){
+function Ngrams($corpus, $codes, $lang, $n, $lemmas, $include_word="", $pos_array=[]){
     $corpus->SetSubCorpus($codes, $lang)
            ->SetLang($lang)
            ->SetFilter();
@@ -66,12 +67,12 @@ function Ngrams($corpus, $codes, $lang, $n, $lemmas, $include_word=""){
     if($n > 2){
         $corpus ->SetNgramFrequency(2, 0)
                 ->CreateNgramTable()
-                ->SetNgramFrequency($n, 0, $include_word)
+                ->SetNgramFrequency($n, 0, $include_word, $pos_array)
                 ->CreateNgramTable()
                 ->CountGt2gramLL();
     }
     else{
-        $corpus ->SetNgramFrequency($n, 0, $include_word)
+        $corpus ->SetNgramFrequency($n, 0, $include_word, $pos_array)
                 ->CreateNgramTable();
     }
 
