@@ -91,13 +91,13 @@ Muut ngrammit näiden yhdistelmiä
 2gramm
 ------
 
-1. V + N
-2. N + V
-3. V + P
-4. P + V
+["V", "N"]
+["N", "V"]
+["V", "P"]
+["P", "V"]
 
 3gramm
 ------
 
-1. N + V + C(onj)
-2. V + P + N
+["N", "V", "C"]
+["V", "P", "N"]
