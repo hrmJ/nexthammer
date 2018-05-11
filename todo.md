@@ -59,3 +59,49 @@ Muut ngrammit näiden yhdistelmiä
 1. N + V + C(onj)
 2. V + P + N
 
+
+
+VERSIO 2
+========
+
+в функциональные фильтры добавил одну позицию 2gramm:
+-------
+
+1. A + N
+2. N + A
+3. P + N
+4. N + N
+
+3gramm
+------
+
+1. P + D + N
+2. A + N + N
+3. N + A + N
+4. N + N + N
+5. A + A + N
+6. P + N + P
+7. N + P + N
+
+Muut ngrammit näiden yhdistelmiä
+
+2. функцинаольная (verb centered)
+=================
+
+2gramm
+------
+
+1. V + N
+2. N + V
+3. V + P
+4. P + V
+
+3gramm
+------
+
+1. N + V + C(onj)
+2. V + P + N
+Со шведским мне нужна твоя помощь, там все запутанно очень для меня
+ФИЛЬТРЫ РАСШИФРОВКА.txt
+1 КБ
+

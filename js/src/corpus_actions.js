@@ -47,6 +47,7 @@ var CorpusActions = function(){
             msg.Show(9999999);
             $.getJSON("php/ajax/get_frequency_list.php", params,
                 function(data){
+                    console.log(data);
                     msg.Destroy();
                     var freqlist = new Corpusdesktop.Table();
                     freqlist
@@ -207,6 +208,54 @@ var CorpusActions = function(){
             $(".my-lightbox").hide();
             $(".lrd_menu").fadeIn();
             CorpusActions.SubCorpusCharacteristics.lrd_lemma = $launcher.text();
+        },
+
+
+        /**
+         *
+         * Print ngram lists based on the words defined by tf_idf
+         *
+         **/
+        PrintNgrams: function(){
+            n = $(this).attr("id").replace(/.*_(\d+)/g,"$1") * 1;
+            CorpusActions.SubCorpusCharacteristics.PrintNgramList(
+                {
+                    n:n,
+                    lemmas:"no",
+                    must_include: CorpusActions.SubCorpusCharacteristics.lrd_lemma,
+                    included_word_lemma: true,
+                    filter_patterns: CorpusActions.ExamineTopics.ngram_patterns["noun-centered"][n+""],
+                },
+                `${n}-grams with ${CorpusActions.SubCorpusCharacteristics.lrd_lemma}`
+            );
+        },
+
+
+        /**
+         *
+         * Patterns used for filtering ngrams based on tf_idf
+         * TODO: make these user-defined 
+         *
+         **/
+        ngram_patterns: {
+
+            "noun-centered" : {
+                "2":[
+                        ["A", "N"],
+                        ["N", "A"],
+                        ["P", "N"],
+                        ["N", "N"]
+                    ],
+                "3":[
+                        ["P", "D", "N"],
+                        ["A", "N", "N"],
+                        ["N", "A", "N"],
+                        ["N", "N", "N"],
+                        ["A", "A", "N"],
+                        ["P", "N", "P"],
+                        ["N", "P", "N"]
+                    ],
+            }        
         },
     
     };

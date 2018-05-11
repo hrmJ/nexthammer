@@ -546,19 +546,26 @@ class Corpus extends CorpusObject{
         $this->ngram_frequencies = Array();
         $this->ngram_frequencies_by_first_word = Array();
 
-           
-        foreach($freqs as $row){
-            if($row["ngram"]){
-                $this->ngram_frequencies[$row["ngram"]] = $row["count"]*1;
-                $words = explode($this->ngram_separator, $row["ngram"]);
-                if (array_key_exists($words[0], $this->ngram_frequencies_by_first_word)){
-                    $this->ngram_frequencies_by_first_word[$words[0]] += $row["count"]*1;
-                }
-                else{
-                    $this->ngram_frequencies_by_first_word[$words[0]] = $row["count"]*1;
+        if(!$freqs){
+            //If no results:
+        
+        }
+        else{
+             foreach($freqs as $row){
+                if($row["ngram"]){
+                    $this->ngram_frequencies[$row["ngram"]] = $row["count"]*1;
+                    $words = explode($this->ngram_separator, $row["ngram"]);
+                    if (array_key_exists($words[0], $this->ngram_frequencies_by_first_word)){
+                        $this->ngram_frequencies_by_first_word[$words[0]] += $row["count"]*1;
+                    }
+                    else{
+                        $this->ngram_frequencies_by_first_word[$words[0]] = $row["count"]*1;
+                    }
                 }
             }
         }
+           
+       
         return $this;
     }
 
