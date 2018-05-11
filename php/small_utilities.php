@@ -89,16 +89,46 @@ function PickPosTags($lang, $pos){
             switch($pos){
                 case "N":
                     return Array("NOUN");
+                case "A":
+                    return Array("ADJ");
+                case "P":
+                    return Array("ADPOS");
+                case "V":
+                    return Array("VERB","AUX");
+                case "D":
+                    return Array("");
+                case "C":
+                    return Array("CONJ","SCONJ");
             }
         case "sv":
             switch($pos){
                 case "N":
                     return Array("NN");
+                case "A":
+                    return Array("JJ");
+                case "P":
+                    return Array("PP");
+                case "D":
+                    return Array("DT");
+                case "C":
+                    return Array("KN");
+                case "V":
+                    return Array("VB");
             }
         case "fr":
             switch($pos){
                 case "N":
                     return Array("NC");
+                case "A":
+                    return Array("ADJ");
+                case "P":
+                    return Array("P","D");
+                case "V":
+                    return Array("V","VPR","VINF","VPP","VINF","VS","CLR");
+                case "D":
+                    return Array("DET");
+                case "C":
+                    return Array("CONJ","SCONJ");
             }
         case "ru":
             switch($pos){
@@ -118,7 +148,17 @@ function PickPosTags($lang, $pos){
         case "en":
             switch($pos){
                 case "N":
-                    return Array("NNP","NN");
+                    return Array("NNP","NN","NNS");
+                case "A":
+                    return Array("JJ");
+                case "P":
+                    return Array("IN");
+                case "V":
+                    return Array("VBG","VBP","VBN","VB","VBZ");
+                case "D":
+                    return Array("DT");
+                case "C":
+                    return Array("CC");
             }
     }
 }
