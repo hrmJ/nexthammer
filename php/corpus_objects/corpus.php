@@ -391,13 +391,15 @@ class Corpus extends CorpusObject{
      *
      * Edits the regular ngramquery to limit the results to those that include 
      * A certain word in one of the slots
+     * TODO: make possible for both lemmas and tokens
      *
      * @param $word string the word / lemma that must be included
      * @param $last_index index of the last pg_params parameter so far
      * @param $n which grams
+     * @param $word_is_lemma accept any form of the specified word
      *
      **/
-    public function SetNgramMustIncludeWord($word, $last_index, $n){
+    public function SetNgramMustIncludeWord($word, $last_index, $n, $word_is_lemma=FALSE){
         $w_index = $last_index + 1;
         $cond = "(";
         for($i=1;$i<=$n;$i++){
@@ -405,7 +407,8 @@ class Corpus extends CorpusObject{
                 if($cond !== "("){
                     $cond .= " OR ";
                 }
-                $cond .= "n$i =  \$$w_index";
+                $colname = ($word_is_lemma ? "lemma_" : "n");
+                $cond .= "$colname" . "$i =  \$$w_index";
             }
         }
         $cond .= ")";
@@ -468,26 +471,30 @@ class Corpus extends CorpusObject{
      * @param $min_count take only ngrams with minimun frequency of this
      * @param string $filter_by_pos a word / lemma an ngram must include in order to qualify
      * @param Array $pos_array array of parts of speech that must be included
+     * @param boolean $word_condition_is_lemma take any form of the word that must be included?
      * 
      */
-    public function SetNgramFrequency($n, $min_count=0, $include_word="", $pos_array=Array()){
+    public function SetNgramFrequency($n, $min_count=0, $include_word="", $pos_array=Array(), $word_condition_is_lemma=FALSE){
         $this->SetAddressesOfAllDocuments();
         $this->ngram_number = $n;
 
         //Construct the LEAD queries for the ngrams
         $wordcols = Array();
-        $leadwordcols = "lower({$this->filter->target_col}) as n1,";
+        $leadwordcols = "lower(tokentab.{$this->filter->target_col}) as n1,";
         $leadposcols = "postab.pos as pos_1,";
+        $leadlemmacols = "lemmatab.lemma as lemma_1,";
         for($i=1;$i<=$n;$i++){
             $n_idx = $i + 1;
             $wordcols[] = "n$i";
             if($i<$n){
-                $leadwordcols .= " lower(LEAD({$this->filter->target_col}, $i) OVER()) AS n$n_idx,";
+                $leadwordcols .= " lower(LEAD(tokentab.{$this->filter->target_col}, $i) OVER()) AS n$n_idx,";
                 $leadposcols .= " LEAD(postab.pos, $i) OVER() AS pos_$n_idx,";
+                $leadlemmacols .= " LEAD(lemmatab.lemma, $i) OVER() AS lemma_$n_idx,";
             }
         };
         $leadwordcols = trim($leadwordcols," ,");
         $leadposcols = trim($leadposcols," ,");
+        $leadlemmacols = trim($leadlemmacols," ,");
 
         $wordcolstring = implode(" || '{$this->ngram_separator}' || ", $wordcols);
         $last_index = sizeof($this->document_addresses["arr"]) + 1;
@@ -495,7 +502,7 @@ class Corpus extends CorpusObject{
         $filter_by_pos = "";
         $filter_by_word = "";
         if($include_word){
-             $filter_by_word = $this->SetNgramMustIncludeWord($include_word, $last_index, $n) . " AND";
+             $filter_by_word = $this->SetNgramMustIncludeWord($include_word, $last_index, $n, $word_condition_is_lemma) . " AND";
         }
         if($pos_array){
              $filter_by_pos = $this->SetNgramFilterByPos($pos_array);
@@ -513,10 +520,10 @@ class Corpus extends CorpusObject{
         //Prepare the query
         $query = "SELECT lower(ngram) AS ngram, count(*) FROM
              (SELECT $wordcolstring as ngram FROM
-             (SELECT $leadwordcols, \n $leadposcols
+             (SELECT $leadwordcols, \n $leadposcols, \n $leadlemmacols
                 FROM {$this->filter->target_table_prefix}_{$this->lang} tokentab
-                LEFT JOIN pos_{$this->lang} postab ON 
-                tokentab.id = postab.linktotext  
+                LEFT JOIN pos_{$this->lang} postab ON tokentab.id = postab.linktotext  
+                LEFT JOIN lemma_{$this->lang} lemmatab ON tokentab.id = lemmatab.linktotext  
                 WHERE {$this->filter->target_col_filter} ($addr_condition)
              ) AS q
                 WHERE n1 ~ \$$last_index AND -- NOTE: exlcuding if a number present
@@ -526,7 +533,6 @@ class Corpus extends CorpusObject{
              )  
              AS ngramq GROUP BY lower(ngram)  HAVING ngramq.count > $min_count
              ORDER BY count DESC";
-
 
         //Run the query
         $result = pg_query_params($this->corpuscon, $query, 
