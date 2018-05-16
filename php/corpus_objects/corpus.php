@@ -426,11 +426,12 @@ class Corpus extends CorpusObject{
      **/
     public function SetNgramFilterByPos($filter_array){
 
-        $s = "\nAND\n(\n";
+        $start_str = "\n(\n";
+        $s = $start_str;
 
         foreach($filter_array as $pattern){
 
-            if($s !== "\nAND\n(\n")
+            if($s !== $start_str)
                 $s .= "OR ";
 
             $s .= "\n(\n";
@@ -462,10 +463,52 @@ class Corpus extends CorpusObject{
 
 
     /**
+     *
+     * Sets a condition to filter out stop words from ngram query
+     *
+     * @param $last_idx last indx of params of the prepared statements
+     *
+     **/
+    public function SetStopWordFilterToNgramQuery($last_idx){
+        $indices = range($last_idx +1, $last_idx +1 + sizeof($this->stopwords) - 1 );
+        //Prepare the indices of the stopwords for the pg query
+        $sw_indexstring = "$" . implode($indices,", $");
+        $s = "";
+        for($i=1;$i<=$this->ngram_number;$i++){
+            if($s)
+                $s .= " AND ";
+            $s .= " n$i NOT IN ($sw_indexstring) ";
+        }
+
+        return "\n $s \n";
+
+    }
+
+
+    /**
+     *
+     * Adds a condition to the query for accepting only words matching a certain regex pattern
+     *
+     * @param $idx index of the pattern that must be matched in the params array
+     *
+     **/
+    public function SetForcePattern($idx){
+        $s = "";
+        for($i=1;$i<=$this->ngram_number;$i++){
+            if($s)
+                $s .= " AND ";
+            $s .= " n$i ~ \$$idx ";
+        }
+        return $s;
+    }
+
+    /**
      * 
      * Fetches all ngrams and orders them descending by frequency.
      * This is not done separately for each document but rather
      * for the whole (sub)corpus.
+     *
+     * TODO: make ngramquery a separate class!
      *
      * @param $n which grams (2,3,4...)
      * @param $min_count take only ngrams with minimun frequency of this
@@ -497,25 +540,39 @@ class Corpus extends CorpusObject{
         $leadlemmacols = trim($leadlemmacols," ,");
 
         $wordcolstring = implode(" || '{$this->ngram_separator}' || ", $wordcols);
-        $last_index = sizeof($this->document_addresses["arr"]) + 1;
+        $last_addr_index = sizeof($this->document_addresses["arr"]) + 1;
+        $addr_condition = str_replace($this->filter->id_col, "tokentab.{$this->filter->id_col}", $this->document_addresses["str"]);
 
+        //Adding filters to the query: if a specific word must be included, if
+        //a certain POS pattern must be followed...
+
+        $force_letters = $this->SetForcePattern($last_addr_index);
+        $exclude_if_only_numbers = $this->SetForcePattern($last_addr_index + 1);
+        $filter_stop_words = $this->SetStopWordFilterToNgramQuery($last_addr_index + 1);
         $filter_by_pos = "";
         $filter_by_word = "";
-        if($include_word){
-             $filter_by_word = $this->SetNgramMustIncludeWord($include_word, $last_index, $n, $word_condition_is_lemma) . " AND";
-        }
         if($pos_array){
              $filter_by_pos = $this->SetNgramFilterByPos($pos_array);
         }
+        if($include_word){
+            $filter_by_word = $this->SetNgramMustIncludeWord($include_word, 
+                sizeof($this->stopwords) + $last_addr_index + 1,
+                $n,
+                $word_condition_is_lemma);
+            //Add an additional and if also filtering by POS
+            $filter_by_word = ($filter_by_pos ? " AND $filter_by_word AND " : " AND $filter_by_word ");
 
-        $nounmarks = PickNoun($this->lang);
-        $nounstr = "(";
-        foreach($nounmarks as $nounmark){
-            $nounstr .= "'$nounmark', ";
         }
-        $nounstr = trim($nounstr," ,") . ")";
+        if (!$include_word and $filter_by_pos){
+            //Add an additional and if not filtering by word
+            $filter_by_pos = " AND $filter_by_pos ";
+        }
 
-        $addr_condition = str_replace($this->filter->id_col, "tokentab.{$this->filter->id_col}", $this->document_addresses["str"]);
+        //Merge the prepared params to one array
+        $params = array_merge($this->document_addresses["arr"],
+                        ["^[^\d\(\)']+$", "[a-öа-я]"],
+                        $this->stopwords,
+                        ($include_word ? [$include_word] : []));
 
         //Prepare the query
         $query = "SELECT lower(ngram) AS ngram, count(*) FROM
@@ -526,20 +583,26 @@ class Corpus extends CorpusObject{
                 LEFT JOIN lemma_{$this->lang} lemmatab ON tokentab.id = lemmatab.linktotext  
                 WHERE {$this->filter->target_col_filter} ($addr_condition)
              ) AS q
-                WHERE n1 ~ \$$last_index AND -- NOTE: exlcuding if a number present
+                WHERE 
+                $force_letters
+                AND
+                $exclude_if_only_numbers
+                AND 
+                $filter_stop_words
                 $filter_by_word
-                LOWER(n1) ~ '[a-öа-я]'  -- NOTE excluding if no letters
                 $filter_by_pos
              )  
              AS ngramq GROUP BY lower(ngram)  HAVING ngramq.count > $min_count
              ORDER BY count DESC";
 
         //Run the query
-        $result = pg_query_params($this->corpuscon, $query, 
-            array_merge($this->document_addresses["arr"],
-            Array("^[^\d\(\)']+$"),
-            ($include_word ? Array($include_word) : Array()))
-        );
+        try{
+            $result = pg_query_params($this->corpuscon, $query, $params);
+        }
+        catch(Exception $err){
+            echo "\n$err\n";
+            var_dump($query);
+        }
 
         //Process the results
         $freqs = pg_fetch_all($result);
@@ -548,7 +611,6 @@ class Corpus extends CorpusObject{
 
         if(!$freqs){
             //If no results:
-        
         }
         else{
              foreach($freqs as $row){
