@@ -182,6 +182,9 @@ var Corpusdesktop = function(){
                     }
                 //}
             });
+
+        // Make the text examining windows draggable
+        $(".text_examiner").draggable();
     };
 
     /**
@@ -889,17 +892,265 @@ var CorpusActions = function(){
          *
          **/
         PrintNgrams: function(paradigm){
+            if(this.current_n < 4){
+                 var ngram_patterns = this.ngram_patterns[paradigm][this.current_n+""];
+            }
+            else{
+                var ngram_patterns = this.BuildNgramPatterns(this.current_n, paradigm);
+            }
+
             CorpusActions.SubCorpusCharacteristics.PrintNgramList(
                 {
                     n:this.current_n,
                     lemmas:"no",
                     must_include: this.lrd_lemma,
                     included_word_lemma: true,
-                    filter_patterns: this.ngram_patterns[paradigm][this.current_n+""],
+                    filter_patterns: ngram_patterns,
                 },
                 `${this.current_n}-grams with ${this.lrd_lemma}`
             );
         },
+
+        /**
+         *
+         * Based on 2 and 3 gramss, build POS filters for 4 and higher
+         *
+         * @param n Which grams
+         * @param type which paragigm
+         *
+         **/
+        BuildNgramPatterns: function(n, type){
+            var self = this;
+            var pats = [];
+            switch(n){
+                case 4:
+                    $.each(self.ngram_patterns[type]["2"],function(idx,pat){
+                        $.each(self.ngram_patterns[type]["2"],function(idx,pat2){
+                            pats.push(pat.concat(pat2));
+                        });
+                    });
+                break;
+                case 5:
+                    $.each(self.ngram_patterns[type]["2"],function(idx,pat){
+                        $.each(self.ngram_patterns[type]["3"],function(idx,pat2){
+                            pats.push(pat.concat(pat2))
+                        });
+                    });
+                    $.each(self.ngram_patterns[type]["3"],function(idx,pat){
+                        $.each(self.ngram_patterns[type]["2"],function(idx,pat2){
+                            pats.push(pat.concat(pat2))
+                        });
+                    });
+                break;
+                case 6:
+                    $.each(self.ngram_patterns[type]["3"],function(idx,pat){
+                        $.each(self.ngram_patterns[type]["3"],function(idx,pat2){
+                            pats.push(pat.concat(pat2))
+                        });
+                    });
+                break;
+                case 7:
+                    var _2plus3 = [];
+                    $.each(self.ngram_patterns[type]["2"],function(idx,pat){
+                        $.each(self.ngram_patterns[type]["3"],function(idx,pat2){
+                            _2plus3.push(pat.concat(pat2));
+                        });
+                    });
+                    $.each(_2plus3,function(idx,pat){
+                        $.each(self.ngram_patterns[type]["2"],function(idx,pat2){
+                            pats.push(pat.concat(pat2));
+                        });
+                    });
+                    var _2plus2 = [];
+                    $.each(self.ngram_patterns[type]["2"],function(idx,pat){
+                        $.each(self.ngram_patterns[type]["2"],function(idx,pat2){
+                            _2plus2.push(pat.concat(pat2));
+                        });
+                    });
+                    $.each(_2plus2,function(idx,pat){
+                        $.each(self.ngram_patterns[type]["3"],function(idx,pat2){
+                            pats.push(pat.concat(pat2));
+                        });
+                    });
+                    var _3plus2 = [];
+                    $.each(self.ngram_patterns[type]["3"],function(idx,pat){
+                        $.each(self.ngram_patterns[type]["2"],function(idx,pat2){
+                            _3plus2.push(pat.concat(pat2));
+                        });
+                    });
+                    $.each(_3plus2,function(idx,pat){
+                        $.each(self.ngram_patterns[type]["2"],function(idx,pat2){
+                            pats.push(pat.concat(pat2));
+                        });
+                    });
+                break;
+                case 8:
+                    var _3plus3 = [];
+                    $.each(self.ngram_patterns[type]["3"],function(idx,pat){
+                        $.each(self.ngram_patterns[type]["3"],function(idx,pat2){
+                            _3plus3.push(pat.concat(pat2));
+                        });
+                    });
+                    $.each(_3plus3,function(idx,pat){
+                        $.each(self.ngram_patterns[type]["2"],function(idx,pat2){
+                            pats.push(pat.concat(pat2));
+                        });
+                    });
+                    var _3plus2 = [];
+                    $.each(self.ngram_patterns[type]["3"],function(idx,pat){
+                        $.each(self.ngram_patterns[type]["2"],function(idx,pat2){
+                            _3plus2.push(pat.concat(pat2));
+                        });
+                    });
+                    $.each(_3plus2,function(idx,pat){
+                        $.each(self.ngram_patterns[type]["3"],function(idx,pat2){
+                            pats.push(pat.concat(pat2));
+                        });
+                    });
+                    var _2plus3 = [];
+                    $.each(self.ngram_patterns[type]["2"],function(idx,pat){
+                        $.each(self.ngram_patterns[type]["3"],function(idx,pat2){
+                            _2plus3.push(pat.concat(pat2));
+                        });
+                    });
+                    $.each(_2plus3,function(idx,pat){
+                        $.each(self.ngram_patterns[type]["3"],function(idx,pat2){
+                            pats.push(pat.concat(pat2));
+                        });
+                    });
+                break;
+                case 9:
+                    var _3plus3 = [];
+                    $.each(self.ngram_patterns[type]["3"],function(idx,pat){
+                        $.each(self.ngram_patterns[type]["3"],function(idx,pat2){
+                            _3plus3.push(pat.concat(pat2));
+                        });
+                    });
+                    $.each(_3plus3,function(idx,pat){
+                        $.each(self.ngram_patterns[type]["3"],function(idx,pat2){
+                            pats.push(pat.concat(pat2));
+                        });
+                    });
+                break;
+                case 10:
+                    //3+3+2+2
+                    var _3plus3 = [];
+                    var _3plus3plus2 = [];
+                    $.each(self.ngram_patterns[type]["3"],function(idx,pat){
+                        $.each(self.ngram_patterns[type]["3"],function(idx,pat2){
+                            _3plus3.push(pat.concat(pat2));
+                        });
+                    });
+                    $.each(_3plus3,function(idx,pat){
+                        $.each(self.ngram_patterns[type]["2"],function(idx,pat2){
+                            _3plus3plus2.push(pat.concat(pat2));
+                        });
+                    });
+                    $.each(_3plus3plus2,function(idx,pat){
+                        $.each(self.ngram_patterns[type]["2"],function(idx,pat2){
+                            pats.push(pat.concat(pat2));
+                        });
+                    });
+                    //3+2+3+2
+                    var _3plus2 = [];
+                    var _3plus2plus3 = [];
+                    $.each(self.ngram_patterns[type]["3"],function(idx,pat){
+                        $.each(self.ngram_patterns[type]["2"],function(idx,pat2){
+                            _3plus2.push(pat.concat(pat2));
+                        });
+                    });
+                    $.each(_3plus2,function(idx,pat){
+                        $.each(self.ngram_patterns[type]["3"],function(idx,pat2){
+                            _3plus2plus3.push(pat.concat(pat2));
+                        });
+                    });
+                    $.each(_3plus2plus3,function(idx,pat){
+                        $.each(self.ngram_patterns[type]["3"],function(idx,pat2){
+                            pats.push(pat.concat(pat2));
+                        });
+                    });
+                    //3+2+2+3
+                    var _3plus2 = [];
+                    var _3plus2plus2 = [];
+                    $.each(self.ngram_patterns[type]["3"],function(idx,pat){
+                        $.each(self.ngram_patterns[type]["2"],function(idx,pat2){
+                            _3plus2.push(pat.concat(pat2));
+                        });
+                    });
+                    $.each(_3plus2,function(idx,pat){
+                        $.each(self.ngram_patterns[type]["2"],function(idx,pat2){
+                            _3plus2plus2.push(pat.concat(pat2));
+                        });
+                    });
+                    $.each(_3plus2plus2,function(idx,pat){
+                        $.each(self.ngram_patterns[type]["3"],function(idx,pat2){
+                            pats.push(pat.concat(pat2));
+                        });
+                    });
+                    //2+3+2+3
+                    var _2plus3 = [];
+                    var _2plus3plus2 = [];
+                    $.each(self.ngram_patterns[type]["2"],function(idx,pat){
+                        $.each(self.ngram_patterns[type]["3"],function(idx,pat2){
+                            _2plus3.push(pat.concat(pat2));
+                        });
+                    });
+                    $.each(_2plus3,function(idx,pat){
+                        $.each(self.ngram_patterns[type]["2"],function(idx,pat2){
+                            _2plus3plus2.push(pat.concat(pat2));
+                        });
+                    });
+                    $.each(_2plus3plus2,function(idx,pat){
+                        $.each(self.ngram_patterns[type]["3"],function(idx,pat2){
+                            pats.push(pat.concat(pat2));
+                        });
+                    });
+                    //2+2+3+3
+                    var _2plus2 = [];
+                    var _2plus2plus3 = [];
+                    $.each(self.ngram_patterns[type]["2"],function(idx,pat){
+                        $.each(self.ngram_patterns[type]["2"],function(idx,pat2){
+                            _2plus2.push(pat.concat(pat2));
+                        });
+                    });
+                    $.each(_2plus2,function(idx,pat){
+                        $.each(self.ngram_patterns[type]["3"],function(idx,pat2){
+                            _2plus2plus3.push(pat.concat(pat2));
+                        });
+                    });
+                    $.each(_2plus2plus3,function(idx,pat){
+                        $.each(self.ngram_patterns[type]["3"],function(idx,pat2){
+                            pats.push(pat.concat(pat2));
+                        });
+                    });
+                    //2+3+3+2
+                    var _2plus3 = [];
+                    var _2plus3plus3 = [];
+                    $.each(self.ngram_patterns[type]["2"],function(idx,pat){
+                        $.each(self.ngram_patterns[type]["3"],function(idx,pat2){
+                            _2plus3.push(pat.concat(pat2));
+                        });
+                    });
+                    $.each(_2plus3,function(idx,pat){
+                        $.each(self.ngram_patterns[type]["3"],function(idx,pat2){
+                            _2plus3plus3.push(pat.concat(pat2));
+                        });
+                    });
+                    $.each(_2plus3plus3,function(idx,pat){
+                        $.each(self.ngram_patterns[type]["2"],function(idx,pat2){
+                            pats.push(pat.concat(pat2));
+                        });
+                    });
+                break;
+            
+            }
+
+            return pats;
+
+        },
+
+
+
 
 
         /**

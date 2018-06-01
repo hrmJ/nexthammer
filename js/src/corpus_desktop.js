@@ -61,6 +61,9 @@ var Corpusdesktop = function(){
                     }
                 //}
             });
+
+        // Make the text examining windows draggable
+        $(".text_examiner").draggable();
     };
 
     /**
