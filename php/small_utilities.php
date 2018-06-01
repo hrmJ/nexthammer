@@ -164,6 +164,47 @@ function PickPosTags($lang, $pos){
 }
 
 
+function BuildNgramPatterns(){
+
+        $ngram_patterns_json = '{
+
+            "Noun-centered" : {
+                "2":[
+                        ["A", "N"],
+                        ["N", "A"],
+                        ["P", "N"],
+                        ["N", "N"]
+                    ],
+                "3":[
+                        ["P", "D", "N"],
+                        ["A", "N", "N"],
+                        ["N", "A", "N"],
+                        ["N", "N", "N"],
+                        ["A", "A", "N"],
+                        ["P", "N", "P"],
+                        ["N", "P", "N"]
+                    ],
+            },
+
+            "Verb-centered" : {
+                "2":[
+                        ["V", "N"],
+                        ["N", "V"],
+                        ["V", "P"],
+                        ["P", "V"]
+                    ],
+                "3":[
+                        ["N", "V", "C"],
+                        ["V", "P", "N"]
+                    ],
+            }        
+        }';
+    #var_dump(json_decode($ngram_patterns_json));
+    var_dump($ngram_patterns_json);
+
+}
+
+
 //Combine lemma2 to lemma1
 function CombineWords($lemma_array, $lemma1, $lemma2){
     //1. Find the freq of one of the lemmas
