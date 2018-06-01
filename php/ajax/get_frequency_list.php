@@ -36,7 +36,7 @@ switch($_GET["action"]){
             $_GET["n"],
             $_GET["lemmas"],
             (isset($_GET["must_include"]) ? $_GET["must_include"] : ""),
-            (isset($_GET["filter_patterns"]) ? $_GET["filter_patterns"] : []),
+            (isset($_GET["ldr_paradigm"]) ? BuildNgramPatterns($_GET["n"], $_GET["ldr_paradigm"]) : []),
             (isset($_GET["included_word_lemma"]) ? $_GET["included_word_lemma"] : FALSE)
         );
         $corpus->OutputJson();

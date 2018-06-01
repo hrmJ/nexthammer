@@ -164,44 +164,282 @@ function PickPosTags($lang, $pos){
 }
 
 
-function BuildNgramPatterns(){
+/**
+ *
+ *
+ * @param integer $n which grams
+ * @param string $paradigm Noun-centered or Verb-centered
+ *
+ **/
+function BuildNgramPatterns($n, $paradigm){
 
-        $ngram_patterns_json = '{
 
-            "Noun-centered" : {
-                "2":[
-                        ["A", "N"],
-                        ["N", "A"],
-                        ["P", "N"],
-                        ["N", "N"]
-                    ],
-                "3":[
-                        ["P", "D", "N"],
-                        ["A", "N", "N"],
-                        ["N", "A", "N"],
-                        ["N", "N", "N"],
-                        ["A", "A", "N"],
-                        ["P", "N", "P"],
-                        ["N", "P", "N"]
-                    ],
-            },
+    $ngram_patterns_json = '
+    {
+        "Noun-centered" : {
+            "2":[
+                    ["A", "N"],
+                    ["N", "A"],
+                    ["P", "N"],
+                    ["N", "N"]
+                ],
+            "3":[
+                    ["P", "D", "N"],
+                    ["A", "N", "N"],
+                    ["N", "A", "N"],
+                    ["N", "N", "N"],
+                    ["A", "A", "N"],
+                    ["P", "N", "P"],
+                    ["N", "P", "N"]
+                ]
+        },
 
-            "Verb-centered" : {
-                "2":[
-                        ["V", "N"],
-                        ["N", "V"],
-                        ["V", "P"],
-                        ["P", "V"]
-                    ],
-                "3":[
-                        ["N", "V", "C"],
-                        ["V", "P", "N"]
-                    ],
-            }        
-        }';
-    #var_dump(json_decode($ngram_patterns_json));
-    var_dump($ngram_patterns_json);
+        "Verb-centered" : {
+            "2":[
+                    ["V", "N"],
+                    ["N", "V"],
+                    ["V", "P"],
+                    ["P", "V"]
+                ],
+            "3":[
+                    ["N", "V", "C"],
+                    ["V", "P", "N"]
+                ]
+        }        
+    }
+    ';
 
+    $basic_patterns = json_decode($ngram_patterns_json,TRUE);
+
+    if($n<4){
+        return $basic_patterns[$paradigm][$n];
+    }
+
+    $pats = [];
+    switch($n){
+        case 4:
+            foreach($basic_patterns[$paradigm]["2"] as $pat){
+                foreach($basic_patterns[$paradigm]["2"] as $pat2){
+                    $pats[] = array_merge($pat, $pat2);
+                }
+            }
+        break;
+        case 5:
+            foreach($basic_patterns[$paradigm]["2"] as $pat){
+                foreach($basic_patterns[$paradigm]["3"] as $pat2){
+                    $pats[] = array_merge($pat, $pat2);
+                }
+            }
+            foreach($basic_patterns[$paradigm]["3"] as $pat){
+                foreach($basic_patterns[$paradigm]["2"] as $pat2){
+                    $pats[] = array_merge($pat, $pat2);
+                }
+            }
+        break;
+        case 6:
+            foreach($basic_patterns[$paradigm]["3"] as $pat){
+                foreach($basic_patterns[$paradigm]["3"] as $pat2){
+                    $pats[] = array_merge($pat, $pat2);
+                }
+            }
+        break;
+        case 7:
+            $_2plus3 = [];
+            foreach($basic_patterns[$paradigm]["2"] as $pat){
+                foreach($basic_patterns[$paradigm]["3"] as $pat2){
+                    $_2plus3[] = array_merge($pat, $pat2);
+                }
+            }
+            foreach($_2plus3 as $pat){
+                foreach($basic_patterns[$paradigm]["2"] as $pat2){
+                    $pats[] = array_merge($pat, $pat2);
+                }
+            }
+            $_2plus2 = [];
+            foreach($basic_patterns[$paradigm]["2"] as $pat){
+                foreach($basic_patterns[$paradigm]["2"] as $pat2){
+                    $_2plus2[] = array_merge($pat, $pat2);
+                }
+            }
+            foreach($_2plus2 as $pat){
+                foreach($basic_patterns[$paradigm]["3"] as $pat2){
+                    $pats[] = array_merge($pat, $pat2);
+                }
+            }
+            $_3plus2 = [];
+            foreach($basic_patterns[$paradigm]["3"] as $pat){
+                foreach($basic_patterns[$paradigm]["2"] as $pat2){
+                    $_3plus2[] = array_merge($pat, $pat2);
+                }
+            }
+            foreach($_3plus2 as $pat){
+                foreach($basic_patterns[$paradigm]["2"] as $pat2){
+                    $pats[] = array_merge($pat, $pat2);
+                }
+            }
+        break;
+        case 8:
+            $_3plus3 = [];
+            foreach($basic_patterns[$paradigm]["3"] as $pat){
+                foreach($basic_patterns[$paradigm]["3"] as $pat2){
+                    $_3plus3[] = array_merge($pat, $pat2);
+                }
+            }
+            foreach($_3plus3 as $pat){
+                foreach($basic_patterns[$paradigm]["2"] as $pat2){
+                    $pats[] = array_merge($pat, $pat2);
+                }
+            }
+            $_3plus2 = [];
+            foreach($basic_patterns[$paradigm]["3"] as $pat){
+                foreach($basic_patterns[$paradigm]["2"] as $pat2){
+                    $_3plus2[] = array_merge($pat, $pat2);
+                }
+            }
+            foreach($_3plus2 as $pat){
+                foreach($basic_patterns[$paradigm]["3"] as $pat2){
+                    $pats[] = array_merge($pat, $pat2);
+                }
+            }
+            $_2plus3 = [];
+            foreach($basic_patterns[$paradigm]["2"] as $pat){
+                foreach($basic_patterns[$paradigm]["3"] as $pat2){
+                    $_2plus3[] = array_merge($pat, $pat2);
+                }
+            }
+            foreach($_2plus3 as $pat){
+                foreach($basic_patterns[$paradigm]["3"] as $pat2){
+                    $pats[] = array_merge($pat, $pat2);
+                }
+            }
+        break;
+        case 9:
+            $_3plus3 = [];
+            foreach($basic_patterns[$paradigm]["3"] as $pat){
+                foreach($basic_patterns[$paradigm]["3"] as $pat2){
+                    $_3plus3[] = array_merge($pat, $pat2);
+                }
+            }
+            foreach($_3plus3 as $pat){
+                foreach($basic_patterns[$paradigm]["3"] as $pat2){
+                    $pats[] = array_merge($pat, $pat2);
+                }
+            }
+        break;
+        case 10:
+            //3+3+2+2
+            $_3plus3 = [];
+            $_3plus3plus2 = [];
+            foreach($basic_patterns[$paradigm]["3"] as $pat){
+                foreach($basic_patterns[$paradigm]["3"] as $pat2){
+                    $_3plus3[] = array_merge($pat, $pat2);
+                }
+            }
+            foreach($_3plus3 as $pat){
+                foreach($basic_patterns[$paradigm]["2"] as $pat2){
+                    $_3plus3plus2[] = array_merge($pat, $pat2);
+                }
+            }
+            foreach($_3plus3plus2 as $pat){
+                foreach($basic_patterns[$paradigm]["2"] as $pat2){
+                    $pats[] = array_merge($pat, $pat2);
+                }
+            }
+            //3+2+3+2
+            $_3plus2 = [];
+            $_3plus2plus3 = [];
+            foreach($basic_patterns[$paradigm]["3"] as $pat){
+                foreach($basic_patterns[$paradigm]["2"] as $pat2){
+                    $_3plus2[] = array_merge($pat, $pat2);
+                }
+            }
+            foreach($_3plus2 as $pat){
+                foreach($basic_patterns[$paradigm]["3"] as $pat2){
+                    $_3plus2plus3[] = array_merge($pat, $pat2);
+                }
+            }
+            foreach($_3plus2plus3 as $pat){
+                foreach($basic_patterns[$paradigm]["3"] as $pat2){
+                    $pats[] = array_merge($pat, $pat2);
+                }
+            }
+            //3+2+2+3
+            $_3plus2 = [];
+            $_3plus2plus2 = [];
+            foreach($basic_patterns[$paradigm]["3"] as $pat){
+                foreach($basic_patterns[$paradigm]["2"] as $pat2){
+                    $_3plus2[] = array_merge($pat, $pat2);
+                }
+            }
+            foreach($_3plus2 as $pat){
+                foreach($basic_patterns[$paradigm]["2"] as $pat2){
+                    $_3plus2plus2[] = array_merge($pat, $pat2);
+                }
+            }
+            foreach($_3plus2plus2 as $pat){
+                foreach($basic_patterns[$paradigm]["3"] as $pat2){
+                    $pats[] = array_merge($pat, $pat2);
+                }
+            }
+            //2+3+2+3
+            $_2plus3 = [];
+            $_2plus3plus2 = [];
+            foreach($basic_patterns[$paradigm]["2"] as $pat){
+                foreach($basic_patterns[$paradigm]["3"] as $pat2){
+                    $_2plus3[] = array_merge($pat, $pat2);
+                }
+            }
+            foreach($_2plus3 as $pat){
+                foreach($basic_patterns[$paradigm]["2"] as $pat2){
+                    $_2plus3plus2[] = array_merge($pat, $pat2);
+                }
+            }
+            foreach($_2plus3plus2 as $pat){
+                foreach($basic_patterns[$paradigm]["3"] as $pat2){
+                    $pats[] = array_merge($pat, $pat2);
+                }
+            }
+            //2+2+3+3
+            $_2plus2 = [];
+            $_2plus2plus3 = [];
+            foreach($basic_patterns[$paradigm]["2"] as $pat){
+                foreach($basic_patterns[$paradigm]["2"] as $pat2){
+                    $_2plus2[] = array_merge($pat, $pat2);
+                }
+            }
+            foreach($_2plus2 as $pat){
+                foreach($basic_patterns[$paradigm]["3"] as $pat2){
+                    $_2plus2plus3[] = array_merge($pat, $pat2);
+                }
+            }
+            foreach($_2plus2plus3 as $pat){
+                foreach($basic_patterns[$paradigm]["3"] as $pat2){
+                    $pats[] = array_merge($pat, $pat2);
+                }
+            }
+            //2+3+3+2
+            $_2plus3 = [];
+            $_2plus3plus3 = [];
+            foreach($basic_patterns[$paradigm]["2"] as $pat){
+                foreach($basic_patterns[$paradigm]["3"] as $pat2){
+                    $_2plus3[] = array_merge($pat, $pat2);
+                }
+            }
+            foreach($_2plus3 as $pat){
+                foreach($basic_patterns[$paradigm]["3"] as $pat2){
+                    $_2plus3plus3[] = array_merge($pat, $pat2);
+                }
+            }
+            foreach($_2plus3plus3 as $pat){
+                foreach($basic_patterns[$paradigm]["2"] as $pat2){
+                    $pats[] = array_merge($pat, $pat2);
+                }
+            }
+        break;
+    
+    }
+
+    return $pats;
 }
 
 
