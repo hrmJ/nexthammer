@@ -1107,6 +1107,8 @@ var CorpusActions = function(){
             var words = [];
             var tf_idf = {};
             var bar;
+            LRDtab.SetNgramRange();
+            LRDtab.SetNumberOfTopicWords();
             $.each(langs,function(idx,lang){
                 var pat = new RegExp("(_?)" + picked_lang + "$","g");
                 words.push(self.ExamineThisText(
@@ -1130,12 +1132,6 @@ var CorpusActions = function(){
 
             LRDtab.Run(words, self);
 
-            //var tf_idf  = $.when.apply($, words).done(LRDtab.SetTfIdf);
-            //$.when(tf_idf).done( function(tf_idf_data){
-            //    self.msg.Add("Tf_idf completed.");
-            //    self.msg.Destroy();
-            //    LRDtab.SetNgrams(langs);
-            //});
         },
 
         /**
@@ -1303,6 +1299,7 @@ var LRDtab = function(){
     ngrams = [];
     processed_items = [];
     number_of_topicwords = 2;
+    ngram_range = [2,3];
 
     /**
      *
@@ -1310,8 +1307,18 @@ var LRDtab = function(){
      * taken into account
      *
      **/
-    SetNumberOfTopicWords = function(num){
-        number_of_topicwords = num;
+    SetNumberOfTopicWords = function(){
+        number_of_topicwords = $("[name='LRDtab_nwords']").val() || number_of_topicwords;
+    }
+
+    /**
+     *
+     * Defines, how many of the top words from the tf_idf list will be
+     * taken into account
+     *
+     **/
+    SetNgramRange = function(){
+        ngram_range = $("[name='LRDtab_ngramrange']").val().split(",") || ngram_range;
     }
 
     /**
@@ -1464,8 +1471,8 @@ var LRDtab = function(){
      *
      **/
     function Run(words, ExamineTopicsObject){
-        ExamineTopicsObject.msg.Destroy();
         $.when(SetTfIdf(words)).done(function(){
+            ExamineTopicsObject.msg.Destroy();
             return $.when(SetNgrams()).done(function(){
                 ExamineTopicsObject.BuildLRDTable(ngrams);
             });
@@ -1476,6 +1483,8 @@ var LRDtab = function(){
     return {
     
         Run,
+        SetNumberOfTopicWords,
+        SetNgramRange,
     
     }
 

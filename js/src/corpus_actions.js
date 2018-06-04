@@ -293,6 +293,8 @@ var CorpusActions = function(){
             var words = [];
             var tf_idf = {};
             var bar;
+            LRDtab.SetNgramRange();
+            LRDtab.SetNumberOfTopicWords();
             $.each(langs,function(idx,lang){
                 var pat = new RegExp("(_?)" + picked_lang + "$","g");
                 words.push(self.ExamineThisText(
@@ -316,12 +318,6 @@ var CorpusActions = function(){
 
             LRDtab.Run(words, self);
 
-            //var tf_idf  = $.when.apply($, words).done(LRDtab.SetTfIdf);
-            //$.when(tf_idf).done( function(tf_idf_data){
-            //    self.msg.Add("Tf_idf completed.");
-            //    self.msg.Destroy();
-            //    LRDtab.SetNgrams(langs);
-            //});
         },
 
         /**

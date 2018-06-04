@@ -86,6 +86,14 @@
                 Baseline for TF_IDF: 
                     <input name='tf_idf_baseline' type='text' placeholder='Set minimum value'> </input>
                 </li>
+                <li class='datalist'>
+                How many topic words in the LRDtab?
+                    <input name='LRDtab_nwords' type='text' placeholder=''></input>
+                </li>
+                <li class='datalist'>
+                Which ngrams to inspect in the LRDtab?
+                    <input name='LRDtab_ngramrange' type='text' placeholder='e.g. 2,6'></input>
+                </li>
                 <li class='some-margin'>
                   <button class='ExamineTopics DisplayTexts'>Launch</button>  
                 </li>

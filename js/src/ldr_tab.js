@@ -9,6 +9,7 @@ var LRDtab = function(){
     ngrams = [];
     processed_items = [];
     number_of_topicwords = 2;
+    ngram_range = [2,3];
 
     /**
      *
@@ -16,8 +17,18 @@ var LRDtab = function(){
      * taken into account
      *
      **/
-    SetNumberOfTopicWords = function(num){
-        number_of_topicwords = num;
+    SetNumberOfTopicWords = function(){
+        number_of_topicwords = $("[name='LRDtab_nwords']").val() || number_of_topicwords;
+    }
+
+    /**
+     *
+     * Defines, how many of the top words from the tf_idf list will be
+     * taken into account
+     *
+     **/
+    SetNgramRange = function(){
+        ngram_range = $("[name='LRDtab_ngramrange']").val().split(",") || ngram_range;
     }
 
     /**
@@ -170,8 +181,8 @@ var LRDtab = function(){
      *
      **/
     function Run(words, ExamineTopicsObject){
-        ExamineTopicsObject.msg.Destroy();
         $.when(SetTfIdf(words)).done(function(){
+            ExamineTopicsObject.msg.Destroy();
             return $.when(SetNgrams()).done(function(){
                 ExamineTopicsObject.BuildLRDTable(ngrams);
             });
@@ -182,6 +193,8 @@ var LRDtab = function(){
     return {
     
         Run,
+        SetNumberOfTopicWords,
+        SetNgramRange,
     
     }
 
