@@ -132,7 +132,6 @@ var CorpusActions = function(){
             var $ul = $("<ul>");
             $.each(Loaders.GetPickedTexts(),function(idx,el){
                 var $li = $(`<li class='actionlist'>${el.title}</li>`).click(text_action);
-                $li.click(text_action);
                 var $input = $(`<input type='hidden' name='code' value=${el.code}></input>`);
                 var $li_below = $("<li class='text_details'></li>");
                 $ul.append($li.append($input)).append($li_below);
@@ -191,29 +190,35 @@ var CorpusActions = function(){
          * Examine the text in question
          *
          * @param $parent_li the li element above the link that fired the event
+         * @param params If the parameters have been preset by another function
+         * @param custom_callback call anothre callback insted of the default BuildTfIdfTable
          *
          **/
-        ExamineThisText: function($parent_li){
+        ExamineThisText: function($parent_li, params, custom_callback){
             var self = this;
+            var callback = custom_callback || this.BuildTfIdfTable.bind(this);
             picked_code = $parent_li.find("input[name='code']").val();
-            params = {
+            params = params || {
                 action:"examine_text",
                 picked_code: picked_code,
                 codes: Loaders.GetPickedCodes(),
                 lang: Loaders.GetPickedLang()
             };
-            var msg = new Utilities.Message("Loading...", $parent_li);
-            var $details_li = $parent_li.next();
-            msg.Show(9999999);
-            $.getJSON("php/ajax/get_frequency_list.php", params,
-                /**
-                 *
-                 * Build a table. TODO: abstract this.
-                 *
-                 **/
-                function(data){
-                    msg.Destroy();
-                    $parent_li.addClass("opened");
+            this.msg = new Utilities.Message("Loading...", $parent_li);
+            this.msg.Show(9999999);
+            this.$parent_li = $parent_li;
+            return $.getJSON("php/ajax/get_frequency_list.php", params, callback);
+        },
+
+        /**
+         *
+         * Builds a table for representing tf_idf data
+         *
+         **/
+        BuildTfIdfTable: function(data){
+                    var $details_li = this.$parent_li.next();
+                    this.msg.Destroy();
+                    this.$parent_li.addClass("opened");
                     var freqlist = new Corpusdesktop.Table();
                     var normalize = true;
                     if(normalize){
@@ -228,10 +233,8 @@ var CorpusActions = function(){
                     }
                     freqlist.SetName(picked_code).SetHeader(["Lemma","Freq","TF_IDF","NB"]).SetRows(newdata).BuildOutput();
                     freqlist.$container.appendTo($details_li.hide());
-                    freqlist.AddRowAction(self.ExamineThisRow.bind(self), 2);
-                    $details_li.slideDown()
-                }
-            );
+                    freqlist.AddRowAction(this.ExamineThisRow.bind(this), 2);
+                    $details_li.slideDown();
         },
 
 
@@ -245,24 +248,47 @@ var CorpusActions = function(){
         LaunchLRDTab: function($parent_li){
             var self = this;
             picked_code = $parent_li.find("input[name='code']").val();
-            params = {
-                action:"LRDtab",
-                //TODO: a more robust solution in the database?
-                picked_code: picked_code.replace("_" + Loaders.GetPickedLang(), ""),
-            };
-            //var msg = new Utilities.Message("Loading...", $parent_li);
-            //var $details_li = $parent_li.next();
-            //msg.Show(9999999);
-            $.getJSON("php/ajax/get_frequency_list.php", params,
-                /**
-                 *
-                 * Build a table. TODO: abstract this.
-                 *
-                 **/
-                function(data){
-                    console.log(data);
+            picked_lang = Loaders.GetPickedLang();
+            langs = Loaders.GetLanguagesInCorpus();
+            codes = Loaders.GetPickedCodesInAllLanguages();
+            var words = [];
+            var tf_idf = {};
+            $.each(langs,function(idx,lang){
+                var pat = new RegExp("(_?)" + picked_lang + "$","g");
+                words.push(self.ExamineThisText(
+                    $parent_li, 
+                    {
+                    action:"examine_text",
+                    picked_code: picked_code.replace(pat,"$1" + lang),
+                    lang: lang,
+                    codes: codes[lang]
+                    },
+                    function(){
+                        self.msg.Add(lang + " done.");
+                    }
+                ));
+            });
+            $.when.apply($, words).done(function(){
+                // Let's map the arguments into an object, for ease of use
+                var keywords_by_lang = [];
+                for(var i = 0; i < arguments.length; i++){
+                    var keywords = [];
+                    var this_response = arguments[i][0];
+                    this_response.sort(
+                            function(a,b) {
+                                return a.tf_idf - b.tf_idf;
+                            }
+                    )
+                    for(var a=1;a<6;a++){
+                        if(this_response.length-a>=0){
+                            keywords.push(this_response[this_response.length-a].lemma);
+                        }
+                    }
+                    keywords_by_lang.push(keywords);
                 }
-            );
+                self.msg.Add("Finished building the tf_idf lists.");
+                console.log(keywords_by_lang);
+            });
         },
 
         /**

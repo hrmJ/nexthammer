@@ -12,6 +12,7 @@ var Loaders = function(){
         var picked_lang = "none";
         var picked_texts = [];
         var picked_corpus = "";
+        var languages_in_corpus = [];
 
 
         /**
@@ -39,6 +40,15 @@ var Loaders = function(){
 
         /**
          *
+         * Gets the languages in the current corpus
+         *
+         **/
+        function GetLanguagesInCorpus(){
+            return languages_in_corpus;
+        }
+
+        /**
+         *
          * Gets the value of the current corpus
          *
          **/
@@ -57,6 +67,7 @@ var Loaders = function(){
             $.get("php/ajax/get_corpus_information.php",
                 {action:"corpus_name"}, function(corpus_name){
                     $(".corpus_select").text(corpus_name)
+                    picked_corpus = corpus_name;
                     callback(corpus_name);
                 });
         }
@@ -102,21 +113,45 @@ var Loaders = function(){
             return codes;
         }
 
+        /**
+         *
+         * Gets the currently picked codes for each of the languages in the corpus
+         * This is still a hack, a more robust solution is needed.
+         * The function assumes an identical naming shceme for each text:
+         * the text has to end in _[lang], [lang] being a two-character language code
+         *
+         *
+         */
+        function GetPickedCodesInAllLanguages(){
+            var codes = GetPickedCodes();
+            var all_codes = {};
+            $.each(languages_in_corpus,function(idx,lang){
+                all_codes[lang] = [];
+            });
+            $.each(codes,function(idx,code){
+                $.each(languages_in_corpus,function(idx,lang){
+                    var pat = new RegExp("(_?)" + picked_lang + "$","g");
+                    all_codes[lang].push(code.replace(pat,"$1" + lang));
+                });
+            });
+            return all_codes;
+        }
 
         /**
          *
          * Lists the languages available in a given corpus
          *
          * @param string corpus_name the name of the corpus in the database
-         * @param boolean just_list do not make a html element, just return the langs
          *
          **/
-        function ListLanguagesInThisCorpus(corpus_name, just_list){
-            $.getJSON("php/ajax/get_corpus_information.php",{action:"languages"},
+        function ListLanguagesInThisCorpus(corpus_name){
+            $.getJSON("php/ajax/get_corpus_information.php",
+                {
+                    action:"languages", 
+                    corpus_name:picked_corpus, 
+                },
                 function(langlist){
-                    if(just_list){
-                        return langlist;
-                    }
+                    languages_in_corpus = langlist;
                     var $sel = $("<select><option value='none'>Choose language</option></select>");
                     //When the language is selected, print a list of the texts
                     $.each(langlist,function(idx,el){
@@ -140,7 +175,11 @@ var Loaders = function(){
          **/
         function UpdateSubCorpus(){
             $.getJSON("php/ajax/get_corpus_information.php",
-                {action: "text_names", lang: picked_lang},
+                {
+                    action: "text_names", 
+                    lang: picked_lang,
+                    corpus_name:picked_corpus, 
+                },
                 function(textlist){
                     var $ul = $("<ul>");
                     var $a = $("<a href='javascript:void(0);' >Unselect all</a>");
@@ -170,6 +209,8 @@ var Loaders = function(){
         GetPickedTexts,
         GetPickedCodes,
         GetPickedLang,
+        GetLanguagesInCorpus,
+        GetPickedCodesInAllLanguages,
     
     };
 

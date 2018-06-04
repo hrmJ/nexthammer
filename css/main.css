@@ -246,6 +246,9 @@ th:hover {
   top: 1em;
   left: 1em;
   z-index: 9999; }
+  .msgbox ul {
+    list-style-type: none;
+    padding: 0; }
 
 a.boxclose {
   float: right;

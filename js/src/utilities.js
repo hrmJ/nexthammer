@@ -63,6 +63,27 @@ var Utilities = function(){
             //BlurContent(self.box);
         },
 
+        /**
+         *  Adds new text to the box
+         *
+         */
+        Add: function(newtext){
+            if(!this.$box.find("ul").length){
+                var oldtext = this.$box.text();
+                $(`<ul><li>${oldtext}</li></ul>`).appendTo(this.$box.html(""));
+            }
+            this.$box.find("ul").append(`<li>${newtext}</li>`)
+        },
+
+        /**
+         *  Clears the text in the message box
+         *
+         */
+        Clear: function(){
+            this.$box.html("");
+            return this;
+        },
+
         Destroy: function(){
             var self = this;
             self.$parent_el.find(".msgbox").fadeOut("slow",function(){
