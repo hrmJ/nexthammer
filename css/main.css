@@ -339,3 +339,6 @@ li.actionlist {
     margin: 0;
     padding: 0;
     background: white; }
+
+.ldrtab {
+  list-style-type: none; }

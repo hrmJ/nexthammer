@@ -1,3 +1,8 @@
+/**
+ * 
+ * @param ngram_range from which ngrams to which [start, end]
+ *
+ **/
 var LRDtab = function(){
 
     keywords = [];
@@ -13,6 +18,15 @@ var LRDtab = function(){
      **/
     SetNumberOfTopicWords = function(num){
         number_of_topicwords = num;
+    }
+
+    /**
+     *
+     * Gets the whole data table for ngrams
+     *
+     **/
+    GetNgrams = function(num){
+        return ngrams;
     }
 
     /**
@@ -74,10 +88,9 @@ var LRDtab = function(){
      *
      * Gets ngrams for each of the key words  for each of the languages
      *
-     * @param ngram_range from which ngrams to which [start, end]
      *
      **/
-    function SetNgrams(ngram_range){
+    function SetNgrams(){
         //CorpusActions.SubCorpusCharacteristics.PrintNgramList
         var langs = Loaders.GetLanguagesInCorpus();
         var paradigm = "Noun-centered";
@@ -115,7 +128,7 @@ var LRDtab = function(){
             });
         });
         return  $.when.apply($, all_ngrams).done(function(){
-            console.log("Tadaa...");
+            bar.Destroy();
             ngrams = ProcessResponse(arguments, 3, "LL","ngram");
             var groups_per_lang = ngram_range[1] - ngram_range[0];
             tabdata = {};
@@ -133,7 +146,7 @@ var LRDtab = function(){
                     }
                 }
             });
-            console.log(tabdata);
+            ngrams = tabdata;
             msg.Destroy();
         });
     }
@@ -153,13 +166,14 @@ var LRDtab = function(){
      * Run the lrdTAB functionality
      *
      * @param words a list of ajax responses
+     * @param ExamineTopicsObject the object that called this function
      *
      **/
-    function Run(words, langs, msg){
+    function Run(words, ExamineTopicsObject){
+        ExamineTopicsObject.msg.Destroy();
         $.when(SetTfIdf(words)).done(function(){
-            msg.Destroy();
-            $.when(SetNgrams([2,3])).done(function(){
-                console.log(ngrams);
+            return $.when(SetNgrams()).done(function(){
+                ExamineTopicsObject.BuildLRDTable(ngrams);
             });
         }
         );

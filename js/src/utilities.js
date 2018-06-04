@@ -59,6 +59,7 @@ var Utilities = function(){
             this.$parent_el.css({"position":"relative"});
             this.$box.appendTo(this.$parent_el).fadeIn("slow");
             setTimeout(function(){ self.Destroy(); },offtime);
+            this.$box.draggable();
             
             //BlurContent(self.box);
         },

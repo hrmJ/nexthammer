@@ -240,6 +240,45 @@ var CorpusActions = function(){
 
         /**
          *
+         * Builds a table for representing tf_idf data in a special table for
+         * analysis
+         *
+         **/
+        BuildLRDTable: function(data){
+                    var $details_li = this.$parent_li.next();
+                    this.msg.Destroy();
+                    this.$parent_li.addClass("opened");
+                    var freqlist = new Corpusdesktop.Table();
+                    var tabdata = [];
+                    var langs = Loaders.GetLanguagesInCorpus();
+                    $.each(data[langs[0]],function(idx, topic_word_data){
+                        tabdata.push({});
+                        $.each(langs,function(lang_idx,lang){
+                            tabdata[tabdata.length-1][lang] = $("<ul class='ldrtab'></ul>");
+                        });
+                    });
+                    $.each(langs,function(lang_idx,lang){
+                        $.each(data[lang], function(idx, topic_word_data){
+                            for(ngramidx in topic_word_data){
+                                tabdata[idx][lang].append(`<li><strong>${ngramidx}</strong></li>`);
+                                $.each(topic_word_data[ngramidx],function(ngidx,this_ngram){
+                                    tabdata[idx][lang].append(`<li>${this_ngram}</li>`);
+                                })
+                            }
+                            tabdata[idx][lang] = tabdata[idx][lang].get(0).outerHTML;
+                        });
+                    });
+                    freqlist.SetName(this.$parent_li.text())
+                            .SetHeader(langs)
+                            .SetRows(tabdata)
+                            .BuildOutput();
+                    freqlist.$container.appendTo($details_li.hide());
+                    //freqlist.AddRowAction(this.ExamineThisRow.bind(this), 2);
+                    $details_li.slideDown();
+        },
+
+        /**
+         *
          * ASKS for  the LRDtab function from the backend
          *
          * @param $parent_li the li element above the link that fired the event
@@ -275,7 +314,7 @@ var CorpusActions = function(){
                 ));
             });
 
-            LRDtab.Run(words, langs, self.msg);
+            LRDtab.Run(words, self);
 
             //var tf_idf  = $.when.apply($, words).done(LRDtab.SetTfIdf);
             //$.when(tf_idf).done( function(tf_idf_data){
