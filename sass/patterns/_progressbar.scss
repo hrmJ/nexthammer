@@ -1,0 +1,21 @@
+
+.progressbar{
+    width: 100%;
+    height:1.3em;
+    background:none;
+    padding:0;
+    margin:1em;
+    border:1px solid white;
+    position:relative;
+    .bar{
+        position:absolute;
+        left:0;
+        height:100%;
+        width:0%;
+        margin:0;
+        padding:0;
+        background:white;
+    }
+}
+
+

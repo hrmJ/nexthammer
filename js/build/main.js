@@ -1257,6 +1257,17 @@ var LRDtab = function(){
     keywords = [];
     ngrams = [];
     processed_items = [];
+    number_of_topicwords = 2;
+
+    /**
+     *
+     * Defines, how many of the top words from the tf_idf list will be
+     * taken into account
+     *
+     **/
+    SetNumberOfTopicWords = function(num){
+        number_of_topicwords = num;
+    }
 
     /**
      *
@@ -1290,12 +1301,7 @@ var LRDtab = function(){
             }
             return_array.push(result);
         }
-        var lang_object = {};
-        var langs = Loaders.GetLanguagesInCorpus();
-        $.each(langs,function(idx,lang){
-            lang_object[lang] = return_array[idx];
-        });
-        return lang_object;
+        return return_array;
     }
 
     /**
@@ -1307,7 +1313,13 @@ var LRDtab = function(){
      **/
     function SetTfIdf(words){
         return $.when.apply($, words).done(function(){
-            keywords = ProcessResponse(arguments, 2, "tf_idf","lemma");
+            return_array = ProcessResponse(arguments, number_of_topicwords, "tf_idf","lemma");
+            var lang_object = {};
+            var langs = Loaders.GetLanguagesInCorpus();
+            $.each(langs,function(idx,lang){
+                lang_object[lang] = return_array[idx];
+            });
+            keywords = lang_object;
         });
     }
 
@@ -1331,14 +1343,12 @@ var LRDtab = function(){
         $.each(langs, function(lidx,lang){
             total_words += keywords[lang].length * (ngram_range[1] - ngram_range[0] + 1);
         });
-        console.log(total_words);
         msg.Show(999999);
         bar.Initialize(total_words);
         $.each(langs,function(lang_idx,lang){
             lrdlemmas = keywords[lang];
             $.each(lrdlemmas, function(lemma_idx, lrd_lemma){
                 for(var n = ngram_range[0]; n <= ngram_range[1]; n++){
-                    console.log(n);
                     var params = {
                         n:n,
                         lemmas:"no",
@@ -1361,6 +1371,23 @@ var LRDtab = function(){
         return  $.when.apply($, all_ngrams).done(function(){
             console.log("Tadaa...");
             ngrams = ProcessResponse(arguments, 3, "LL","ngram");
+            var groups_per_lang = ngram_range[1] - ngram_range[0];
+            tabdata = {};
+            $.each(langs,function(idx,lang){
+                tabdata[lang] = [];
+                per_lang = (ngram_range[1] - ngram_range[0] + 1);
+                rows_processed = idx*number_of_topicwords*per_lang;
+                for(var t = 1; t <= number_of_topicwords; t++){
+                    //For every topic word
+                    tabdata[lang].push({});
+                    for(var n = ngram_range[0]; n <= ngram_range[1]; n++){
+                        //For every ngram containing this topic word
+                        tabdata[lang][tabdata[lang].length-1][n] = ngrams[rows_processed];
+                        rows_processed++;
+                    }
+                }
+            });
+            console.log(tabdata);
             msg.Destroy();
         });
     }
