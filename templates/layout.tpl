@@ -89,6 +89,9 @@
                 <li class='some-margin'>
                   <button class='ExamineTopics DisplayTexts'>Launch</button>  
                 </li>
+                <li class='some-margin'>
+                  <button class='ExamineTopics DisplayTextsForTab'>Launch LRDtab</button>  
+                </li>
             </ul>
         </div>
 

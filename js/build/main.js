@@ -761,34 +761,56 @@ var CorpusActions = function(){
         /**
          *
          * Display the list of the texts of the current subcorpus as links
-         * TODO: make this more general
+         *
+         * @param text_action What to do when the text name is clicked
          *
          **/
-        DisplayTexts: function(){
+        DisplayTexts: function(text_action){
             $("#rnd_action").hide();
             $(".start_rnd button").text("LRD");
             var self = this;
+            text_action  = text_action || this.DisplayWordsInText.bind(this);
             $(".my-lightbox").hide();
             var $ul = $("<ul>");
             $.each(Loaders.GetPickedTexts(),function(idx,el){
-                var $li = $(`<li class='actionlist'>${el.title}</li>`);
+                var $li = $(`<li class='actionlist'>${el.title}</li>`).click(text_action);
+                $li.click(text_action);
                 var $input = $(`<input type='hidden' name='code' value=${el.code}></input>`);
                 var $li_below = $("<li class='text_details'></li>");
-                $li.click(function(){ 
-                    if( !$(this).next().find("table").length ){
-                        //If data not already loaded
-                        self.ExamineThisText($(this)); 
-                    }
-                    else{
-                        $(this).toggleClass("opened").next().slideToggle();
-                    }
-                });
                 $ul.append($li.append($input)).append($li_below);
             });
             $ul.appendTo($("#texts_to_examine").html(""));
             $(".text_examiner").fadeIn();
         },
 
+        /**
+         *
+         * Opens a table of the key words in the selected text
+         *
+         * @param e the click event
+         *
+         **/
+        DisplayWordsInText: function(e){
+            if( !$(e.target).next().find("table").length ){
+                //If data not already loaded
+                this.ExamineThisText($(e.target)); 
+            }
+            else{
+                $(e.target).toggleClass("opened").next().slideToggle();
+            }
+        },
+
+
+        /**
+         *
+         * Display the list of the texts of the current subcorpus as links. 
+         * Clicking each text starts the process for building a mutlilingual
+         * LRD table for the text
+         *
+         **/
+        DisplayTextsForTab: function(){
+            ExamineTopics.DisplayTexts();
+        },
 
         /**
          *
