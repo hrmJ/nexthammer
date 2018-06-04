@@ -5,12 +5,7 @@
  **/
 $(document).ready(function(){
     //Load the name of the corpus. When done, load the list of languages available
-    $.get("php/ajax/get_corpus_information.php",
-        {action:"corpus_name"},
-        function(corpus_name){
-            $(".corpus_select").text(corpus_name);
-            Loaders.ListLanguagesInThisCorpus(corpus_name);
-        });
+    Loaders.SetCurrentCorpus(Loaders.ListLanguagesInThisCorpus)
     //Displaying the current subcorpus
     $(".current_subcorpus").click(function(){$(".textpicker").fadeToggle()});
     //Open the actions subwindow

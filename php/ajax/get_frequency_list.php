@@ -41,6 +41,9 @@ switch($_GET["action"]){
         );
         $corpus->OutputJson();
         break;
+    case "LRDtab":
+        echo json_encode(["MORO",$_GET["picked_code"]]);
+        break;
 }
 
 

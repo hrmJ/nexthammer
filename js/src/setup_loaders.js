@@ -11,6 +11,7 @@ var Loaders = function(){
 
         var picked_lang = "none";
         var picked_texts = [];
+        var picked_corpus = "";
 
 
         /**
@@ -34,6 +35,30 @@ var Loaders = function(){
          **/
         function GetPickedLang(){
             return picked_lang;
+        }
+
+        /**
+         *
+         * Gets the value of the current corpus
+         *
+         **/
+        function GetPickedCorpus(){
+            return picked_corpus;
+        }
+
+        /**
+         *
+         * Fetches the name of the current corpus
+         *
+         * @param callback do something with the corpus name after loading is ready
+         *
+         **/
+        function SetCurrentCorpus(callback){
+            $.get("php/ajax/get_corpus_information.php",
+                {action:"corpus_name"}, function(corpus_name){
+                    $(".corpus_select").text(corpus_name)
+                    callback(corpus_name);
+                });
         }
 
         /**
@@ -83,11 +108,15 @@ var Loaders = function(){
          * Lists the languages available in a given corpus
          *
          * @param string corpus_name the name of the corpus in the database
+         * @param boolean just_list do not make a html element, just return the langs
          *
          **/
-        function ListLanguagesInThisCorpus(corpus_name){
+        function ListLanguagesInThisCorpus(corpus_name, just_list){
             $.getJSON("php/ajax/get_corpus_information.php",{action:"languages"},
                 function(langlist){
+                    if(just_list){
+                        return langlist;
+                    }
                     var $sel = $("<select><option value='none'>Choose language</option></select>");
                     //When the language is selected, print a list of the texts
                     $.each(langlist,function(idx,el){
@@ -100,6 +129,7 @@ var Loaders = function(){
                             UpdateSubCorpus()});
                 });
         }
+
 
 
         /**
@@ -135,6 +165,8 @@ var Loaders = function(){
     return {
 
         ListLanguagesInThisCorpus,
+        SetCurrentCorpus,
+        GetPickedCorpus,
         GetPickedTexts,
         GetPickedCodes,
         GetPickedLang,

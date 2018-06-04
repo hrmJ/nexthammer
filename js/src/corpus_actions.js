@@ -158,6 +158,22 @@ var CorpusActions = function(){
             }
         },
 
+        /**
+         *
+         * Launches the LRDtab functionality
+         *
+         * @param e the click event
+         *
+         **/
+        DisplayLRDTab: function(e){
+            if( !$(e.target).next().find("table").length ){
+                //If data not already loaded
+                this.LaunchLRDTab($(e.target)); 
+            }
+            else{
+                $(e.target).toggleClass("opened").next().slideToggle();
+            }
+        },
 
         /**
          *
@@ -167,7 +183,7 @@ var CorpusActions = function(){
          *
          **/
         DisplayTextsForTab: function(){
-            ExamineTopics.DisplayTexts();
+            ExamineTopics.DisplayTexts(this.DisplayLRDTab.bind(this));
         },
 
         /**
@@ -218,6 +234,36 @@ var CorpusActions = function(){
             );
         },
 
+
+        /**
+         *
+         * ASKS for  the LRDtab function from the backend
+         *
+         * @param $parent_li the li element above the link that fired the event
+         *
+         **/
+        LaunchLRDTab: function($parent_li){
+            var self = this;
+            picked_code = $parent_li.find("input[name='code']").val();
+            params = {
+                action:"LRDtab",
+                //TODO: a more robust solution in the database?
+                picked_code: picked_code.replace("_" + Loaders.GetPickedLang(), ""),
+            };
+            //var msg = new Utilities.Message("Loading...", $parent_li);
+            //var $details_li = $parent_li.next();
+            //msg.Show(9999999);
+            $.getJSON("php/ajax/get_frequency_list.php", params,
+                /**
+                 *
+                 * Build a table. TODO: abstract this.
+                 *
+                 **/
+                function(data){
+                    console.log(data);
+                }
+            );
+        },
 
         /**
          *
