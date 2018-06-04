@@ -253,6 +253,7 @@ var CorpusActions = function(){
             codes = Loaders.GetPickedCodesInAllLanguages();
             var words = [];
             var tf_idf = {};
+            var bar;
             $.each(langs,function(idx,lang){
                 var pat = new RegExp("(_?)" + picked_lang + "$","g");
                 words.push(self.ExamineThisText(
@@ -264,31 +265,24 @@ var CorpusActions = function(){
                     codes: codes[lang]
                     },
                     function(){
-                        self.msg.Add(lang + " done.");
+                        if(!bar){
+                            bar = new Utilities.ProgressBar(self.msg.$box);
+                            bar.Initialize(langs.length);
+                        }
+                        bar.Progress();
+                        //self.msg.Add(lang + " done.");
                     }
                 ));
             });
-            $.when.apply($, words).done(function(){
-                // Let's map the arguments into an object, for ease of use
-                var keywords_by_lang = [];
-                for(var i = 0; i < arguments.length; i++){
-                    var keywords = [];
-                    var this_response = arguments[i][0];
-                    this_response.sort(
-                            function(a,b) {
-                                return a.tf_idf - b.tf_idf;
-                            }
-                    )
-                    for(var a=1;a<6;a++){
-                        if(this_response.length-a>=0){
-                            keywords.push(this_response[this_response.length-a].lemma);
-                        }
-                    }
-                    keywords_by_lang.push(keywords);
-                }
-                self.msg.Add("Finished building the tf_idf lists.");
-                console.log(keywords_by_lang);
-            });
+
+            LRDtab.Run(words, langs, self.msg);
+
+            //var tf_idf  = $.when.apply($, words).done(LRDtab.SetTfIdf);
+            //$.when(tf_idf).done( function(tf_idf_data){
+            //    self.msg.Add("Tf_idf completed.");
+            //    self.msg.Destroy();
+            //    LRDtab.SetNgrams(langs);
+            //});
         },
 
         /**

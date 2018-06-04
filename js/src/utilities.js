@@ -84,6 +84,21 @@ var Utilities = function(){
             return this;
         },
 
+        /**
+         *
+         *  Changes the text of the last item of the message
+         *
+         */
+        Update: function(){
+            if(this.$box.find("ul").length){
+                this.$box.find("li:last-of-type").text(text);
+            }
+            else{
+                this.$box.text(text);
+            }
+            return this;
+        },
+
         Destroy: function(){
             var self = this;
             self.$parent_el.find(".msgbox").fadeOut("slow",function(){
@@ -105,10 +120,72 @@ var Utilities = function(){
       });
     }
 
+    /**
+     *
+     * A simple proggress bar
+     *
+     **/
+    var ProgressBar = function($parent_el){
+
+        this.$parent_el = $parent_el || $("body");
+        this.destination_val = null;
+        this.progressed = 0;
+
+        /**
+         *
+         * Sets the bar up
+         *
+         * @param destination_val the value that will be 100 %
+         *
+         **/
+        this.Initialize = function(destination_val){
+            this.$cont = $("<div class='progressbar'></div>");
+            this.$bar = $("<div class='bar'></div>");
+            this.$bar.appendTo(this.$cont);
+            this.$cont.appendTo(this.$parent_el);
+            this.destination_val = destination_val;
+        }
+
+        /**
+         *
+         * Moves the bar forward
+         *
+         * @param how_much how much we move the bar
+         *
+         **/
+        this.Progress = function(how_much){
+            how_much = how_much || 1;
+            this.progressed += how_much;
+            var percent = this.progressed / this.destination_val * 100;
+            //var percent = this.$bar.get(0).style.width.replace("%","")*1;
+            this.$bar.css({"width" : percent + "%"});
+        }
+
+        /**
+         *
+         * Makes a new assessment of the length of the task
+         *
+         **/
+        this.AddToDestination = function(addedval){
+            this.destination_val += addedval;
+            return this;
+        }
+
+        /**
+         *
+         * Removes the progress bar
+         *
+         **/
+        this.Destroy = function(){
+            this.$cont.fadeOut().remove();
+        }
+    }
+
     return {
         uuidv4,
         SelectAll,
-        Message
+        Message,
+        ProgressBar,
     };
 
 }();
