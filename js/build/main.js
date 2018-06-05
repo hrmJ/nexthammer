@@ -1088,7 +1088,11 @@ var CorpusActions = function(){
                             for(ngramidx in topic_word_data){
                                 tabdata[idx][lang].append(`<li><strong>${ngramidx}</strong></li>`);
                                 $.each(topic_word_data[ngramidx],function(ngidx,this_ngram){
-                                    tabdata[idx][lang].append(`<li>${this_ngram}</li>`);
+                                    var $li = $(`<li class='LRD_ngram'>${this_ngram.ngram}
+                                        <input type='hidden' class='ngram_ll' value='${this_ngram.LL}'></input>
+                                        <input type='hidden' class='ngram_pmi' value='${this_ngram.PMI}'></input>
+                                        </li>`);
+                                    tabdata[idx][lang].append($li);
                                 })
                             }
                             tabdata[idx][lang] = tabdata[idx][lang].get(0).outerHTML;
@@ -1100,6 +1104,14 @@ var CorpusActions = function(){
                             .SetRows(tabdata)
                             .BuildOutput();
                     freqlist.$container.appendTo($details_li.hide());
+                    //TODO: better
+                    $(".LRD_ngram").click(function(){
+                        var msg = new Utilities.Message("",$(this));
+                        msg.Add($(this).text());
+                        msg.Add("LL: " + $(this).find(".ngram_ll").val());
+                        msg.Add("PMI: " + $(this).find(".ngram_pmi").val());
+                        msg.Show(5000);
+                    });
                     //freqlist.AddRowAction(this.ExamineThisRow.bind(this), 2);
                     //ADD an action to inspect LL etc
                     $details_li.slideDown();
@@ -1313,6 +1325,22 @@ var LRDtab = function(){
     number_of_topicwords = 2;
     ngram_range = [2,3];
     ngram_number = 3;
+    lrd_method = "LL";
+
+
+    /**
+     *
+     * Defines, what method will be used for picking
+     * the top ngrams
+     *
+     * @param e event
+     * @param ui jquery ui object
+     *
+     **/
+    SetLRDmethod = function(e, ui){
+        lrd_method = $(this).val();
+    }
+
 
     /**
      *
@@ -1465,7 +1493,7 @@ var LRDtab = function(){
         });
         return  $.when.apply($, all_ngrams).done(function(){
             bar.Destroy();
-            ngrams = ProcessResponse(arguments, ngram_number, "LL","ngram");
+            ngrams = ProcessResponse(arguments, ngram_number, lrd_method);
             var groups_per_lang = ngram_range[1] - ngram_range[0];
             tabdata = {};
             $.each(langs,function(idx,lang){
@@ -1514,6 +1542,8 @@ var LRDtab = function(){
      **/
     function InitializeControls(){
     
+        $("#LRDtab_method").selectmenu();
+        $("#LRDtab_method").on("selectmenuchange", SetLRDmethod);
         $("#LRDtab_ngramnumber").slider(
             {
             min:1,

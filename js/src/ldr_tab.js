@@ -11,6 +11,22 @@ var LRDtab = function(){
     number_of_topicwords = 2;
     ngram_range = [2,3];
     ngram_number = 3;
+    lrd_method = "LL";
+
+
+    /**
+     *
+     * Defines, what method will be used for picking
+     * the top ngrams
+     *
+     * @param e event
+     * @param ui jquery ui object
+     *
+     **/
+    SetLRDmethod = function(e, ui){
+        lrd_method = $(this).val();
+    }
+
 
     /**
      *
@@ -163,7 +179,7 @@ var LRDtab = function(){
         });
         return  $.when.apply($, all_ngrams).done(function(){
             bar.Destroy();
-            ngrams = ProcessResponse(arguments, ngram_number, "LL","ngram");
+            ngrams = ProcessResponse(arguments, ngram_number, lrd_method);
             var groups_per_lang = ngram_range[1] - ngram_range[0];
             tabdata = {};
             $.each(langs,function(idx,lang){
@@ -212,6 +228,8 @@ var LRDtab = function(){
      **/
     function InitializeControls(){
     
+        $("#LRDtab_method").selectmenu();
+        $("#LRDtab_method").on("selectmenuchange", SetLRDmethod);
         $("#LRDtab_ngramnumber").slider(
             {
             min:1,

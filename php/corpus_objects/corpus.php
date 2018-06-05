@@ -296,14 +296,19 @@ class Corpus extends CorpusObject{
                 }
                 else{
                     $log_likelihoods_of_bigrams[] = $this->ngramdata[2][$thiskey]["LL"];
+                    $pmi_of_bigrams[] = $this->ngramdata[2][$thiskey]["PMI"];
                 }
             }
             if(sizeof($log_likelihoods_of_bigrams) == $this->ngram_number -1 ){
+                $pmi_val = 1;
+                foreach($pmi_of_bigrams as $val){
+                    $pmi_val = $val * $pmi_val;
+                }
                 $this->data[] = Array(
                     "ngram" => $ngram,
                     "freq" => $ngramdata["freq"],
                     "LL" =>  array_sum($log_likelihoods_of_bigrams),
-                    "PMI" => "?"
+                    "PMI" => $pmi_val
                 );
             }
         }
@@ -315,9 +320,8 @@ class Corpus extends CorpusObject{
 
     /**
      * 
-     * Creates an ngram list for outputting. Includes Log-likelihood (LL) and Mutual
-     * information values for
-     * each row.
+     * Creates an ngram list for outputting. Includes Log-likelihood (LL) and
+     * Mutual information values for each row.
      *
      * 
      */
@@ -326,7 +330,8 @@ class Corpus extends CorpusObject{
         $this->ngramdata[$this->ngram_number] = Array();
         foreach($this->ngram_frequencies as $ngram => $freq){
             $words = explode($this->ngram_separator, $ngram);
-            $ll = "(not available yet for n > 2)";
+            $ll = "";
+            $pmi = "";
             if($this->ngram_number == 2){
                 $without_second = $this->GetWithoutSecond($words);
                 $ll = LogLikeLihood($freq,
@@ -334,20 +339,23 @@ class Corpus extends CorpusObject{
                                       $this->word_frequencies[$words[0]], 
                                       $this->word_frequencies[$words[1]],
                                       $this->total_words);
+                $pmi =  PMI($freq,
+                                 $this->word_frequencies[$words[0]], 
+                                 $this->word_frequencies[$words[1]],
+                                 $this->total_words);
+                $this->data[] = Array(
+                    "ngram" => $ngram,
+                    "freq" => $freq,
+                    "LL" =>  $ll,
+                    "PMI" => $pmi
+                );
             }
+
             $this->ngramdata[$this->ngram_number][$ngram] = Array(
                 "freq" => $freq,
-                "LL" =>  $ll
-            );
-            $this->data[] = Array(
-                "ngram" => $ngram,
-                "freq" => $freq,
                 "LL" =>  $ll,
-                "PMI" => PMI($freq,
-                             $this->word_frequencies[$words[0]], 
-                             $this->word_frequencies[$words[1]],
-                             $this->total_words)
-            );
+                "PMI" => $pmi);
+
         }
 
         return $this;

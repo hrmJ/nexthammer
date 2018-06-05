@@ -87,7 +87,7 @@
                     <div><input name='tf_idf_baseline' type='text' placeholder='Set minimum value'> </input></div>
                 </li>
                 <li class='launcher_parent'>
-                  <button class='ExamineTopics DisplayTexts'>Launch</button>  
+                  <button class='ExamineTopics DisplayTexts'>Launch LRD</button>  
                 </li>
             </ul>
             <h2>LRD tab</h2>
@@ -106,6 +106,15 @@
                     <div> How many ngrams for each ngram level? </div>
                     <div class='slider' id='LRDtab_ngramnumber'></div>
                     <div class='slider_result'></div>
+                </li>
+                <li class='datalist dl_parent'>
+                    <div>Method for picking up the top ngrams</div>
+                    <div class=''>
+                        <select  id='LRDtab_method'>
+                            <option>LL</option>
+                            <option>PMI</option>
+                        </select>
+                    </div>
                 </li>
                 <li class='launcher_parent'>
                   <button class='ExamineTopics DisplayTextsForTab'>Launch LRDtab</button>  
