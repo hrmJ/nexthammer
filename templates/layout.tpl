@@ -82,22 +82,32 @@
         <div class='menubelow' id="rnd_action">
             <h2>LRD</h2>
             <ul id='topic_params_menu' class=''>
-                <li class='datalist'>
-                Baseline for TF_IDF: 
-                    <input name='tf_idf_baseline' type='text' placeholder='Set minimum value'> </input>
+                <li class='datalist dl_parent'>
+                    <div> Baseline for TF_IDF:</div>
+                    <div><input name='tf_idf_baseline' type='text' placeholder='Set minimum value'> </input></div>
                 </li>
-                <li class='datalist'>
-                How many topic words in the LRDtab?
-                    <input name='LRDtab_nwords' type='text' placeholder=''></input>
-                </li>
-                <li class='datalist'>
-                Which ngrams to inspect in the LRDtab?
-                    <input name='LRDtab_ngramrange' type='text' placeholder='e.g. 2,6'></input>
-                </li>
-                <li class='some-margin'>
+                <li class='launcher_parent'>
                   <button class='ExamineTopics DisplayTexts'>Launch</button>  
                 </li>
-                <li class='some-margin'>
+            </ul>
+            <h2>LRD tab</h2>
+            <ul>
+                <li class='datalist dl_parent'>
+                    <div>How many topic words in the LRDtab?</div>
+                    <div class='slider' id='LRDtab_nwords'></div>
+                    <div class='slider_result'></div>
+                </li>
+                <li class='datalist dl_parent'>
+                    <div>Which ngrams to inspect in the LRDtab?</div>
+                    <div class='slider' id='LRDtab_ngramrange'></div>
+                    <div class='slider_result'></div>
+                </li>
+                <li class='datalist dl_parent'>
+                    <div> How many ngrams for each ngram level? </div>
+                    <div class='slider' id='LRDtab_ngramnumber'></div>
+                    <div class='slider_result'></div>
+                </li>
+                <li class='launcher_parent'>
                   <button class='ExamineTopics DisplayTextsForTab'>Launch LRDtab</button>  
                 </li>
             </ul>

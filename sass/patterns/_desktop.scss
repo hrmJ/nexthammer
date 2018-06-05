@@ -82,3 +82,26 @@ th{
         color:white;
     }
 }
+
+
+.lrd_table{
+    border-collapse:collapse;
+    thead{
+        border-bottom: 1px solid #7b7b7b;
+        td{
+            border-right: 1px dashed #7b7b7b;
+        }
+    }
+    tr:nth-child(even){
+        background: #f6f6e7;
+    }
+    td{
+        padding:0.6em;
+        vertical-align: top;
+        border-right: 1px dashed #7b7b7b;
+        /* padding-left: 0; */
+        margin-left: 0;
+        /* padding-right: 0; */
+    }
+}
+

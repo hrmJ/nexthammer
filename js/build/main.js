@@ -394,6 +394,18 @@ var Corpusdesktop = function(){
 
         /**
          *
+         * Adds a specific css class for the table
+         *
+         * @param newclass the name of the css class 
+         *
+         **/
+        this.SetClass = function(newclass){
+            this.$table.addClass(newclass);
+            return this;
+        };
+
+        /**
+         *
          * Binds a specific action to the rows of the table.
          *
          * @param callback a function that is called when a row of the table is clicked
@@ -1083,11 +1095,13 @@ var CorpusActions = function(){
                         });
                     });
                     freqlist.SetName(this.$parent_li.text())
+                            .SetClass("lrd_table")
                             .SetHeader(langs)
                             .SetRows(tabdata)
                             .BuildOutput();
                     freqlist.$container.appendTo($details_li.hide());
                     //freqlist.AddRowAction(this.ExamineThisRow.bind(this), 2);
+                    //ADD an action to inspect LL etc
                     $details_li.slideDown();
         },
 
@@ -1107,8 +1121,6 @@ var CorpusActions = function(){
             var words = [];
             var tf_idf = {};
             var bar;
-            LRDtab.SetNgramRange();
-            LRDtab.SetNumberOfTopicWords();
             $.each(langs,function(idx,lang){
                 var pat = new RegExp("(_?)" + picked_lang + "$","g");
                 words.push(self.ExamineThisText(
@@ -1300,15 +1312,20 @@ var LRDtab = function(){
     processed_items = [];
     number_of_topicwords = 2;
     ngram_range = [2,3];
+    ngram_number = 3;
 
     /**
      *
      * Defines, how many of the top words from the tf_idf list will be
      * taken into account
      *
+     * @param e event
+     * @param ui jquery ui object
+     *
      **/
-    SetNumberOfTopicWords = function(){
-        number_of_topicwords = $("[name='LRDtab_nwords']").val() || number_of_topicwords;
+    SetNumberOfTopicWords = function(e, ui){
+        $(e.target).parent().find(".slider_result").text(ui.value);
+        number_of_topicwords = ui.value;
     }
 
     /**
@@ -1316,9 +1333,27 @@ var LRDtab = function(){
      * Defines, how many of the top words from the tf_idf list will be
      * taken into account
      *
+     * @param e event
+     * @param ui jquery ui object
+     *
+     *
      **/
-    SetNgramRange = function(){
-        ngram_range = $("[name='LRDtab_ngramrange']").val().split(",") || ngram_range;
+    SetNgramRange = function(e, ui){
+        $(e.target).parent().find(".slider_result").text(ui.values.join(" - "));
+        ngram_range = ui.values;
+    }
+
+    /**
+     *
+     * Defines, how many ngrams (max) will be printed for each ngram level
+     *
+     * @param e event
+     * @param ui jquery ui object
+     *
+     **/
+    SetNgramNumber = function(e, ui){
+        $(e.target).parent().find(".slider_result").text(ui.value);
+        ngram_number = ui.value;
     }
 
     /**
@@ -1430,7 +1465,7 @@ var LRDtab = function(){
         });
         return  $.when.apply($, all_ngrams).done(function(){
             bar.Destroy();
-            ngrams = ProcessResponse(arguments, 3, "LL","ngram");
+            ngrams = ProcessResponse(arguments, ngram_number, "LL","ngram");
             var groups_per_lang = ngram_range[1] - ngram_range[0];
             tabdata = {};
             $.each(langs,function(idx,lang){
@@ -1452,15 +1487,6 @@ var LRDtab = function(){
         });
     }
 
-    /**
-     *
-     * Gets the list of keywords for each lang
-     *
-     * @param langs an array includin the correct order of languages
-     *
-     **/
-    function GetKeyWordsByLang(langs){
-    }
 
     /**
      *
@@ -1480,11 +1506,45 @@ var LRDtab = function(){
         );
     }
 
+    /**
+     *
+     * Initializes the parameters the user can use to adjust
+     *
+     *
+     **/
+    function InitializeControls(){
+    
+        $("#LRDtab_ngramnumber").slider(
+            {
+            min:1,
+            max:20,
+            value:3,
+            change: SetNgramNumber,
+            })
+            .parent().find(".slider_result").text(ngram_number);
+        $("#LRDtab_nwords").slider(
+            {
+            min:1,
+            max:20,
+            value:3,
+            change: SetNumberOfTopicWords
+            })
+            .parent().find(".slider_result").text(number_of_topicwords);
+        $("#LRDtab_ngramrange").slider(
+            {
+            range:true,
+            values:ngram_range,
+            min:2,
+            max:10,
+            change: SetNgramRange
+            })
+            .parent().find(".slider_result").text(ngram_range.join(" - ")); ;
+    }
+
     return {
     
         Run,
-        SetNumberOfTopicWords,
-        SetNgramRange,
+        InitializeControls,
     
     }
 
@@ -1577,5 +1637,6 @@ $(document).ready(function(){
             CorpusActions.ExamineTopics.ChooseParadigm($(this));
         }
     );
+    LRDtab.InitializeControls();
 
 });

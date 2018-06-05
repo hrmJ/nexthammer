@@ -269,11 +269,13 @@ var CorpusActions = function(){
                         });
                     });
                     freqlist.SetName(this.$parent_li.text())
+                            .SetClass("lrd_table")
                             .SetHeader(langs)
                             .SetRows(tabdata)
                             .BuildOutput();
                     freqlist.$container.appendTo($details_li.hide());
                     //freqlist.AddRowAction(this.ExamineThisRow.bind(this), 2);
+                    //ADD an action to inspect LL etc
                     $details_li.slideDown();
         },
 
@@ -293,8 +295,6 @@ var CorpusActions = function(){
             var words = [];
             var tf_idf = {};
             var bar;
-            LRDtab.SetNgramRange();
-            LRDtab.SetNumberOfTopicWords();
             $.each(langs,function(idx,lang){
                 var pat = new RegExp("(_?)" + picked_lang + "$","g");
                 words.push(self.ExamineThisText(

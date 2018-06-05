@@ -184,6 +184,22 @@ th:hover {
   background: grey;
   color: white; }
 
+.lrd_table {
+  border-collapse: collapse; }
+  .lrd_table thead {
+    border-bottom: 1px solid #7b7b7b; }
+    .lrd_table thead td {
+      border-right: 1px dashed #7b7b7b; }
+  .lrd_table tr:nth-child(even) {
+    background: #f6f6e7; }
+  .lrd_table td {
+    padding: 0.6em;
+    vertical-align: top;
+    border-right: 1px dashed #7b7b7b;
+    /* padding-left: 0; */
+    margin-left: 0;
+    /* padding-right: 0; */ }
+
 .arrow_box {
   position: relative;
   background: grey;
@@ -319,9 +335,26 @@ li.actionlist {
   display: none;
   list-style-type: none; }
 
+.slider {
+  max-width: 20em; }
+
+.launcher_parent {
+  margin-top: 2em; }
+
 .datalist {
   margin-top: 0.5em;
   font-size: 0.75em; }
+
+.dl_parent {
+  display: flex;
+  align-items: center; }
+  .dl_parent > div + div {
+    margin-left: 1em; }
+  .dl_parent > div:first-child {
+    margin-right: 1em;
+    max-width: 13em; }
+  .dl_parent > div:nth-child(2) {
+    flex: 1 3 50%; }
 
 .progressbar {
   width: 100%;

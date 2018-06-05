@@ -174,6 +174,18 @@ var Corpusdesktop = function(){
 
         /**
          *
+         * Adds a specific css class for the table
+         *
+         * @param newclass the name of the css class 
+         *
+         **/
+        this.SetClass = function(newclass){
+            this.$table.addClass(newclass);
+            return this;
+        };
+
+        /**
+         *
          * Binds a specific action to the rows of the table.
          *
          * @param callback a function that is called when a row of the table is clicked

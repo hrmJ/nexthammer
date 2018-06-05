@@ -85,5 +85,6 @@ $(document).ready(function(){
             CorpusActions.ExamineTopics.ChooseParadigm($(this));
         }
     );
+    LRDtab.InitializeControls();
 
 });
