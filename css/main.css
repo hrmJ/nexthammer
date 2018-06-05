@@ -200,6 +200,11 @@ th:hover {
     margin-left: 0;
     /* padding-right: 0; */ }
 
+.LRD_ngram:hover {
+  cursor: pointer;
+  background: grey;
+  color: white; }
+
 .arrow_box {
   position: relative;
   background: grey;

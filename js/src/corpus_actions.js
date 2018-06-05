@@ -278,14 +278,7 @@ var CorpusActions = function(){
                             .SetRows(tabdata)
                             .BuildOutput();
                     freqlist.$container.appendTo($details_li.hide());
-                    //TODO: better
-                    $(".LRD_ngram").click(function(){
-                        var msg = new Utilities.Message("",$(this));
-                        msg.Add($(this).text());
-                        msg.Add("LL: " + $(this).find(".ngram_ll").val());
-                        msg.Add("PMI: " + $(this).find(".ngram_pmi").val());
-                        msg.Show(5000);
-                    });
+                    $(".LRD_ngram").click(LRDtab.ViewNgramDetails);
                     //freqlist.AddRowAction(this.ExamineThisRow.bind(this), 2);
                     //ADD an action to inspect LL etc
                     $details_li.slideDown();

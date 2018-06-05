@@ -74,6 +74,25 @@ var Utilities = function(){
                 $(`<ul><li>${oldtext}</li></ul>`).appendTo(this.$box.html(""));
             }
             this.$box.find("ul").append(`<li>${newtext}</li>`)
+            return this;
+        },
+
+        /**
+         *  Adds a close button 
+         */
+        AddCloseButton: function(){
+            var $a = $("<a class='boxclose'></a>").click(this.Destroy.bind(this));
+            this.$box.prepend($a);
+            return this;
+        },
+
+        /**
+         *  Adds an id , e.g. to prevent duplicates
+         *  @param id  the id to be added
+         */
+        AddId: function(id){
+            this.$box.attr({"id": id});
+            return this;
         },
 
         /**
@@ -1104,14 +1123,7 @@ var CorpusActions = function(){
                             .SetRows(tabdata)
                             .BuildOutput();
                     freqlist.$container.appendTo($details_li.hide());
-                    //TODO: better
-                    $(".LRD_ngram").click(function(){
-                        var msg = new Utilities.Message("",$(this));
-                        msg.Add($(this).text());
-                        msg.Add("LL: " + $(this).find(".ngram_ll").val());
-                        msg.Add("PMI: " + $(this).find(".ngram_pmi").val());
-                        msg.Show(5000);
-                    });
+                    $(".LRD_ngram").click(LRDtab.ViewNgramDetails);
                     //freqlist.AddRowAction(this.ExamineThisRow.bind(this), 2);
                     //ADD an action to inspect LL etc
                     $details_li.slideDown();
@@ -1342,6 +1354,7 @@ var LRDtab = function(){
     }
 
 
+
     /**
      *
      * Defines, how many of the top words from the tf_idf list will be
@@ -1392,6 +1405,30 @@ var LRDtab = function(){
     GetNgrams = function(num){
         return ngrams;
     }
+
+    /**
+     *
+     * Shows a small box that contains information about the ngram
+     *
+     * @param e the event that was fired
+     *
+     **/
+    ViewNgramDetails = function(e){
+        var id = "box_" + $(this).text();
+        if($(e.target).is("a")){
+            return 0;
+        }
+        if($("#" + id).length){
+            return 0;
+        }
+        var msg = new Utilities.Message("",$(this));
+        msg.Add($(this).text())
+           .Add("LL: " + $(this).find(".ngram_ll").val())
+           .Add("PMI: " + $(this).find(".ngram_pmi").val())
+           .AddId(id)
+           .AddCloseButton();
+        msg.Show(9999);
+    };
 
     /**
      *
@@ -1575,6 +1612,7 @@ var LRDtab = function(){
     
         Run,
         InitializeControls,
+        ViewNgramDetails,
     
     }
 

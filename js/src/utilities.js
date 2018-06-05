@@ -74,6 +74,25 @@ var Utilities = function(){
                 $(`<ul><li>${oldtext}</li></ul>`).appendTo(this.$box.html(""));
             }
             this.$box.find("ul").append(`<li>${newtext}</li>`)
+            return this;
+        },
+
+        /**
+         *  Adds a close button 
+         */
+        AddCloseButton: function(){
+            var $a = $("<a class='boxclose'></a>").click(this.Destroy.bind(this));
+            this.$box.prepend($a);
+            return this;
+        },
+
+        /**
+         *  Adds an id , e.g. to prevent duplicates
+         *  @param id  the id to be added
+         */
+        AddId: function(id){
+            this.$box.attr({"id": id});
+            return this;
         },
 
         /**

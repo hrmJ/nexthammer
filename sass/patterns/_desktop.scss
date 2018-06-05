@@ -105,3 +105,12 @@ th{
     }
 }
 
+.LRD_ngram{
+
+    &:hover{
+        @include pointer;
+        background:grey;
+        color:white;
+    }
+}
+
