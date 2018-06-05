@@ -101,7 +101,7 @@ var LRDtab = function(){
            .Add("PMI: " + $(this).find(".ngram_pmi").val())
            .AddId(id)
            .AddCloseButton();
-        msg.Show(9999);
+        msg.Show(99999);
     };
 
     /**
