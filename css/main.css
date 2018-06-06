@@ -357,7 +357,7 @@ li.actionlist {
     margin-left: 1em; }
   .dl_parent > div:first-child {
     margin-right: 1em;
-    max-width: 13em; }
+    width: 13em; }
   .dl_parent > div:nth-child(2) {
     flex: 1 3 50%; }
 

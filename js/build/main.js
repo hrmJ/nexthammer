@@ -1338,6 +1338,7 @@ var LRDtab = function(){
     ngram_range = [2,3];
     ngram_number = 3;
     lrd_method = "LL";
+    lrd_paradigm = "Noun-centered";
 
 
     /**
@@ -1345,12 +1346,20 @@ var LRDtab = function(){
      * Defines, what method will be used for picking
      * the top ngrams
      *
-     * @param e event
-     * @param ui jquery ui object
      *
      **/
-    SetLRDmethod = function(e, ui){
+    SetLRDmethod = function(){
         lrd_method = $(this).val();
+    }
+
+    /**
+     *
+     * Defines, what paradigm will be used for constructing the ngrams
+     *
+     *
+     **/
+    SetLRDparadigm = function(){
+        lrd_paradigm = $(this).val();
     }
 
 
@@ -1494,7 +1503,6 @@ var LRDtab = function(){
     function SetNgrams(){
         //CorpusActions.SubCorpusCharacteristics.PrintNgramList
         var langs = Loaders.GetLanguagesInCorpus();
-        var paradigm = "Noun-centered";
         var all_ngrams = [];
         var codes = Loaders.GetPickedCodesInAllLanguages();
         var msg = new Utilities.Message("Building the ngrams. This will take some time...", $(".container"));
@@ -1514,7 +1522,7 @@ var LRDtab = function(){
                         lemmas:"no",
                         must_include: lrd_lemma,
                         included_word_lemma: true,
-                        ldr_paradigm: paradigm,
+                        ldr_paradigm: lrd_paradigm,
                         codes: codes[lang],
                         action: "corpus_ngram_list",
                         lang: lang
@@ -1581,6 +1589,8 @@ var LRDtab = function(){
     
         $("#LRDtab_method").selectmenu();
         $("#LRDtab_method").on("selectmenuchange", SetLRDmethod);
+        $("#LRDtab_paradigm").selectmenu();
+        $("#LRDtab_paradigm").on("selectmenuchange", SetLRDparadigm);
         $("#LRDtab_ngramnumber").slider(
             {
             min:1,
