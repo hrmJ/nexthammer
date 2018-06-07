@@ -4,9 +4,9 @@
 <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 <link href="css/main.css?id=[@css_id]" rel="stylesheet" type="text/css">
-<link href="../js_libraries/jquery-ui-1.12.1.custom/jquery-ui.min.css" rel="stylesheet" type="text/css">
-<script src="../js_libraries/jquery-3.2.1.min.js"></script>
-<script src="../js_libraries/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
+<link href="js/build/vendor/jquery-ui-1.12.1.custom/jquery-ui.min.css" rel="stylesheet" type="text/css">
+<script src="js/build/vendor/jquery-3.2.1.min.js"></script>
+<script src="js/build/vendor/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
 <script src="js/build/main.js?id=[@js_id]"></script>
 </head>
 <body>

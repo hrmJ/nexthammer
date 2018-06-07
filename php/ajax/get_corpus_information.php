@@ -4,7 +4,7 @@
  * Interacts with the database to retrieve simple information such as corpus names etc.
  *
  **/
-require_once '../../../session_functions.php';
+require_once '../session_functions.php';
 require_once '../corpus_objects/corpus_object.php';
 require_once '../corpus_objects/corpus.php';
 

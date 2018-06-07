@@ -1,7 +1,7 @@
 <?php
 
 //General imports:
-require_once '../../../session_functions.php';
+require_once '../session_functions.php';
 
 //Specially for topics:
 require_once '../statistical_functions_for_topics.php'; require_once '../small_utilities.php';

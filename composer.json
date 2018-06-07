@@ -1,0 +1,15 @@
+{
+    "name": "tact/texthammer",
+    "description": "A framework for managing (especially parallel) corpora",
+    "type": "project",
+    "require": {
+        "phpunit/phpunit": "^7.0",
+        "kachkaev/php-r": "^1.0"
+    },
+    "authors": [
+        {
+            "name": "Juho Härme",
+            "email": "juho.harme@uta.fi"
+        }
+    ]
+}

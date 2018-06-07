@@ -5,7 +5,7 @@
  * the corpora. In addition, gives the user possibilities to manage e.g. stopwords
  *
  **/
-require_once '../../../session_functions.php';
+require_once '../session_functions.php';
 require_once '../corpus_objects/corpus_object.php';
 require_once '../corpus_objects/corpus.php';
 
