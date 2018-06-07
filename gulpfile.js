@@ -20,24 +20,24 @@ var
 
 
 gulp.task("js",function(){
-    var jsfiles = ['corpustools/topics_interface/js/src/utilities.js',
-                   'corpustools/topics_interface/js/src/corpus_desktop.js',
-                   'corpustools/topics_interface/js/src/setup_loaders.js',
-                   'corpustools/topics_interface/js/src/corpus_actions.js',
-                   'corpustools/topics_interface/js/src/corpus_management_actions.js',
-                   'corpustools/topics_interface/js/src/ldr_tab.js',
-                   'corpustools/topics_interface/js/src/interface_events.js'];
+    var jsfiles = ['js/src/utilities.js',
+                   'js/src/corpus_desktop.js',
+                   'js/src/setup_loaders.js',
+                   'js/src/corpus_actions.js',
+                   'js/src/corpus_management_actions.js',
+                   'js/src/ldr_tab.js',
+                   'js/src/interface_events.js'];
     var jsbuild = gulp.src(jsfiles).pipe(deporder()).pipe(concat('main.js'));
     //var jsbuild = gulp.src("corpustools/topics_interface/js/src/*.js").pipe(deporder()).pipe(concat('main.js'));
-    return jsbuild.pipe(gulp.dest('corpustools/topics_interface/js/build/'));
+    return jsbuild.pipe(gulp.dest('js/build/'));
 });
 
 gulp.task("css",function(){
-        var sass_folder = "corpustools/topics_interface/sass/**/*.scss";
+        var sass_folder = "sass/**/*.scss";
         gulp.src(sass_folder)
     	sass(sass_folder)
 		.on('error', sass.logError)
-		.pipe(gulp.dest('corpustools/topics_interface/css/'))
+		.pipe(gulp.dest('css/'))
 });
 
 
@@ -55,8 +55,8 @@ gulp.task("css",function(){
 
 gulp.task("watch",function(){
 
-    gulp.watch("corpustools/topics_interface/js/src/*.js",["js"]);
-    gulp.watch("corpustools/topics_interface/sass/**/*",["css"]);
+    gulp.watch("js/src/*.js",["js"]);
+    gulp.watch("sass/**/*",["css"]);
 
 });
 
