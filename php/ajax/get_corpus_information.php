@@ -9,7 +9,7 @@ require_once '../corpus_objects/corpus_object.php';
 require_once '../corpus_objects/corpus.php';
 
 $corpus = new Corpus();
-$corpus->SetConfigPath("../../../../config.ini");
+$corpus->SetConfigPath("../../../config.ini");
 $data = null;
 
 if($_GET["action"] == "corpus_name"){

@@ -11,7 +11,7 @@ require_once '../corpus_objects/corpus.php';
 
 $corpusname = "pest_inter";
 $corpus = new Corpus();
-$corpus->SetConfigPath("../../../../config.ini")
+$corpus->SetConfigPath("../../../config.ini")
     ->SetConnectionToMain()
     ->SetStopWords();
 

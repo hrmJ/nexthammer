@@ -15,7 +15,7 @@ require_once 'actions/frequencylist_actions.php';
 $corpusname = "pest_inter";
 $corpus = new Corpus();
 $corpus->SetCorpusName($corpusname)
-       ->SetConfigPath("../../../../config.ini")
+       ->SetConfigPath("../../../config.ini")
        ->SetConnectionToCorpus()
        ->SetConnectionToMain()
        ->SetStopWords();
