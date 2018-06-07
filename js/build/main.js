@@ -1454,6 +1454,7 @@ var LRDtab = function(){
         for(var i = 0; i < ajax_args.length; i++){
             var result = [];
             var this_response = ajax_args[i][0];
+            console.log(this_response);
             this_response.sort(
                     function(a,b) {
                         return a[sortkey] - b[sortkey];

@@ -300,16 +300,13 @@ class Corpus extends CorpusObject{
                 }
             }
             if(sizeof($log_likelihoods_of_bigrams) == $this->ngram_number -1 ){
-                $pmi_val = 1;
-                foreach($pmi_of_bigrams as $val){
-                    $pmi_val = $val * $pmi_val;
-                }
                 $this->data[] = Array(
                     "ngram" => $ngram,
                     "freq" => $ngramdata["freq"],
                     "LL" =>  array_sum($log_likelihoods_of_bigrams),
-                    "PMI" => $pmi_val
+                    "PMI" => array_sum($pmi_of_bigrams)
                 );
+                
             }
         }
         return $this;
