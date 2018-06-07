@@ -1,0 +1,13 @@
+__pycache__
+*__pycache__
+*.xml
+*.swp
+*.conll
+*.ini
+.dump
+*.dump
+*config.ini
+
+/vendor/
+.sass-cache
+node_modules/
