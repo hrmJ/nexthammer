@@ -75,6 +75,7 @@ class Dictionary{
                 break;
             }
         }
+        return $this;
     }
 
     /**

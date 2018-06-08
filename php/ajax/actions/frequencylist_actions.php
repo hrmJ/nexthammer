@@ -77,6 +77,23 @@ function Ngrams($corpus, $codes, $lang, $n, $lemmas, $include_word="", $pos_arra
                 ->CreateNgramTable();
     }
 
+} 
+/**
+ *
+ *  Translate all the words given as arguments
+ *
+ * @param $source_words the words that will be translated
+ * @param $target_langs the languages we will search translations into
+ *
+ */
+function FindPossibleTranslations($source_words, $target_langs){
+    $dict = new Texthammer\Dictionary();
+    $dict->SetTargetLangs($target_langs);
+    $tanslations = [];
+    foreach($source_words as $word){
+        $dict->Translate()->GetTranslations();
+        $translations[]
+    }
 }
 
 

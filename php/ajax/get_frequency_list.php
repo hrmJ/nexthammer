@@ -1,4 +1,6 @@
 <?php
+require '../vendor/autoload.php';
+use Texthammer;
 
 //General imports:
 require_once '../session_functions.php';
@@ -41,8 +43,8 @@ switch($_GET["action"]){
         );
         $corpus->OutputJson();
         break;
-    case "LRDtab":
-        echo json_encode(["MORO",$_GET["picked_code"]]);
+    case "GetTranslations":
+        FindPossibleTranslations($_GET["source_words"], $_GET["langs"]);
         break;
 }
 

@@ -1,18 +1,29 @@
 /**
  * 
+ * Gives the user multilingual tables of ngrams. The ngrams are sorted
+ * by either Log Likelihood (LL) or Mutual information  (MI/PMI) values.
+ * Only ngrams including thematically relevant words are taken into account.
+ * These words are filtered with the help of tf_idf values.
+ *
+ *
+ * @param keywords the words filtered after tf_idf
+ * @param number_of_topicwords how many words for each document
  * @param ngram_range from which ngrams to which [start, end]
+ * @param ngram_number how many ngrams for each individual key word
+ * @param lrd_method LL or PMI
+ * @param lrd_paradigm how to filter the ngrams: Noun-centered or Verb-centerd
  *
  **/
 var LRDtab = function(){
 
     keywords = [];
     ngrams = [];
-    processed_items = [];
     number_of_topicwords = 2;
     ngram_range = [2,3];
     ngram_number = 3;
     lrd_method = "LL";
     lrd_paradigm = "Noun-centered";
+    source_lang = "en",
 
 
     /**
@@ -168,6 +179,17 @@ var LRDtab = function(){
         });
     }
 
+    /**
+     *
+     * Picks one language as a source and filters the other languages' keyword l
+     *
+     **/
+    function FilterByDictionary(){
+        $.each(keywords[source_lang],function(idx,word){
+        
+        });
+    }
+
 
     /**
      *
@@ -247,9 +269,14 @@ var LRDtab = function(){
     function Run(words, ExamineTopicsObject){
         $.when(SetTfIdf(words)).done(function(){
             ExamineTopicsObject.msg.Destroy();
-            return $.when(SetNgrams()).done(function(){
-                ExamineTopicsObject.BuildLRDTable(ngrams);
+            $words_translated  =  $.when(FilterByDictionary()).done(function(){
+                console.log(keywords);
             });
+
+            //$ngrams_done  =  $.when(SetNgrams()).done(function(){
+            //    ExamineTopicsObject.BuildLRDTable(ngrams);
+            //});
+
         }
         );
     }
