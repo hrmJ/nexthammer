@@ -289,6 +289,7 @@ class Corpus extends CorpusObject{
         foreach($this->ngramdata[$this->ngram_number] as $ngram => $ngramdata){
             $words = explode($this->ngram_separator, $ngram);
             $log_likelihoods_of_bigrams = [];
+            $pmi_of_bigrams = [];
             for($i=0;$i<$this->ngram_number-1;$i++){
                 $thiskey = "{$words[$i]}{$this->ngram_separator}{$words[$i+1]}";
                 if(!array_key_exists($thiskey, $this->ngramdata[2])){

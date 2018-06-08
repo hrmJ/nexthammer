@@ -108,8 +108,10 @@ var Utilities = function(){
          *
          *  Changes the text of the last item of the message
          *
+         *  @param text what to display
+         *
          */
-        Update: function(){
+        Update: function(text){
             if(this.$box.find("ul").length){
                 this.$box.find("li:last-of-type").text(text);
             }

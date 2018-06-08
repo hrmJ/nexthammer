@@ -108,8 +108,10 @@ var Utilities = function(){
          *
          *  Changes the text of the last item of the message
          *
+         *  @param text what to display
+         *
          */
-        Update: function(){
+        Update: function(text){
             if(this.$box.find("ul").length){
                 this.$box.find("li:last-of-type").text(text);
             }
@@ -889,11 +891,19 @@ var CorpusActions = function(){
             params.codes = Loaders.GetPickedCodes();
             params.lang = Loaders.GetPickedLang();
             var msg = new Utilities.Message("Loading...", $(".container"));
+            var secs = 0;
+            var loadtime = setInterval(function(){
+                secs++;
+                msg.Update("Loading... (" + secs + " seconds )");
+            },1000);
             msg.Show(9999999);
+            console.log(params);
             $.getJSON("php/ajax/get_frequency_list.php", params,
                 function(data){
+                    clearInterval(loadtime);
                     console.log(data);
-                    msg.Destroy();
+                    msg.Update("Loading took " + secs + " seconds.");
+                    setTimeout(function(){msg.Destroy()},2000);
                     var freqlist = new Corpusdesktop.Table();
                     freqlist
                         .SetName(desktop_name || "Ngrams (the whole subcorpus)")
