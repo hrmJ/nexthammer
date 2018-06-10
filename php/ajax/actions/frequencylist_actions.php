@@ -2,8 +2,7 @@
 
 
 
-/**
- *
+/** 
  *  Output information about one document
  *
  * @param Corpus $corpus the (empty) collection of texts that will be processed
@@ -78,6 +77,7 @@ function Ngrams($corpus, $codes, $lang, $n, $lemmas, $include_word="", $pos_arra
     }
 
 } 
+
 /**
  *
  *  Translate all the words given as arguments
@@ -91,9 +91,9 @@ function FindPossibleTranslations($source_words, $target_langs){
     $dict->SetTargetLangs($target_langs);
     $tanslations = [];
     foreach($source_words as $word){
-        $dict->Translate()->GetTranslations();
-        $translations[]
+        $translations[$word] = $dict->SetStartWord($word)->Translate()->GetAllTranslations();
     }
+    var_dump($translations);
 }
 
 

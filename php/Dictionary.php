@@ -68,9 +68,11 @@ class Dictionary{
             $p = $obj->query->pages;
             $this->translations[$lang] = Array();
             foreach($p as $sp){
-                foreach($sp->iwlinks as $entry){
-                    $prop = "*";
-                    $this->translations[$lang][] =  $entry->$prop;
+                if(isset($sp->iwlinks)){
+                    foreach($sp->iwlinks as $entry){
+                        $prop = "*";
+                        $this->translations[$lang][] =  $entry->$prop;
+                    }
                 }
                 break;
             }
@@ -86,7 +88,6 @@ class Dictionary{
      *
      **/
     public function GetTranslationsForLanguage($lang){
-    
         return $this->translations[$lang];
     }
 
