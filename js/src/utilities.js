@@ -39,6 +39,7 @@ var Utilities = function(){
      *
      */
     var Message = function(msg, $parent_el){
+        console.log("new message created");
         this.$box = $("<div></div>").text(msg).attr({"class":"msgbox"});
         this.$parent_el = $parent_el || $("body");
     }
@@ -55,10 +56,11 @@ var Utilities = function(){
          */
         Show: function(offtime){
             var self = this;
-            var offtime = offtime || 2000;
             this.$parent_el.css({"position":"relative"});
             this.$box.appendTo(this.$parent_el).fadeIn("slow");
-            setTimeout(function(){ self.Destroy(); },offtime);
+            if(offtime){
+                setTimeout(function(){ self.Destroy(); },offtime);
+            }
             this.$box.draggable();
             
             //BlurContent(self.box);
@@ -122,10 +124,7 @@ var Utilities = function(){
         },
 
         Destroy: function(){
-            var self = this;
-            this.$box.fadeOut("slow",function(){
-                self.$box.remove();
-            });
+            this.$box.html("").remove();
         }
     }
 

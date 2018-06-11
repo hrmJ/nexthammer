@@ -49,7 +49,7 @@ var CorpusActions = function(){
                 secs++;
                 msg.Update("Loading... (" + secs + " seconds )");
             },1000);
-            msg.Show(9999999);
+            msg.Show(99999);
             console.log(params);
             $.getJSON("php/ajax/get_frequency_list.php", params,
                 function(data){
@@ -212,8 +212,10 @@ var CorpusActions = function(){
                 codes: Loaders.GetPickedCodes(),
                 lang: Loaders.GetPickedLang()
             };
-            this.msg = new Utilities.Message("Loading...", $parent_li);
-            this.msg.Show(9999999);
+            if(!this.msg){
+                this.msg = new Utilities.Message("Loading...", $parent_li);
+                this.msg.Show();
+            }
             this.$parent_li = $parent_li;
             return $.getJSON("php/ajax/get_frequency_list.php", params, callback);
         },

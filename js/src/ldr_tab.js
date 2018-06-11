@@ -365,8 +365,8 @@ var LRDtab = function(){
      **/
     function Run(words, ExamineTopicsObject){
         $.when(SetTfIdf(words)).done(function(){
-            console.log("destroying ");
             console.log(ExamineTopicsObject.msg);
+            $("#tf_start_msg").hide();
             ExamineTopicsObject.msg.Destroy();
             $.when(FilterByDictionary()).done(function(){
                 console.log("DONE");
