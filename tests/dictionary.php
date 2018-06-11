@@ -63,7 +63,7 @@ class DictionaryTest extends TestCase
     public function testAjaxFunction() {
         $langs = ["fi","sv","fr","ru"];
         $words = ["treaty","woman","work","child"];
-        FindPossibleTranslations($words, $langs);
+        var_dump(FindPossibleTranslations($words, $langs));
     }
 }
 

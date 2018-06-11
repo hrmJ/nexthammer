@@ -1,7 +1,6 @@
 <?php
-require '../vendor/autoload.php';
-use Texthammer;
 
+require '../../vendor/autoload.php';
 //General imports:
 require_once '../session_functions.php';
 
@@ -44,7 +43,8 @@ switch($_GET["action"]){
         $corpus->OutputJson();
         break;
     case "GetTranslations":
-        FindPossibleTranslations($_GET["source_words"], $_GET["langs"]);
+        $translations = FindPossibleTranslations([$_GET["source_word"]], $_GET["langs"]);
+        echo json_encode($translations);
         break;
 }
 

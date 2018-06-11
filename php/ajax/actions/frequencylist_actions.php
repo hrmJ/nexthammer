@@ -1,6 +1,6 @@
 <?php
 
-
+use Texthammer\Dictionary;
 
 /** 
  *  Output information about one document
@@ -87,13 +87,13 @@ function Ngrams($corpus, $codes, $lang, $n, $lemmas, $include_word="", $pos_arra
  *
  */
 function FindPossibleTranslations($source_words, $target_langs){
-    $dict = new Texthammer\Dictionary();
+    $dict = new Dictionary();
     $dict->SetTargetLangs($target_langs);
     $tanslations = [];
     foreach($source_words as $word){
         $translations[$word] = $dict->SetStartWord($word)->Translate()->GetAllTranslations();
     }
-    var_dump($translations);
+    return $translations;
 }
 
 

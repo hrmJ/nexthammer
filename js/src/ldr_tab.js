@@ -7,6 +7,7 @@
  *
  *
  * @param keywords the words filtered after tf_idf
+ * @param filtered_by_dict_keywords the words filtered after consulting a dictionary
  * @param number_of_topicwords how many words for each document
  * @param ngram_range from which ngrams to which [start, end]
  * @param ngram_number how many ngrams for each individual key word
@@ -16,9 +17,10 @@
  **/
 var LRDtab = function(){
 
-    keywords = [];
+    keywords = {};
+    filtered_by_dict_keywords = {};
     ngrams = [];
-    number_of_topicwords = 2;
+    number_of_topicwords = 10;
     ngram_range = [2,3];
     ngram_number = 3;
     lrd_method = "LL";
@@ -126,7 +128,7 @@ var LRDtab = function(){
 
     /**
      *
-     * Process a response from an ajax request
+     * Process a response from an ajax request. Possibly, sort the response.
      *
      * @param ajax_args the actual ajax response
      * @param how_many_returns how many items to take
@@ -136,18 +138,24 @@ var LRDtab = function(){
      **/
     function ProcessResponse(ajax_args, how_many_returns, sortkey, limit_keys){
         return_array = [];
+        how_many_returns = how_many_returns || ajax_args.length;
         for(var i = 0; i < ajax_args.length; i++){
             var result = [];
             var this_response = ajax_args[i][0];
-            console.log(this_response);
-            this_response.sort(
-                    function(a,b) {
-                        return a[sortkey] - b[sortkey];
-                    }
-            )
-            for(var a=1;a<=how_many_returns;a++){
-                if(this_response.length-a>=0){
-                    if(limit_keys){
+            //console.log(this_response);
+            if(sortkey){
+                this_response.sort(
+                        function(a,b) {
+                            return a[sortkey] - b[sortkey];
+                        }
+                );
+            }
+            if(!this_response.length){
+                result.push(this_response);
+            }
+            else{
+                for(var a=1;a<=how_many_returns;a++){
+                     if(limit_keys){
                         result.push(this_response[this_response.length-a][limit_keys]);
                     }
                     else{
@@ -181,15 +189,62 @@ var LRDtab = function(){
 
     /**
      *
-     * Picks one language as a source and filters the other languages' keyword l
+     * Picks one language as a source and filters the other languages' keyword to
+     * produce a list of possible multilingual keywords
      *
      **/
     function FilterByDictionary(){
-        $.each(keywords[source_lang],function(idx,word){
-        
+        var langs = Loaders.GetLanguagesInCorpus();
+        var target_langs = [];
+        $.each(langs,function(idx, lang){
+            if(lang != source_lang){
+                target_langs.push(lang);
+            }
+            //Create a table for the filtered words
+            filtered_by_dict_keywords[lang] = [];
         });
-    }
-
+        var filtered = [];
+        $.each(keywords[source_lang],function(idx,word){
+            params = {
+                "action": "GetTranslations" ,
+                "source_word": word,
+                "langs": target_langs
+            };
+            filtered.push($.getJSON("php/ajax/get_frequency_list.php",params,function(data){
+                console.log(data);
+            }));
+        });
+        $.when.apply($, filtered).done(function(){
+            for(var i = 0; i<arguments.length; i++){
+                //Iterating through EACH keyword in the source language
+                var word = arguments[i][0];
+                var source_word = Object.keys(word)[0];
+                filtered_by_dict_keywords[source_lang].push(source_word);
+                //Search for each target language and try to find words
+                //that were among the keywords and are possible translations
+                //of the source language keyword
+               $.each(target_langs,function(lidx,lang){
+                   var has_translations = false;
+                   $.each(word[source_word][lang],function(tidx, translation){
+                       var match_idx = keywords[lang].indexOf(translation);
+                       if(match_idx > -1){
+                           //If any word in the target language's keyword list matches,
+                           //stop searching and use that
+                           filtered_by_dict_keywords[lang].push(keywords[lang][match_idx]);
+                           has_translations = true;
+                           return false;
+                       }
+                   });
+                   //If nothing found for this target language, add an empty
+                   //string to mark this
+                   if(!has_translations){
+                       filtered_by_dict_keywords[lang].push("");
+                   }
+               });
+            }
+            console.log(filtered_by_dict_keywords);
+        }); 
+    } 
 
     /**
      *
@@ -227,7 +282,7 @@ var LRDtab = function(){
                     all_ngrams.push($.getJSON("php/ajax/get_frequency_list.php", params,
                         function(data){
                             bar.Progress();
-                            console.log(lrd_lemma);
+                            //console.log(lrd_lemma);
                         }
                     ));
                 }
@@ -269,9 +324,10 @@ var LRDtab = function(){
     function Run(words, ExamineTopicsObject){
         $.when(SetTfIdf(words)).done(function(){
             ExamineTopicsObject.msg.Destroy();
-            $words_translated  =  $.when(FilterByDictionary()).done(function(){
-                console.log(keywords);
-            });
+            FilterByDictionary()
+            //$words_translated  =  $.when(FilterByDictionary()).done(function(){
+            //    console.log("DONE!");
+            //});
 
             //$ngrams_done  =  $.when(SetNgrams()).done(function(){
             //    ExamineTopicsObject.BuildLRDTable(ngrams);
@@ -303,7 +359,7 @@ var LRDtab = function(){
             .parent().find(".slider_result").text(ngram_number);
         $("#LRDtab_nwords").slider(
             {
-            min:1,
+            min:10,
             max:20,
             value:3,
             change: SetNumberOfTopicWords
