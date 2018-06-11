@@ -67,12 +67,7 @@ switch($_GET["action"]){
             echo json_encode( [
                     $_GET["lang"] => [
                         $_GET["lrd_rank"] => [
-                            $_GET["n"] => [
-                                    "ngram" => "",
-                                    "freq" => "",
-                                    "LL" =>  "",
-                                    "PMI" => ""
-                            ]
+                            $_GET["n"] => [""]
                         ]
                     ]
                 ]);

@@ -259,33 +259,37 @@ var CorpusActions = function(){
                     var freqlist = new Corpusdesktop.Table();
                     var tabdata = [];
                     var langs = Loaders.GetLanguagesInCorpus();
-                    $.each(data[langs[0]],function(idx, topic_word_data){
+                    var headerlangs = [];
+                    var ngramrange = LRDtab.GetNgramRange();
+                    console.log(data);
+                    $.each(data[langs[0]],function(keyword_idx, keyword_data){
                         tabdata.push({});
-                        $.each(langs,function(lang_idx,lang){
-                            tabdata[tabdata.length-1][lang] = $("<ul class='ldrtab'></ul>");
-                        });
                     });
-                    $.each(langs,function(lang_idx,lang){
-                        $.each(data[lang], function(idx, topic_word_data){
-                            console.log(topic_word_data);
-                            for(ngramidx in topic_word_data){
-                                tabdata[idx][lang].append(`<li><strong>${ngramidx}</strong></li>`);
-                                $.each(topic_word_data[ngramidx],function(ngidx,this_ngram){
-                                    if(this_ngram){
-                                        var $li = $(`<li class='LRD_ngram'>${this_ngram.ngram}
-                                            <input type='hidden' class='ngram_ll' value='${this_ngram.LL}'></input>
-                                            <input type='hidden' class='ngram_pmi' value='${this_ngram.PMI}'></input>
-                                            </li>`);
-                                        tabdata[idx][lang].append($li);
-                                    }
-                                })
+                    console.log(tabdata);
+                    $.each(data,function(lang, langdata){
+                        headerlangs.push(lang);
+                        for(var i = 0; i < LRDtab.GetNumberOfTopicWords(); i++){
+                            if(langdata[i+1]){
+                                $ul = $("<ul class='ldrtab'></ul>");
+                                for(var n = ngramrange[0]; n <= ngramrange[1]; n++){
+                                    var ngram_data = langdata[i+1][n];
+                                    $ul.append(`<li><strong>${i}</strong></li>`);
+                                    $.each(ngram_data,function(idx, this_ngram){
+                                        if(this_ngram){
+                                            $(`<li class='LRD_ngram'>${this_ngram.ngram}
+                                                <input type='hidden' class='ngram_ll' value='${this_ngram.LL}'></input>
+                                                <input type='hidden' class='ngram_pmi' value='${this_ngram.PMI}'></input>
+                                            </li>`).appendTo($ul);
+                                        }
+                                    });
+                                }
+                                tabdata[i][lang] = $ul.get(0).outerHTML;
                             }
-                            tabdata[idx][lang] = tabdata[idx][lang].get(0).outerHTML;
-                        });
+                        }
                     });
                     freqlist.SetName(this.$parent_li.text())
                             .SetClass("lrd_table")
-                            .SetHeader(langs)
+                            .SetHeader(headerlangs)
                             .SetRows(tabdata)
                             .BuildOutput();
                     freqlist.$container.appendTo($details_li.hide());

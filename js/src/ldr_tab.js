@@ -27,6 +27,23 @@ var LRDtab = function(){
     lrd_paradigm = "Noun-centered";
     source_lang = "en",
 
+    /**
+     *
+     * Gets the number of topic words
+     *
+     **/
+    GetNumberOfTopicWords = function(){
+        return number_of_topicwords
+    }
+
+    /**
+     *
+     * Gets the range of ngram levels
+     *
+     **/
+    GetNgramRange = function(){
+        return ngram_range;
+    }
 
     /**
      *
@@ -329,6 +346,7 @@ var LRDtab = function(){
                     tabdata[lang][word_rank][n].push(this_ngram);
                 });
             }
+            ngrams = tabdata;
             console.log(tabdata);
             //ngrams = ProcessResponse(arguments, ngram_number, lrd_method);
             //console.log(ngrams);
@@ -370,7 +388,7 @@ var LRDtab = function(){
             $.when(FilterByDictionary()).done(function(){
                 console.log("DONE");
                 $.when(SetNgrams()).done(function(){
-                    //ExamineTopicsObject.BuildLRDTable(ngrams);
+                    ExamineTopicsObject.BuildLRDTable(ngrams);
                     console.log("done");
                 });
             });
@@ -422,6 +440,8 @@ var LRDtab = function(){
         Run,
         InitializeControls,
         ViewNgramDetails,
+        GetNumberOfTopicWords,
+        GetNgramRange,
     
     }
 
