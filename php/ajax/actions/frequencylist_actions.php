@@ -51,6 +51,9 @@ function SubcorpusStats($corpus, $codes, $lang){
  *
  */
 function Ngrams($corpus, $codes, $lang, $n, $lemmas, $include_word="", $pos_array=[], $word_condition_is_lemma=FALSE){
+    if($include_word=="{{skip}}"){
+        return false;
+    }
     $corpus->SetSubCorpus($codes, $lang)
            ->SetLang($lang)
            ->SetFilter();
@@ -75,6 +78,8 @@ function Ngrams($corpus, $codes, $lang, $n, $lemmas, $include_word="", $pos_arra
         $corpus ->SetNgramFrequency($n, 0, $include_word, $pos_array, $word_condition_is_lemma)
                 ->CreateNgramTable();
     }
+
+    return true;
 
 } 
 

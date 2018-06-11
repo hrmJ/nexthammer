@@ -31,7 +31,7 @@ switch($_GET["action"]){
         $corpus->OutputJson();
         break;
     case "corpus_ngram_list":
-        Ngrams($corpus,
+        if(Ngrams($corpus,
             $_GET["codes"], 
             $_GET["lang"],
             $_GET["n"],
@@ -39,9 +39,46 @@ switch($_GET["action"]){
             (isset($_GET["must_include"]) ? $_GET["must_include"] : ""),
             (isset($_GET["ldr_paradigm"]) ? BuildNgramPatterns($_GET["n"], $_GET["ldr_paradigm"]) : []),
             (isset($_GET["included_word_lemma"]) ? $_GET["included_word_lemma"] : FALSE)
-        );
-        $corpus->OutputJson();
+        )){
+            $corpus->OutputJson();
+        }
+        else{
+            //if dealing with an ngram that has to be skipped for some reason
+            echo json_encode([]);
+        }
         break;
+    case "lrd_ngram_list":
+        if(Ngrams($corpus,
+            $_GET["codes"], 
+            $_GET["lang"],
+            $_GET["n"],
+            $_GET["lemmas"],
+            (isset($_GET["must_include"]) ? $_GET["must_include"] : ""),
+            (isset($_GET["ldr_paradigm"]) ? BuildNgramPatterns($_GET["n"], $_GET["ldr_paradigm"]) : []),
+            (isset($_GET["included_word_lemma"]) ? $_GET["included_word_lemma"] : FALSE)
+        )){
+            echo json_encode( [
+                    $_GET["lang"] => [
+                        $_GET["lrd_rank"] => [
+                            $_GET["n"] => $corpus->GetData()
+                        ]
+                    ]
+                ]);
+        }
+        else{
+            //if dealing with an ngram that has to be skipped for some reason
+            echo json_encode( [
+                    $_GET["lang"] => [
+                        $_GET["lrd_rank"] => [
+                            $_GET["n"] => [
+                                    "ngram" => "",
+                                    "freq" => "",
+                                    "LL" => "" ,
+                                    "PMI" => "" ]
+                        ]
+                    ]
+                ]);
+        }
     case "GetTranslations":
         $translations = FindPossibleTranslations([$_GET["source_word"]], $_GET["langs"]);
         echo json_encode($translations);

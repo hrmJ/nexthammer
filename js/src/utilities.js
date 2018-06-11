@@ -123,8 +123,8 @@ var Utilities = function(){
 
         Destroy: function(){
             var self = this;
-            self.$parent_el.find(".msgbox").fadeOut("slow",function(){
-                self.$parent_el.find(".msgbox").remove();
+            this.$box.fadeOut("slow",function(){
+                self.$box.remove();
             });
         }
     }

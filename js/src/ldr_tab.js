@@ -20,8 +20,8 @@ var LRDtab = function(){
     keywords = {};
     filtered_by_dict_keywords = {};
     ngrams = [];
-    number_of_topicwords = 10;
-    ngram_range = [2,3];
+    number_of_topicwords = 2;
+    ngram_range = [2,2];
     ngram_number = 3;
     lrd_method = "LL";
     lrd_paradigm = "Noun-centered";
@@ -248,7 +248,7 @@ var LRDtab = function(){
                    //If nothing found for this target language, add an empty
                    //string to mark this
                    if(!has_translations){
-                       filtered_by_dict_keywords[lang].push("");
+                       filtered_by_dict_keywords[lang].push("{{skip}}");
                    }
                });
                 if(!has_at_least_one_translation){
@@ -271,6 +271,7 @@ var LRDtab = function(){
      **/
     function SetNgrams(){
         //CorpusActions.SubCorpusCharacteristics.PrintNgramList
+        var keyword_source = filtered_by_dict_keywords;
         var langs = Loaders.GetLanguagesInCorpus();
         var all_ngrams = [];
         var codes = Loaders.GetPickedCodesInAllLanguages();
@@ -278,12 +279,12 @@ var LRDtab = function(){
         var bar = new Utilities.ProgressBar(msg.$box);
         var total_words = 0;
         $.each(langs, function(lidx,lang){
-            total_words += filtered_by_dict_keywords[lang].length * (ngram_range[1] - ngram_range[0] + 1);
+            total_words += keyword_source[lang].length * (ngram_range[1] - ngram_range[0] + 1);
         });
         msg.Show(999999);
         bar.Initialize(total_words);
         $.each(langs,function(lang_idx,lang){
-            lrdlemmas = filtered_by_dict_keywords[lang];
+            lrdlemmas = keyword_source[lang];
             $.each(lrdlemmas, function(lemma_idx, lrd_lemma){
                 for(var n = ngram_range[0]; n <= ngram_range[1]; n++){
                     var params = {
@@ -293,13 +294,15 @@ var LRDtab = function(){
                         included_word_lemma: true,
                         ldr_paradigm: lrd_paradigm,
                         codes: codes[lang],
-                        action: "corpus_ngram_list",
+                        action: "lrd_ngram_list",
+                        lrd_rank: lemma_idx+1,
                         lang: lang
                     };
+                    console.log(params);
                     all_ngrams.push($.getJSON("php/ajax/get_frequency_list.php", params,
                         function(data){
                             bar.Progress();
-                            //console.log(lrd_lemma);
+                            console.log(data);
                         }
                     ));
                 }
@@ -307,24 +310,29 @@ var LRDtab = function(){
         });
         return  $.when.apply($, all_ngrams).done(function(){
             bar.Destroy();
-            ngrams = ProcessResponse(arguments, ngram_number, lrd_method);
-            var groups_per_lang = ngram_range[1] - ngram_range[0];
             tabdata = {};
-            $.each(langs,function(idx,lang){
-                tabdata[lang] = [];
-                per_lang = (ngram_range[1] - ngram_range[0] + 1);
-                rows_processed = idx*number_of_topicwords*per_lang;
-                for(var t = 1; t <= number_of_topicwords; t++){
-                    //For every topic word
-                    tabdata[lang].push({});
-                    for(var n = ngram_range[0]; n <= ngram_range[1]; n++){
-                        //For every ngram containing this topic word
-                        tabdata[lang][tabdata[lang].length-1][n] = ngrams[rows_processed];
-                        rows_processed++;
-                    }
-                }
-            });
-            ngrams = tabdata;
+            //for(var i = 0; i < arguments.length; i++ ){
+            //    tabdata[lang] = [];
+            //}
+            //ngrams = ProcessResponse(arguments, ngram_number, lrd_method);
+            //console.log(ngrams);
+            //var groups_per_lang = ngram_range[1] - ngram_range[0];
+            //tabdata = {};
+            //$.each(langs,function(idx,lang){
+            //    tabdata[lang] = [];
+            //    per_lang = (ngram_range[1] - ngram_range[0] + 1);
+            //    rows_processed = idx*number_of_topicwords*per_lang;
+            //    for(var t = 1; t <= number_of_topicwords; t++){
+            //        //For every topic word
+            //        tabdata[lang].push({});
+            //        for(var n = ngram_range[0]; n <= ngram_range[1]; n++){
+            //            //For every ngram containing this topic word
+            //            tabdata[lang][tabdata[lang].length-1][n] = ngrams[rows_processed];
+            //            rows_processed++;
+            //        }
+            //    }
+            //});
+            //ngrams = tabdata;
             msg.Destroy();
         });
     }
@@ -340,11 +348,15 @@ var LRDtab = function(){
      **/
     function Run(words, ExamineTopicsObject){
         $.when(SetTfIdf(words)).done(function(){
+            console.log("destroying ");
+            console.log(ExamineTopicsObject.msg);
             ExamineTopicsObject.msg.Destroy();
             $.when(FilterByDictionary()).done(function(){
-                //$.when(SetNgrams()).done(function(){
-                //    ExamineTopicsObject.BuildLRDTable(ngrams);
-                //});
+                console.log("DONE");
+                $.when(SetNgrams()).done(function(){
+                    //ExamineTopicsObject.BuildLRDTable(ngrams);
+                    console.log("done");
+                });
             });
         }
         );
@@ -372,7 +384,7 @@ var LRDtab = function(){
             .parent().find(".slider_result").text(ngram_number);
         $("#LRDtab_nwords").slider(
             {
-            min:10,
+            min:5,
             max:20,
             value:3,
             change: SetNumberOfTopicWords

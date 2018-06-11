@@ -28,32 +28,32 @@ class DictionaryTest extends TestCase
         $this->dict->SetStartWord("treaty");
     }
 
-#    /**
-#     *
-#     * Can fetch a list of all  the texts in a particular language
-#     *
-#     **/
-#    public function testTranslateFromEnglishToFinnish() {
-#        $this->dict->SetStartWord("treaty")->SetTargetLangs(["fi"])->Translate();
-#        $trans = $this->dict->GetTranslationsForLanguage("fi");
-#        $this->assertTrue(sizeOf($trans)>0);
-#        var_dump($trans);
-#    }
-#
-#    /**
-#     *
-#     * Can fetch a list of all  the texts in a particular language
-#     *
-#     **/
-#    public function testTranslateFromEnglishToFinnishAndSwedish() {
-#        $this->dict->SetStartWord("treaty")->SetTargetLangs(["fi","sv"])->Translate();
-#        $trans = $this->dict->GetTranslationsForLanguage("sv");
-#        $this->assertTrue(sizeOf($trans)>0);
-#        var_dump($trans);
-#        $trans = $this->dict->GetAllTranslations();
-#        var_dump($trans);
-#    }
-#
+    /**
+     *
+     * Can fetch a list of all  the texts in a particular language
+     *
+     **/
+    public function testTranslateFromEnglishToFinnish() {
+        $this->dict->SetStartWord("treaty")->SetTargetLangs(["fi"])->Translate();
+        $trans = $this->dict->GetTranslationsForLanguage("fi");
+        $this->assertTrue(sizeOf($trans)>0);
+        var_dump($trans);
+    }
+
+    /**
+     *
+     * Can fetch a list of all  the texts in a particular language
+     *
+     **/
+    public function testTranslateFromEnglishToFinnishAndSwedish() {
+        $this->dict->SetStartWord("treaty")->SetTargetLangs(["fi","sv"])->Translate();
+        $trans = $this->dict->GetTranslationsForLanguage("sv");
+        $this->assertTrue(sizeOf($trans)>0);
+        var_dump($trans);
+        $trans = $this->dict->GetAllTranslations();
+        var_dump($trans);
+    }
+
 
     /**
      *

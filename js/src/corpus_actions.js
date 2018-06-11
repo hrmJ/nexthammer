@@ -267,14 +267,17 @@ var CorpusActions = function(){
                     });
                     $.each(langs,function(lang_idx,lang){
                         $.each(data[lang], function(idx, topic_word_data){
+                            console.log(topic_word_data);
                             for(ngramidx in topic_word_data){
                                 tabdata[idx][lang].append(`<li><strong>${ngramidx}</strong></li>`);
                                 $.each(topic_word_data[ngramidx],function(ngidx,this_ngram){
-                                    var $li = $(`<li class='LRD_ngram'>${this_ngram.ngram}
-                                        <input type='hidden' class='ngram_ll' value='${this_ngram.LL}'></input>
-                                        <input type='hidden' class='ngram_pmi' value='${this_ngram.PMI}'></input>
-                                        </li>`);
-                                    tabdata[idx][lang].append($li);
+                                    if(this_ngram){
+                                        var $li = $(`<li class='LRD_ngram'>${this_ngram.ngram}
+                                            <input type='hidden' class='ngram_ll' value='${this_ngram.LL}'></input>
+                                            <input type='hidden' class='ngram_pmi' value='${this_ngram.PMI}'></input>
+                                            </li>`);
+                                        tabdata[idx][lang].append($li);
+                                    }
                                 })
                             }
                             tabdata[idx][lang] = tabdata[idx][lang].get(0).outerHTML;
