@@ -273,7 +273,7 @@ var CorpusActions = function(){
                                 $ul = $("<ul class='ldrtab'></ul>");
                                 for(var n = ngramrange[0]; n <= ngramrange[1]; n++){
                                     var ngram_data = langdata[i+1][n];
-                                    $ul.append(`<li><strong>${i}</strong></li>`);
+                                    $ul.append(`<li><strong>${n}</strong></li>`);
                                     $.each(ngram_data,function(idx, this_ngram){
                                         if(this_ngram){
                                             $(`<li class='LRD_ngram'>${this_ngram.ngram}
