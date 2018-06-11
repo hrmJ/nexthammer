@@ -1530,9 +1530,13 @@ var LRDtab = function(){
      *
      **/
     function FilterByDictionary(){
-        var langs = Loaders.GetLanguagesInCorpus();
+        var all_langs = Loaders.GetLanguagesInCorpus();
         var target_langs = [];
-        $.each(langs,function(idx, lang){
+        var msg = new Utilities.Message("Looking up wiktionary to filter the key word lists...", $(".container"));
+        var bar = new Utilities.ProgressBar(msg.$box);
+        bar.Initialize(number_of_topicwords);
+        msg.Show(999999);
+        $.each(all_langs,function(idx, lang){
             if(lang != source_lang){
                 target_langs.push(lang);
             }
@@ -1541,24 +1545,29 @@ var LRDtab = function(){
         });
         var filtered = [];
         $.each(keywords[source_lang],function(idx,word){
+            //Search for translation for each of the key word in the language
+            //chosen as source (default: english)
             params = {
                 "action": "GetTranslations" ,
                 "source_word": word,
                 "langs": target_langs
             };
             filtered.push($.getJSON("php/ajax/get_frequency_list.php",params,function(data){
-                console.log(data);
+                bar.Progress()
             }));
         });
-        $.when.apply($, filtered).done(function(){
-            for(var i = 0; i<arguments.length; i++){
+        return $.when.apply($, filtered).done(function(){
+            ajax_args = arguments;
+            msg.Destroy();
+            for(var i = 0; i<ajax_args.length; i++){
                 //Iterating through EACH keyword in the source language
-                var word = arguments[i][0];
+                var word = ajax_args[i][0];
                 var source_word = Object.keys(word)[0];
                 filtered_by_dict_keywords[source_lang].push(source_word);
                 //Search for each target language and try to find words
                 //that were among the keywords and are possible translations
                 //of the source language keyword
+               var has_at_least_one_translation = false;
                $.each(target_langs,function(lidx,lang){
                    var has_translations = false;
                    $.each(word[source_word][lang],function(tidx, translation){
@@ -1568,6 +1577,7 @@ var LRDtab = function(){
                            //stop searching and use that
                            filtered_by_dict_keywords[lang].push(keywords[lang][match_idx]);
                            has_translations = true;
+                           has_at_least_one_translation = true;
                            return false;
                        }
                    });
@@ -1577,8 +1587,15 @@ var LRDtab = function(){
                        filtered_by_dict_keywords[lang].push("");
                    }
                });
+                if(!has_at_least_one_translation){
+                    //If no translations at all, remove the word
+                    $.each(all_langs,function(idx,lang){
+                        filtered_by_dict_keywords[lang].pop();
+                    });
+                }
             }
             console.log(filtered_by_dict_keywords);
+            console.log(keywords);
         }); 
     } 
 
@@ -1597,12 +1614,12 @@ var LRDtab = function(){
         var bar = new Utilities.ProgressBar(msg.$box);
         var total_words = 0;
         $.each(langs, function(lidx,lang){
-            total_words += keywords[lang].length * (ngram_range[1] - ngram_range[0] + 1);
+            total_words += filtered_by_dict_keywords[lang].length * (ngram_range[1] - ngram_range[0] + 1);
         });
         msg.Show(999999);
         bar.Initialize(total_words);
         $.each(langs,function(lang_idx,lang){
-            lrdlemmas = keywords[lang];
+            lrdlemmas = filtered_by_dict_keywords[lang];
             $.each(lrdlemmas, function(lemma_idx, lrd_lemma){
                 for(var n = ngram_range[0]; n <= ngram_range[1]; n++){
                     var params = {
@@ -1660,15 +1677,11 @@ var LRDtab = function(){
     function Run(words, ExamineTopicsObject){
         $.when(SetTfIdf(words)).done(function(){
             ExamineTopicsObject.msg.Destroy();
-            FilterByDictionary()
-            //$words_translated  =  $.when(FilterByDictionary()).done(function(){
-            //    console.log("DONE!");
-            //});
-
-            //$ngrams_done  =  $.when(SetNgrams()).done(function(){
-            //    ExamineTopicsObject.BuildLRDTable(ngrams);
-            //});
-
+            $.when(FilterByDictionary()).done(function(){
+                //$.when(SetNgrams()).done(function(){
+                //    ExamineTopicsObject.BuildLRDTable(ngrams);
+                //});
+            });
         }
         );
     }
