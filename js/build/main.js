@@ -789,7 +789,8 @@ var Loaders = function(){
                     $(".lang_select select").selectmenu();
                     $(".lang_select select").on("selectmenuchange",function(){
                             SetPickedLang($(this).val());
-                            UpdateSubCorpus()});
+                            UpdateSubCorpus()
+                    });
                 });
         }
 
@@ -1611,6 +1612,7 @@ var LRDtab = function(){
     function SetNgrams(){
         //CorpusActions.SubCorpusCharacteristics.PrintNgramList
         var keyword_source = filtered_by_dict_keywords;
+        //var keyword_source = keywords;
         var langs = Loaders.GetLanguagesInCorpus();
         var all_ngrams = [];
         var codes = Loaders.GetPickedCodesInAllLanguages();
@@ -1637,7 +1639,6 @@ var LRDtab = function(){
                         lrd_rank: lemma_idx+1,
                         lang: lang
                     };
-                    console.log(params);
                     all_ngrams.push($.getJSON("php/ajax/get_frequency_list.php", params,
                         function(data){
                             bar.Progress();
@@ -1650,9 +1651,25 @@ var LRDtab = function(){
         return  $.when.apply($, all_ngrams).done(function(){
             bar.Destroy();
             tabdata = {};
-            //for(var i = 0; i < arguments.length; i++ ){
-            //    tabdata[lang] = [];
-            //}
+            console.log("here we go again...");
+            for(var i = 0; i < arguments.length; i++ ){
+                var lang = Object.keys(arguments[i][0])[0];
+                var word_rank = Object.keys(arguments[i][0][lang])[0]*1;
+                var n = Object.keys(arguments[i][0][lang][word_rank])[0];
+                if(!tabdata[lang]){
+                    tabdata[lang] = {}
+                }
+                if(!tabdata[lang][word_rank]){
+                    tabdata[lang][word_rank] = {};
+                }
+                if(!tabdata[lang][word_rank][n]){
+                    tabdata[lang][word_rank][n] = [];
+                }
+                $.each(arguments[i][0][lang][word_rank][n],function(idx, this_ngram){
+                    tabdata[lang][word_rank][n].push(this_ngram);
+                });
+            }
+            console.log(tabdata);
             //ngrams = ProcessResponse(arguments, ngram_number, lrd_method);
             //console.log(ngrams);
             //var groups_per_lang = ngram_range[1] - ngram_range[0];
@@ -1839,4 +1856,23 @@ $(document).ready(function(){
     );
     LRDtab.InitializeControls();
 
+                    //For some quick, dirty tests:
+                    //var params = {
+                    //    n:2,
+                    //    lemmas:"no",
+                    //    must_include: "{{skip}}",
+                    //    included_word_lemma: true,
+                    //    ldr_paradigm: "Verb-centered",
+                    //    codes: ["un_cert_able_seamen_1946_fi"],
+                    //    action: "lrd_ngram_list",
+                    //    lrd_rank: 1,
+                    //    lang: "fi"
+                    //};
+                    //    console.log(params);
+                    //        $.getJSON("php/ajax/get_frequency_list.php",
+                    //            params
+                    //            ,function(data){
+                    //                console.log(data);
+                    //                console.log("!!!!MORO");
+                    //            });
 });

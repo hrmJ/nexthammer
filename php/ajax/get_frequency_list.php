@@ -55,8 +55,7 @@ switch($_GET["action"]){
             $_GET["lemmas"],
             (isset($_GET["must_include"]) ? $_GET["must_include"] : ""),
             (isset($_GET["ldr_paradigm"]) ? BuildNgramPatterns($_GET["n"], $_GET["ldr_paradigm"]) : []),
-            (isset($_GET["included_word_lemma"]) ? $_GET["included_word_lemma"] : FALSE)
-        )){
+            (isset($_GET["included_word_lemma"]) ? $_GET["included_word_lemma"] : FALSE))){
             echo json_encode( [
                     $_GET["lang"] => [
                         $_GET["lrd_rank"] => [
@@ -64,21 +63,21 @@ switch($_GET["action"]){
                         ]
                     ]
                 ]);
-        }
-        else{
-            //if dealing with an ngram that has to be skipped for some reason
+        }else{
             echo json_encode( [
                     $_GET["lang"] => [
                         $_GET["lrd_rank"] => [
                             $_GET["n"] => [
                                     "ngram" => "",
                                     "freq" => "",
-                                    "LL" => "" ,
-                                    "PMI" => "" ]
+                                    "LL" =>  "",
+                                    "PMI" => ""
+                            ]
                         ]
                     ]
                 ]);
         }
+        break;
     case "GetTranslations":
         $translations = FindPossibleTranslations([$_GET["source_word"]], $_GET["langs"]);
         echo json_encode($translations);

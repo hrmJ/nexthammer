@@ -161,7 +161,8 @@ var Loaders = function(){
                     $(".lang_select select").selectmenu();
                     $(".lang_select select").on("selectmenuchange",function(){
                             SetPickedLang($(this).val());
-                            UpdateSubCorpus()});
+                            UpdateSubCorpus()
+                    });
                 });
         }
 

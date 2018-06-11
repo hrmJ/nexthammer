@@ -87,4 +87,23 @@ $(document).ready(function(){
     );
     LRDtab.InitializeControls();
 
+                    //For some quick, dirty tests:
+                    //var params = {
+                    //    n:2,
+                    //    lemmas:"no",
+                    //    must_include: "{{skip}}",
+                    //    included_word_lemma: true,
+                    //    ldr_paradigm: "Verb-centered",
+                    //    codes: ["un_cert_able_seamen_1946_fi"],
+                    //    action: "lrd_ngram_list",
+                    //    lrd_rank: 1,
+                    //    lang: "fi"
+                    //};
+                    //    console.log(params);
+                    //        $.getJSON("php/ajax/get_frequency_list.php",
+                    //            params
+                    //            ,function(data){
+                    //                console.log(data);
+                    //                console.log("!!!!MORO");
+                    //            });
 });
