@@ -200,9 +200,10 @@ var CorpusActions = function(){
          * @param $parent_li the li element above the link that fired the event
          * @param params If the parameters have been preset by another function
          * @param custom_callback call anothre callback insted of the default BuildTfIdfTable
+         * @param no_msg do not show a loading message, if this is true
          *
          **/
-        ExamineThisText: function($parent_li, params, custom_callback){
+        ExamineThisText: function($parent_li, params, custom_callback, no_msg){
             var self = this;
             var callback = custom_callback || this.BuildTfIdfTable.bind(this);
             picked_code = $parent_li.find("input[name='code']").val();
@@ -212,7 +213,7 @@ var CorpusActions = function(){
                 codes: Loaders.GetPickedCodes(),
                 lang: Loaders.GetPickedLang()
             };
-            if(!this.msg){
+            if(!no_msg){
                 this.msg = new Utilities.Message("Loading...", $parent_li);
                 this.msg.Show();
             }
@@ -317,6 +318,8 @@ var CorpusActions = function(){
             var words = [];
             var tf_idf = {};
             var bar;
+            this.msg = new Utilities.Message("Loading...", $parent_li);
+            this.msg.Show();
             $.each(langs,function(idx,lang){
                 var pat = new RegExp("(_?)" + picked_lang + "$","g");
                 words.push(self.ExamineThisText(
@@ -334,8 +337,7 @@ var CorpusActions = function(){
                         }
                         bar.Progress();
                         //self.msg.Add(lang + " done.");
-                    }
-                ));
+                    }, true));
             });
 
             LRDtab.Run(words, self);
