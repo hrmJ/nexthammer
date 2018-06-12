@@ -1742,7 +1742,7 @@ var LRDtab = function(){
             {
             min:1,
             max:20,
-            value:3,
+            value: ngram_number,
             change: SetNgramNumber,
             })
             .parent().find(".slider_result").text(ngram_number);
@@ -1750,7 +1750,7 @@ var LRDtab = function(){
             {
             min:2,
             max:20,
-            value:3,
+            value: number_of_topicwords,
             change: SetNumberOfTopicWords
             })
             .parent().find(".slider_result").text(number_of_topicwords);
