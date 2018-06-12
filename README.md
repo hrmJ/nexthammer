@@ -32,7 +32,7 @@ For develpoment
 ---------------
 
 In addition to the steps in the previous section [gulp.js](https://gulpjs.com/)
-is needed to combining the js and converting sass files to css.
+is needed for combining the js and converting sass files to css.
 
 1. Install `node` and `npm`
 2. run `npm install` in the nexthammer folder
