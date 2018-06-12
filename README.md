@@ -8,6 +8,9 @@ Texthammer) and is an attempt to modernize the look of the project as well
 as to take advantage of AJAX and other more up-to-date ways to build wep applications
 (the original texthammer interface can be accessed through [this link](https://puolukka.uta.fi/~texthammer/corpustools))
 
+To try the project, you can check out [the test version at University of tampere](https://puolukka.uta.fi/nexthammer).
+
+
 Installing: a quick guide
 ==========================
 
