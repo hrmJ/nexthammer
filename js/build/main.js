@@ -1368,7 +1368,7 @@ var LRDtab = function(){
     filtered_by_dict_keywords = {};
     ngrams = [];
     number_of_topicwords = 2;
-    ngram_range = [2,2];
+    ngram_range = [2,3];
     ngram_number = 5;
     lrd_method = "LL";
     lrd_paradigm = "Noun-centered";
@@ -1748,7 +1748,7 @@ var LRDtab = function(){
             .parent().find(".slider_result").text(ngram_number);
         $("#LRDtab_nwords").slider(
             {
-            min:5,
+            min:2,
             max:20,
             value:3,
             change: SetNumberOfTopicWords
