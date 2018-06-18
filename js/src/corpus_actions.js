@@ -268,7 +268,6 @@ var CorpusActions = function(){
                     $.each(data[langs[0]],function(keyword_idx, keyword_data){
                         tabdata.push({});
                     });
-                    console.log(tabdata);
                     $.each(data,function(lang, langdata){
                         headerlangs.push(lang);
                         for(var i = 0; i < LRDtab.GetNumberOfTopicWords(); i++){

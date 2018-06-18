@@ -1,0 +1,18 @@
+<phpunit bootstrap="tests/bootstrap.php" colors="true">
+    <testsuites>
+        <testsuite name="topic words">
+            <file>tests/ngrams.php</file>
+            <file>tests/filters.php</file>
+        </testsuite>
+        <testsuite name="general">
+            <file>tests/templates.php</file>
+            <file>tests/rdf.php</file>
+        </testsuite>
+        <testsuite name="corpus_objects">
+            <file>tests/corpus.php</file>
+        </testsuite>
+        <testsuite name="corpus_management">
+            <file>tests/corpus_management.php</file>
+        </testsuite>
+    </testsuites>
+</phpunit>
