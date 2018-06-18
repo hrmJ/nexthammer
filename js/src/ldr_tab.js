@@ -6,19 +6,21 @@
  * These words are filtered with the help of tf_idf values.
  *
  *
- * @param keywords the words filtered after tf_idf
+ * @param words_in_doc all the words that appear in the document (object with languages as keys).
  * @param filtered_by_dict_keywords the words filtered after consulting a dictionary
  * @param number_of_topicwords how many words for each document
  * @param ngram_range from which ngrams to which [start, end]
  * @param ngram_number how many ngrams for each individual key word
  * @param lrd_method LL or PMI
+ * @param sl_keywords_ranked ordered list of keywords in the source language
  * @param lrd_paradigm how to filter the ngrams: Noun-centered or Verb-centerd
  *
  **/
 var LRDtab = function(){
 
-    keywords = {};
-    filtered_by_dict_keywords = {};
+    words_in_doc = {};
+    sl_keywords_ranked = [];
+    filtered_by_dict_keywords = [];
     ngrams = [];
     number_of_topicwords = 5;
     ngram_range = [2,3];
@@ -26,6 +28,16 @@ var LRDtab = function(){
     lrd_method = "LL";
     lrd_paradigm = "Noun-centered";
     source_lang = "en",
+
+
+    /**
+     *
+     * Gets the source language
+     *
+     **/
+    GetSourceLang = function(){
+        return source_lang;
+    }
 
     /**
      *
@@ -187,20 +199,59 @@ var LRDtab = function(){
 
     /**
      *
-     * Gets a list of keywords for the document in all languages
+     * Gets a list for the most frequent words in all the languages
+     * in order to reduce the number of ngrams to be queried in the 
+     * next stage
      *
-     * @param words array of ajax responses
+     * @param picked_code code of the document under examination
      *
      **/
-    function SetTfIdf(words){
-        return $.when.apply($, words).done(function(){
-            return_array = ProcessResponse(arguments, number_of_topicwords, "tf_idf","lemma");
-            var lang_object = {};
-            var langs = Loaders.GetLanguagesInCorpus();
-            $.each(langs,function(idx,lang){
-                lang_object[lang] = return_array[idx];
+    function GetWordLists(picked_code){
+        var langs = Loaders.GetLanguagesInCorpus(),
+            picked_lang = Loaders.GetPickedLang(),
+            responses = [],
+            codes = Loaders.GetPickedCodesInAllLanguages();
+            $.each(langs,function(lidx, lang){
+                if(lang != source_lang){
+                    var pat = new RegExp("(_?)" + picked_lang + "$","g");
+                    responses.push($.getJSON("php/ajax/get_frequency_list.php",
+                        {
+                        action: "corpus_frequency_list",
+                        codes:codes[lang],
+                        codes: [picked_code.replace(pat,"$1" + lang)],
+                        lang: lang,
+                        bylang: "yes"
+                        }
+                    ));
+                }
             });
-            keywords = lang_object;
+        return $.when.apply($, responses).done(function(){
+            $.each(arguments,function(idx,arg){
+                lang = Object.keys(arg[0])[0],
+                words_in_doc[lang] = arg[0][lang];
+            });
+        });
+    }
+
+
+    /**
+     *
+     * Gets a list of keywords for the document in all languages
+     *
+     * @param sl_wordlist_response ajax response of the keywords for the source language
+     *
+     **/
+    function SetTfIdf(sl_wordlist_response){
+        return $.when(sl_wordlist_response).done(function(){
+            console.log("DONE!");
+            console.log(arguments);
+            //return_array = ProcessResponse(arguments, number_of_topicwords, "tf_idf","lemma");
+            //var lang_object = {};
+            //var langs = Loaders.GetLanguagesInCorpus();
+            //$.each(langs,function(idx,lang){
+            //    lang_object[lang] = return_array[idx];
+            //});
+            //keywords = lang_object;
         });
     }
 
@@ -209,28 +260,30 @@ var LRDtab = function(){
      * Picks one language as a source and filters the other languages' keyword to
      * produce a list of possible multilingual keywords
      *
+     * @param sl_keywords array of the keywords in the source language
+     *
      **/
-    function FilterByDictionary(){
-        var all_langs = Loaders.GetLanguagesInCorpus();
-        var target_langs = [];
-        var msg = new Utilities.Message("Looking up wiktionary to filter the key word lists...", $(".container"));
-        var bar = new Utilities.ProgressBar(msg.$box);
+    function FilterByDictionary(sl_keywords){
+        var all_langs = Loaders.GetLanguagesInCorpus(),
+            target_langs = [],
+            msg = new Utilities.Message("Looking up wiktionary to filter the key word lists...", $(".container")),
+            bar = new Utilities.ProgressBar(msg.$box);
+        filtered_by_dict_keywords = [];
         bar.Initialize(number_of_topicwords);
         msg.Show(999999);
         $.each(all_langs,function(idx, lang){
             if(lang != source_lang){
                 target_langs.push(lang);
             }
-            //Create a table for the filtered words
-            filtered_by_dict_keywords[lang] = [];
         });
         var filtered = [];
-        $.each(keywords[source_lang],function(idx,word){
+        $.each(sl_keywords,function(idx,word){
             //Search for translation for each of the key word in the language
             //chosen as source (default: english)
+            console.log(word);
             params = {
                 "action": "GetTranslations" ,
-                "source_word": word,
+                "source_word": word.lemma,
                 "langs": target_langs
             };
             filtered.push($.getJSON("php/ajax/get_frequency_list.php",params,function(data){
@@ -242,41 +295,25 @@ var LRDtab = function(){
             msg.Destroy();
             for(var i = 0; i<ajax_args.length; i++){
                 //Iterating through EACH keyword in the source language
-                var word = ajax_args[i][0];
-                var source_word = Object.keys(word)[0];
-                filtered_by_dict_keywords[source_lang].push(source_word);
-                //Search for each target language and try to find words
-                //that were among the keywords and are possible translations
-                //of the source language keyword
-               var has_at_least_one_translation = false;
-               $.each(target_langs,function(lidx,lang){
-                   var has_translations = false;
-                   $.each(word[source_word][lang],function(tidx, translation){
-                       var match_idx = keywords[lang].indexOf(translation);
-                       if(match_idx > -1){
-                           //If any word in the target language's keyword list matches,
-                           //stop searching and use that
-                           filtered_by_dict_keywords[lang].push(keywords[lang][match_idx]);
-                           has_translations = true;
-                           has_at_least_one_translation = true;
-                           return false;
-                       }
-                   });
-                   //If nothing found for this target language, add an empty
-                   //string to mark this
-                   if(!has_translations){
-                       filtered_by_dict_keywords[lang].push("{{skip}}");
-                   }
-               });
-                if(!has_at_least_one_translation){
-                    //If no translations at all, remove the word
-                    $.each(all_langs,function(idx,lang){
-                        filtered_by_dict_keywords[lang].pop();
-                    });
+                var word = ajax_args[i][0],
+                    source_word = Object.keys(word)[0],
+                    has_at_least_one_translation = false,
+                    this_keyword = {};
+                this_keyword[source_lang] = [source_word];
+                $.each(target_langs,function(lidx,lang){
+                    //Pick the translations for each target lang
+                    //and make sure at least one language has some.
+                    this_keyword[lang] = [];
+                    if(word[source_word][lang].length){
+                        has_at_least_one_translation = true;
+                        this_keyword[lang] = word[source_word][lang];
+                    }
+                });
+                if(has_at_least_one_translation){
+                   filtered_by_dict_keywords.push(this_keyword);
                 }
             }
             console.log(filtered_by_dict_keywords);
-            console.log(keywords);
         }); 
     } 
 
@@ -288,51 +325,67 @@ var LRDtab = function(){
      **/
     function SetNgrams(){
         //CorpusActions.SubCorpusCharacteristics.PrintNgramList
-        var keyword_source = filtered_by_dict_keywords;
-        //var keyword_source = keywords;
-        var langs = Loaders.GetLanguagesInCorpus();
-        var all_ngrams = [];
-        var codes = Loaders.GetPickedCodesInAllLanguages();
-        var msg = new Utilities.Message("Building the ngrams. This will take some time...", $(".container"));
-        var bar = new Utilities.ProgressBar(msg.$box);
-        var total_words = 0;
-        $.each(langs, function(lidx,lang){
-            total_words += keyword_source[lang].length * (ngram_range[1] - ngram_range[0] + 1);
+        var keyword_source = filtered_by_dict_keywords,
+            langs = Loaders.GetLanguagesInCorpus(),
+            all_ngrams = [],
+            codes = Loaders.GetPickedCodesInAllLanguages(),
+            msg = new Utilities.Message("Building the ngrams. This will take some time...", $(".container")),
+            bar = new Utilities.ProgressBar(msg.$box),
+            total_words = 0;
+        //COUNT all the ngrams that have to be searched for
+        //and use that information for the progress bar
+        $.each(keyword_source, function(keyword_idx, this_keyword){
+            $.each(langs,function(lang_idx,lang){
+                $.each(this_keyword[lang], function(lemma_idx, lrd_lemma){
+                    if( lang == source_lang || words_in_doc[lang].indexOf(lrd_lemma)>-1){
+                        total_words += ngram_range[1] - ngram_range[0] + 1;
+                    }
+                });
+            });
         });
         msg.Show(999999);
         bar.Initialize(total_words);
-        $.each(langs,function(lang_idx,lang){
-            lrdlemmas = keyword_source[lang];
-            $.each(lrdlemmas, function(lemma_idx, lrd_lemma){
-                for(var n = ngram_range[0]; n <= ngram_range[1]; n++){
-                    var params = {
-                        n:n,
-                        lemmas:"no",
-                        must_include: lrd_lemma,
-                        included_word_lemma: true,
-                        ldr_paradigm: lrd_paradigm,
-                        codes: codes[lang],
-                        action: "lrd_ngram_list",
-                        lrd_rank: lemma_idx+1,
-                        lang: lang
-                    };
-                    all_ngrams.push($.getJSON("php/ajax/get_frequency_list.php", params,
-                        function(data){
-                            bar.Progress();
-                            console.log(data);
+        //Start fetching the ngrams from the backend
+        $.each(keyword_source,function(keyword_idx,this_keyword){
+            $.each(langs,function(lang_idx,lang){
+                if(this_keyword[lang].length){
+                    $.each(this_keyword[lang], function(lemma_idx, lrd_lemma){
+                        if( lang == source_lang || words_in_doc[lang].indexOf(lrd_lemma)>-1){
+                            //Only search for ngrams that for words 
+                            //that actually appear in the document
+                            for(var n = ngram_range[0]; n <= ngram_range[1]; n++){
+                                var params = {
+                                    n:n,
+                                    lemmas:"no",
+                                    must_include: lrd_lemma,
+                                    included_word_lemma: true,
+                                    ldr_paradigm: lrd_paradigm,
+                                    codes: codes[lang],
+                                    action: "lrd_ngram_list",
+                                    lang: lang,
+                                    lrd_rank: sl_keywords_ranked.indexOf(this_keyword[source_lang][0])+1,
+                                };
+                                all_ngrams.push($.getJSON("php/ajax/get_frequency_list.php", params,
+                                    function(data){
+                                        bar.Progress();
+                                        console.log(data);
+                                    }
+                                ));
+                            }
                         }
-                    ));
+                    });
                 }
             });
         });
-        return  $.when.apply($, all_ngrams).done(function(){
+        return $.when.apply($, all_ngrams).done(function(){
             bar.Destroy();
             tabdata = {};
             console.log("here we go again...");
+            console.log(arguments);
             for(var i = 0; i < arguments.length; i++ ){
-                var lang = Object.keys(arguments[i][0])[0];
-                var word_rank = Object.keys(arguments[i][0][lang])[0]*1;
-                var n = Object.keys(arguments[i][0][lang][word_rank])[0];
+                var lang = Object.keys(arguments[i][0])[0],
+                    word_rank = Object.keys(arguments[i][0][lang])[0]*1,
+                    n = Object.keys(arguments[i][0][lang][word_rank])[0];
                 if(!tabdata[lang]){
                     tabdata[lang] = {};
                 }
@@ -346,9 +399,27 @@ var LRDtab = function(){
                 //FInally, sort by LL or PMI
                 these_ngrams.sortOn(lrd_method,"desc");
                 //By default, don't take every ngram 
+                //THIS filters out bad translations!
                 tabdata[lang][word_rank][n] = these_ngrams.slice(0,ngram_number);
-
             }
+            $.each(langs,function(l_idx, lang){
+                if(lang != source_lang){
+                   if(!tabdata[lang]){
+                       tabdata[lang] = {};
+                   }
+                   for(i=1; i <= number_of_topicwords; i++){
+                       if(!tabdata[lang][i]){
+                           tabdata[lang][i] = {};
+                       }
+                        for(var n = ngram_range[0]; n <= ngram_range[1]; n++){
+                           if(!tabdata[lang][i][n]){
+                               tabdata[lang][i][n] = "";
+                           }
+                        }
+                   }
+                }
+            });
+            console.log(tabdata);
             ngrams = tabdata;
             msg.Destroy();
         });
@@ -359,24 +430,30 @@ var LRDtab = function(){
      *
      * Run the lrdTAB functionality
      *
-     * @param words a list of ajax responses
+     * @param sl_wordlist_response the ajax response from the keyword list for the source language
      * @param ExamineTopicsObject the object that called this function
+     * @param picked_code the code of the document under examination
      *
      **/
-    function Run(words, ExamineTopicsObject){
-        $.when(SetTfIdf(words)).done(function(){
-            console.log(ExamineTopicsObject.msg);
-            $("#tf_start_msg").hide();
+    function Run(sl_wordlist_response, ExamineTopicsObject, picked_code){
+        $.when(sl_wordlist_response).done(function(){
+            sl_keywords_ranked = [];
             ExamineTopicsObject.msg.Destroy();
-            $.when(FilterByDictionary()).done(function(){
-                console.log("DONE");
-                $.when(SetNgrams()).done(function(){
-                    ExamineTopicsObject.BuildLRDTable(ngrams);
-                    console.log("done");
+            var sl_keywords = arguments[0];
+            sl_keywords.sortOn("tf_idf","desc");
+            sl_keywords  = sl_keywords.slice(0,number_of_topicwords);
+            $.each(sl_keywords, function(kw_idx, keyword){
+                sl_keywords_ranked.push(keyword.lemma);
+            });
+            $.when(GetWordLists(picked_code)).done(function(){
+                $.when(FilterByDictionary(sl_keywords)).done(function(){
+                    $.when(SetNgrams()).done(function(){
+                        console.log("GINISHED");
+                        ExamineTopicsObject.BuildLRDTable(ngrams);
+                    });
                 });
             });
-        }
-        );
+        });
     }
 
     /**
@@ -425,6 +502,7 @@ var LRDtab = function(){
         ViewNgramDetails,
         GetNumberOfTopicWords,
         GetNgramRange,
+        GetSourceLang,
     
     }
 

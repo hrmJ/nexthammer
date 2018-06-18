@@ -28,7 +28,13 @@ switch($_GET["action"]){
         break;
     case "corpus_frequency_list":
         SubcorpusStats($corpus, $_GET["codes"], $_GET["lang"]);
-        $corpus->OutputJson();
+        if(isset($_GET["bylang"])){
+            $corpus->SimplifyDataByVariable("lemma");
+            echo json_encode([$_GET["lang"] => $corpus->GetData()]);
+        }
+        else{
+            $corpus->OutputJson();
+        }
         break;
     case "corpus_ngram_list":
         if(Ngrams($corpus,
@@ -40,7 +46,12 @@ switch($_GET["action"]){
             (isset($_GET["ldr_paradigm"]) ? BuildNgramPatterns($_GET["n"], $_GET["ldr_paradigm"]) : []),
             (isset($_GET["included_word_lemma"]) ? $_GET["included_word_lemma"] : FALSE)
         )){
-            $corpus->OutputJson();
+            if(isset($_GET["bylang"])){
+                echo json_encode([$_GET["lang"] => $corpus->GetData()]);
+            }
+            else{
+                $corpus->OutputJson();
+            }
         }
         else{
             //if dealing with an ngram that has to be skipped for some reason

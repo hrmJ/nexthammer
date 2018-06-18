@@ -50,11 +50,9 @@ var CorpusActions = function(){
                 msg.Update("Loading... (" + secs + " seconds )");
             },1000);
             msg.Show(99999);
-            console.log(params);
             $.getJSON("php/ajax/get_frequency_list.php", params,
                 function(data){
                     clearInterval(loadtime);
-                    console.log(data);
                     msg.Update("Loading took " + secs + " seconds.");
                     setTimeout(function(){msg.Destroy()},2000);
                     var freqlist = new Corpusdesktop.Table();
@@ -309,38 +307,21 @@ var CorpusActions = function(){
          *
          **/
         LaunchLRDTab: function($parent_li){
-            var self = this;
-            picked_code = $parent_li.find("input[name='code']").val();
-            picked_lang = Loaders.GetPickedLang();
-            langs = Loaders.GetLanguagesInCorpus();
-            codes = Loaders.GetPickedCodesInAllLanguages();
-            var words = [];
-            var tf_idf = {};
-            var bar;
+            var sl = LRDtab.GetSourceLang(),
+                picked_code = $parent_li.find("input[name='code']").val(),
+                picked_lang = Loaders.GetPickedLang(),
+                codes = Loaders.GetPickedCodesInAllLanguages(),
+                self = this;
+            var pat = new RegExp("(_?)" + picked_lang + "$","g");
             this.msg = new Utilities.Message("Loading...", $parent_li);
             this.msg.Show();
-            $.each(langs,function(idx,lang){
-                var pat = new RegExp("(_?)" + picked_lang + "$","g");
-                words.push(self.ExamineThisText(
-                    $parent_li, 
-                    {
-                    action:"examine_text",
-                    picked_code: picked_code.replace(pat,"$1" + lang),
-                    lang: lang,
-                    codes: codes[lang]
-                    },
-                    function(){
-                        if(!bar){
-                            bar = new Utilities.ProgressBar(self.msg.$box);
-                            bar.Initialize(langs.length);
-                        }
-                        bar.Progress();
-                        //self.msg.Add(lang + " done.");
-                    }, true));
-            });
-
-            LRDtab.Run(words, self);
-
+            LRDtab.Run(this.ExamineThisText($parent_li, {
+                action:"examine_text",
+                picked_code: picked_code.replace(pat,"$1" + sl),
+                lang: sl,
+                codes: codes[sl]
+                }, function(){self.msg.Update("Source language ready.")}, true),
+                this, picked_code);
         },
 
         /**

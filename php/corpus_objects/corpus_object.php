@@ -39,6 +39,23 @@ class CorpusObject{
 
     /**
      * 
+     * Simplifies the data by using one parametr of a multidimensional
+     * array.
+     *
+     * @param $key the parameter
+     * 
+     */
+    public function SimplifyDataByVariable($key){
+        $temp = [];
+        foreach($this->data as $row){
+            $temp[] = $row[$key];
+        }
+        $this->data = $temp;
+        return $this;
+    }
+
+    /**
+     * 
      * Sets the language;
      * 
      */
