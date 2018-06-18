@@ -37,10 +37,10 @@ is needed for combining the js and converting sass files to css.
 1. Install `node` and `npm`
 2. run `npm install` in the nexthammer folder
 
-Installing using an lxc container using a texthammer database dump
+Installing using an lxc container (with a texthammer database dump)
 --------------------------------------------------------------------
 
-TODO: make a shell script for all this...
+`TODO: make a shell script for all this...`
 
 First, clone this repository to your desired location. (`git clone https://github.com/hrmJ/nexthammer.git`)
 
@@ -150,7 +150,7 @@ CREATE TABLE topicwords_stopwords (
     lemma VARCHAR (300)
 );
 
-GRANT ALL PRIVILEGES ON ALL TABLES DATABASE "dbmain" to tester;
+GRANT ALL PRIVILEGES ON DATABASE "dbmain" to tester;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO tester;
 ```
 
@@ -173,7 +173,7 @@ npm install gulp-cli -g
 
 Now, go to the project folder (`opt/nexthammer/nexthammer`) and run `npm install --save-dev`.
 
-Finally, composer and phpunit
+Composer and phpunit
 
 ```
 apt install composer
@@ -182,7 +182,7 @@ composer install
 composer update
 ```
 
-Finally, run the phptests (in the nexthammer folder):
+Finally, run the php tests (in the nexthammer folder):
 
 
 ```
