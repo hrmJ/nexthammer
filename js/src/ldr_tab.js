@@ -313,6 +313,7 @@ var LRDtab = function(){
                                     action: "lrd_ngram_list",
                                     lang: lang,
                                     lrd_rank: sl_keywords_ranked.indexOf(this_keyword[source_lang][0])+1,
+                                    remove_hashes: "yes",
                                 };
                                 all_ngrams.push($.getJSON("php/ajax/get_frequency_list.php", params,
                                     function(data){

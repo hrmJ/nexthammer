@@ -56,6 +56,26 @@ class CorpusObject{
 
     /**
      * 
+     * Cleans up unwanted symbols etc from data
+     *
+     * @param $to_be_cleaned the string that we want to get rid of
+     * @param $key if set, the data will be cleaned from a specific parameter only
+     * 
+     */
+    public function CleanDataFromString($to_be_cleaned, $key=null){
+        foreach($this->data as $r_idx => $row){
+            if($key){
+                $this->data[$r_idx][$key] = str_replace($to_be_cleaned, "", $this->data[$r_idx][$key]);
+            }
+            else{
+                $this->data[$r_idx] = str_replace($to_be_cleaned, "", $this->data[$r_idx]);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * 
      * Sets the language;
      * 
      */

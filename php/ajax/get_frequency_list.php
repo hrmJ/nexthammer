@@ -29,7 +29,7 @@ switch($_GET["action"]){
     case "corpus_frequency_list":
         SubcorpusStats($corpus, $_GET["codes"], $_GET["lang"]);
         if(isset($_GET["bylang"])){
-            $corpus->SimplifyDataByVariable("lemma");
+            $corpus->CleanDataFromString("#","lemma")->SimplifyDataByVariable("lemma");
             echo json_encode([$_GET["lang"] => $corpus->GetData()]);
         }
         else{

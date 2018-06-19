@@ -413,8 +413,25 @@ class Corpus extends CorpusObject{
                 if($cond !== "("){
                     $cond .= " OR ";
                 }
-                $colname = ($word_is_lemma ? "lemma_" : "n");
-                $cond .= "$colname" . "$i =  \$$w_index";
+                $colname = "n$i";
+                if($word_is_lemma){
+                    #HACK!
+                    if(isset($_GET["remove_hashes"])){
+                        $colname = "replace(lemma_$i,'#','')";
+                    }
+                    else{
+                        $colname = "lemma_$i";
+                    }
+                }
+                if($word_is_lemma and isset($_GET["remove_hashes"])){
+                    //TRYING to deal with Finnish compound words:
+                    $cond .= "($colname =  \$$w_index OR 
+                        regexp_replace($colname, '^([^#]+)#.*','\1') = \$$w_index OR 
+                        regexp_replace($colname, '^[^#]+#(.*)','\1') = \$$w_index)";
+                }
+                else{
+                    $cond .= "$colname =  \$$w_index";
+                }
             }
         }
         $cond .= ")";
