@@ -70,6 +70,16 @@ class FreqlistTest extends TestCase
         $this->assertTrue($nohash);
     }
 
+    public function testSplitByHashes() {
+        $texts = $this->corpus->GetDocumentNamesAndCodes("fi");
+        $codes = [$texts[0]["code"]];
+        SubcorpusStats($this->corpus, $codes, "fi");
+        $prev = $this->corpus->GetData();
+        $this->corpus->DelimitDataByString("#","lemma")->SimplifyDataByVariable("lemma");
+        $next = $this->corpus->GetData();
+        $this->assertTrue($prev != $next);
+    }
+
 }
 
 ?>

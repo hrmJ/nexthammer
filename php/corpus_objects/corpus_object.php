@@ -74,6 +74,28 @@ class CorpusObject{
         return $this;
     }
 
+
+    /**
+     * 
+     * Splits data rows based on a pattern 
+     *
+     * @param $pat the pattern to be used for splitting
+     * 
+     */
+    public function DelimitDataByString($pat, $key){
+        foreach($this->data as $r_idx => $row){
+            if($key){
+                $new_entries = explode($pat, $row[$key]);
+                foreach($new_entries as $entry){
+                    $temp = $row;
+                    $temp[$key] = $entry;
+                    $this->data[] = $temp;
+                }
+            }
+        }
+        return $this;
+    }
+
     /**
      * 
      * Sets the language;
