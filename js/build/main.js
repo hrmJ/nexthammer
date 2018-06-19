@@ -1482,47 +1482,6 @@ var LRDtab = function(){
         msg.Show(99999);
     };
 
-    /**
-     *
-     * Process a response from an ajax request. Possibly, sort the response.
-     *
-     * @param ajax_args the actual ajax response
-     * @param how_many_returns how many items to take
-     * @param sortkey by what key to sort
-     * @param limit_keys take only these values to the final result
-     *
-     **/
-    function ProcessResponse(ajax_args, how_many_returns, sortkey, limit_keys){
-        return_array = [];
-        how_many_returns = how_many_returns || ajax_args.length;
-        for(var i = 0; i < ajax_args.length; i++){
-            var result = [];
-            var this_response = ajax_args[i][0];
-            //console.log(this_response);
-            if(sortkey){
-                this_response.sort(
-                        function(a,b) {
-                            return a[sortkey] - b[sortkey];
-                        }
-                );
-            }
-            if(!this_response.length){
-                result.push(this_response);
-            }
-            else{
-                for(var a=1;a<=how_many_returns;a++){
-                     if(limit_keys){
-                        result.push(this_response[this_response.length-a][limit_keys]);
-                    }
-                    else{
-                        result.push(this_response[this_response.length-a]);
-                    }
-                }
-            }
-            return_array.push(result);
-        }
-        return return_array;
-    }
 
     /**
      *
@@ -1537,48 +1496,34 @@ var LRDtab = function(){
         var langs = Loaders.GetLanguagesInCorpus(),
             picked_lang = Loaders.GetPickedLang(),
             responses = [],
-            codes = Loaders.GetPickedCodesInAllLanguages();
-            $.each(langs,function(lidx, lang){
-                if(lang != source_lang){
-                    var pat = new RegExp("(_?)" + picked_lang + "$","g");
-                    responses.push($.getJSON("php/ajax/get_frequency_list.php",
-                        {
-                        action: "corpus_frequency_list",
-                        codes:codes[lang],
-                        codes: [picked_code.replace(pat,"$1" + lang)],
-                        lang: lang,
-                        bylang: "yes"
-                        }
-                    ));
-                }
-            });
+            codes = Loaders.GetPickedCodesInAllLanguages(),
+            msg = new Utilities.Message("Querying word lists..."),
+            bar = new Utilities.ProgressBar(msg.$box);
+        msg.Show(9999);
+        bar.Initialize(langs.length);
+        $.each(langs,function(lidx, lang){
+            if(lang != source_lang){
+                var pat = new RegExp("(_?)" + picked_lang + "$","g");
+                responses.push($.getJSON("php/ajax/get_frequency_list.php",
+                    {
+                    action: "corpus_frequency_list",
+                    codes:codes[lang],
+                    codes: [picked_code.replace(pat,"$1" + lang)],
+                    lang: lang,
+                    bylang: "yes"
+                    }, 
+                    function(){
+                        bar.Progress();
+                    }
+                ));
+            }
+        });
         return $.when.apply($, responses).done(function(){
             $.each(arguments,function(idx,arg){
+                msg.Destroy();
                 lang = Object.keys(arg[0])[0],
                 words_in_doc[lang] = arg[0][lang];
             });
-        });
-    }
-
-
-    /**
-     *
-     * Gets a list of keywords for the document in all languages
-     *
-     * @param sl_wordlist_response ajax response of the keywords for the source language
-     *
-     **/
-    function SetTfIdf(sl_wordlist_response){
-        return $.when(sl_wordlist_response).done(function(){
-            console.log("DONE!");
-            console.log(arguments);
-            //return_array = ProcessResponse(arguments, number_of_topicwords, "tf_idf","lemma");
-            //var lang_object = {};
-            //var langs = Loaders.GetLanguagesInCorpus();
-            //$.each(langs,function(idx,lang){
-            //    lang_object[lang] = return_array[idx];
-            //});
-            //keywords = lang_object;
         });
     }
 
@@ -1639,6 +1584,10 @@ var LRDtab = function(){
                 if(has_at_least_one_translation){
                    filtered_by_dict_keywords.push(this_keyword);
                 }
+                else{
+                    //If no translation found, remove this word from the ranked keywords
+                    sl_keywords_ranked.splice(i,1);
+                }
             }
             console.log(filtered_by_dict_keywords);
         }); 
@@ -1678,7 +1627,7 @@ var LRDtab = function(){
                 if(this_keyword[lang].length){
                     $.each(this_keyword[lang], function(lemma_idx, lrd_lemma){
                         if( lang == source_lang || words_in_doc[lang].indexOf(lrd_lemma)>-1){
-                            //Only search for ngrams that for words 
+                            //Only search for ngrams for words 
                             //that actually appear in the document
                             for(var n = ngram_range[0]; n <= ngram_range[1]; n++){
                                 var params = {
@@ -1707,8 +1656,6 @@ var LRDtab = function(){
         return $.when.apply($, all_ngrams).done(function(){
             bar.Destroy();
             tabdata = {};
-            console.log("here we go again...");
-            console.log(arguments);
             for(var i = 0; i < arguments.length; i++ ){
                 var lang = Object.keys(arguments[i][0])[0],
                     word_rank = Object.keys(arguments[i][0][lang])[0]*1,
@@ -1729,12 +1676,13 @@ var LRDtab = function(){
                 //THIS filters out bad translations!
                 tabdata[lang][word_rank][n] = these_ngrams.slice(0,ngram_number);
             }
+            //Add missing languages as empty entries
             $.each(langs,function(l_idx, lang){
                 if(lang != source_lang){
                    if(!tabdata[lang]){
                        tabdata[lang] = {};
                    }
-                   for(i=1; i <= number_of_topicwords; i++){
+                   for(i=1; i <= sl_keywords_ranked.length; i++){
                        if(!tabdata[lang][i]){
                            tabdata[lang][i] = {};
                        }
