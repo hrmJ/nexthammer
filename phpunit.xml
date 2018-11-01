@@ -12,6 +12,9 @@
         <testsuite name="corpus_objects">
             <file>tests/corpus.php</file>
         </testsuite>
+        <testsuite name="corpusactions">
+            <file>tests/concordancer.php</file>
+        </testsuite>
         <testsuite name="corpus_management">
             <file>tests/corpus_management.php</file>
         </testsuite>
