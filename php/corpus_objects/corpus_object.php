@@ -19,7 +19,7 @@
 class CorpusObject{
 
     protected $data = Array();
-    protected $corpuscon = null;
+    public $corpuscon = null;
     protected $configpath = "";
     protected $total_words = 0;
     protected $noun_frequencies = Array();

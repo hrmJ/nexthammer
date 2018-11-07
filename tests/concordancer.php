@@ -4,6 +4,7 @@ require 'vendor/autoload.php';
 
 use PHPUnit\Framework\TestCase;
 use Texthammer\corpusactions\Concordancer;
+use Texthammer\corpusactions\Concordancehit;
 
 
 /**
@@ -32,10 +33,41 @@ class ConcordancerTest extends TestCase
      */
     public function testCreateObject()
     {
-        $conc = new Concordancer();
+        $conc = new Concordancer($this->corpus);
         $this->assertInstanceOf(Concordancer::class, $conc);
     }
 
+
+    /**
+     *
+     * Test getting hit ids for one word
+     * 
+     */
+    public function testGetHitsForToken()
+    {
+        $exp = "Convention";
+        $this->corpus->SetFilter();
+        $this->corpus->filter->Tokens();
+        $conc = new Concordancer($this->corpus);
+        $conc->GetHitIds($exp);
+        $this->assertGreaterThan(0, sizeof($conc->hit_ids));
+    }
+
+
+    /**
+     *
+     * Test fething the first 100 concordances
+     * 
+     */
+    public function testGetSegIds()
+    {
+        $exp = "Convention";
+        $this->corpus->SetFilter();
+        $this->corpus->filter->Tokens();
+        $conc = new Concordancer($this->corpus);
+        $conc->GetHitIds($exp);
+        $conc->GetConcForHits();
+    }
 
 }
 
