@@ -2,6 +2,7 @@ const path = require('path');
 //const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 
 
 let htmlOptions = {
@@ -32,6 +33,10 @@ module.exports = {
     plugins: [
         //new ExtractTextPlugin("styles.css"),
         new HtmlWebpackPlugin(htmlOptions),
+        new webpack.ProvidePlugin({
+          $: "jquery",
+          jQuery: "jquery"
+        })
     ],
     devServer: {
         contentBase: './src'
