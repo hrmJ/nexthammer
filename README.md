@@ -165,11 +165,20 @@ apt install ruby2.5 ruby2.5-dev
 gem install sass
 ```
 
-Then gulp:
+Then gulp + babel + webpack:
+
 
 ```
 npm install gulp-cli -g
+npm install --save-dev gulp-babel @babel/core @babel/preset-env
+npm i -D webpack webpack-dev-server webpack-cli
+npm i --save-dev style-loader css-loader
+npm i --save-dev extract-text-webpack-plugin@next
+npm i --save-dev sass-loader
+npm i --save-dev uglifyjs-webpack-plugin
+npm i --save-dev html-webpack-plugin
 ```
+
 
 Now, go to the project folder (`opt/nexthammer/nexthammer`) and run `npm install --save-dev`.
 

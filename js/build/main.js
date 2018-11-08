@@ -1,242 +1,257 @@
+"use strict";
+
 /**
  *
  * Just some small helper functions
  *
  **/
+var Utilities = function () {
+  /**
+   *
+   * Selects or unselects all checkboxes within a div
+   *
+   * @param $launcher the link that fired the event
+   *
+   */
+  function SelectAll($launcher) {
+    if ($launcher.text() == "Select all") {
+      var newval = true;
+      $launcher.text("Unselect all");
+    } else {
+      var newval = false;
+      $launcher.text("Select all");
+    }
 
+    $launcher.parents("div").find("input[type='checkbox']").each(function () {
+      $(this)[0].checked = newval;
+    });
+  }
 
-var Utilities = function(){
+  ;
+  /**
+   *
+   * Olio lyhyiden viestien näyttämiseen hallintanäytöllä.
+   *
+   * @param msg näytettävä viesti
+   * @param $parent_el jquery-elementti, jonka sisään viesti syötetään
+   *
+   */
+
+  var Message = function Message(msg, $parent_el) {
+    console.log("new message created");
+    this.$box = $("<div></div>").text(msg).attr({
+      "class": "msgbox"
+    });
+    this.$parent_el = $parent_el || $("body");
+  };
+
+  Message.prototype = {
+    background: "",
+    color: "",
+
+    /**
+     * Näyttää viestilaatikon viesti käyttäjälle
+     *
+     * @param offtime millisekunteina se, kuinka kauan viesti näkyy (oletus 2 s)
+     *
+     */
+    Show: function Show(offtime) {
+      var self = this;
+      this.$parent_el.css({
+        "position": "relative"
+      });
+      this.$box.appendTo(this.$parent_el).fadeIn("slow");
+
+      if (offtime) {
+        setTimeout(function () {
+          self.Destroy();
+        }, offtime);
+      }
+
+      this.$box.draggable(); //BlurContent(self.box);
+    },
+
+    /**
+     *  Adds new text to the box
+     *
+     */
+    Add: function Add(newtext) {
+      if (!this.$box.find("ul").length) {
+        var oldtext = this.$box.text();
+        $("<ul><li>".concat(oldtext, "</li></ul>")).appendTo(this.$box.html(""));
+      }
+
+      this.$box.find("ul").append("<li>".concat(newtext, "</li>"));
+      return this;
+    },
+
+    /**
+     *  Adds a close button 
+     */
+    AddCloseButton: function AddCloseButton() {
+      var $a = $("<a class='boxclose'></a>").click(this.Destroy.bind(this));
+      this.$box.prepend($a);
+      return this;
+    },
+
+    /**
+     *  Adds an id , e.g. to prevent duplicates
+     *  @param id  the id to be added
+     */
+    AddId: function AddId(id) {
+      this.$box.attr({
+        "id": id
+      });
+      return this;
+    },
+
+    /**
+     *  Clears the text in the message box
+     *
+     */
+    Clear: function Clear() {
+      this.$box.html("");
+      return this;
+    },
 
     /**
      *
-     * Selects or unselects all checkboxes within a div
+     *  Changes the text of the last item of the message
      *
-     * @param $launcher the link that fired the event
-     *
-     */
-    function SelectAll($launcher){
-        if($launcher.text() == "Select all"){
-            var newval = true;
-            $launcher.text("Unselect all");
-        }
-        else{
-            var newval = false;
-            $launcher.text("Select all");
-        }
-        $launcher.parents("div").find("input[type='checkbox']").each(function(){
-            $(this)[0].checked = newval;
-        });
-    
-    };
-
-
-    /**
-     *
-     * Olio lyhyiden viestien näyttämiseen hallintanäytöllä.
-     *
-     * @param msg näytettävä viesti
-     * @param $parent_el jquery-elementti, jonka sisään viesti syötetään
+     *  @param text what to display
      *
      */
-    var Message = function(msg, $parent_el){
-        console.log("new message created");
-        this.$box = $("<div></div>").text(msg).attr({"class":"msgbox"});
-        this.$parent_el = $parent_el || $("body");
+    Update: function Update(text) {
+      if (this.$box.find("ul").length) {
+        this.$box.find("li:last-of-type").text(text);
+      } else {
+        this.$box.text(text);
+      }
+
+      return this;
+    },
+    Destroy: function Destroy() {
+      this.$box.html("").remove();
     }
-
-    Message.prototype = {
-        background: "",
-        color: "",
-
-        /**
-         * Näyttää viestilaatikon viesti käyttäjälle
-         *
-         * @param offtime millisekunteina se, kuinka kauan viesti näkyy (oletus 2 s)
-         *
-         */
-        Show: function(offtime){
-            var self = this;
-            this.$parent_el.css({"position":"relative"});
-            this.$box.appendTo(this.$parent_el).fadeIn("slow");
-            if(offtime){
-                setTimeout(function(){ self.Destroy(); },offtime);
-            }
-            this.$box.draggable();
-            
-            //BlurContent(self.box);
-        },
-
-        /**
-         *  Adds new text to the box
-         *
-         */
-        Add: function(newtext){
-            if(!this.$box.find("ul").length){
-                var oldtext = this.$box.text();
-                $(`<ul><li>${oldtext}</li></ul>`).appendTo(this.$box.html(""));
-            }
-            this.$box.find("ul").append(`<li>${newtext}</li>`)
-            return this;
-        },
-
-        /**
-         *  Adds a close button 
-         */
-        AddCloseButton: function(){
-            var $a = $("<a class='boxclose'></a>").click(this.Destroy.bind(this));
-            this.$box.prepend($a);
-            return this;
-        },
-
-        /**
-         *  Adds an id , e.g. to prevent duplicates
-         *  @param id  the id to be added
-         */
-        AddId: function(id){
-            this.$box.attr({"id": id});
-            return this;
-        },
-
-        /**
-         *  Clears the text in the message box
-         *
-         */
-        Clear: function(){
-            this.$box.html("");
-            return this;
-        },
-
-        /**
-         *
-         *  Changes the text of the last item of the message
-         *
-         *  @param text what to display
-         *
-         */
-        Update: function(text){
-            if(this.$box.find("ul").length){
-                this.$box.find("li:last-of-type").text(text);
-            }
-            else{
-                this.$box.text(text);
-            }
-            return this;
-        },
-
-        Destroy: function(){
-            this.$box.html("").remove();
-        }
-    }
-
     /**
      *
      * Generates unique ids, from  
      * https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript#2117523
      *
      **/
-    function uuidv4() {
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-      });
-    }
 
+  };
+
+  function uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      var r = Math.random() * 16 | 0,
+          v = c == 'x' ? r : r & 0x3 | 0x8;
+      return v.toString(16);
+    });
+  }
+  /**
+   *
+   * A simple proggress bar
+   *
+   **/
+
+
+  var ProgressBar = function ProgressBar($parent_el) {
+    this.$parent_el = $parent_el || $("body");
+    this.destination_val = null;
+    this.progressed = 0;
     /**
      *
-     * A simple proggress bar
+     * Sets the bar up
+     *
+     * @param destination_val the value that will be 100 %
      *
      **/
-    var ProgressBar = function($parent_el){
 
-        this.$parent_el = $parent_el || $("body");
-        this.destination_val = null;
-        this.progressed = 0;
-
-        /**
-         *
-         * Sets the bar up
-         *
-         * @param destination_val the value that will be 100 %
-         *
-         **/
-        this.Initialize = function(destination_val){
-            this.$cont = $("<div class='progressbar'></div>");
-            this.$bar = $("<div class='bar'></div>");
-            this.$bar.appendTo(this.$cont);
-            this.$cont.appendTo(this.$parent_el);
-            this.destination_val = destination_val;
-        }
-
-        /**
-         *
-         * Moves the bar forward
-         *
-         * @param how_much how much we move the bar
-         *
-         **/
-        this.Progress = function(how_much){
-            how_much = how_much || 1;
-            this.progressed += how_much;
-            var percent = this.progressed / this.destination_val * 100;
-            //var percent = this.$bar.get(0).style.width.replace("%","")*1;
-            this.$bar.css({"width" : percent + "%"});
-        }
-
-        /**
-         *
-         * Makes a new assessment of the length of the task
-         *
-         **/
-        this.AddToDestination = function(addedval){
-            this.destination_val += addedval;
-            return this;
-        }
-
-        /**
-         *
-         * Removes the progress bar
-         *
-         **/
-        this.Destroy = function(){
-            this.$cont.fadeOut().remove();
-        }
-    }
-
-    return {
-        uuidv4,
-        SelectAll,
-        Message,
-        ProgressBar,
+    this.Initialize = function (destination_val) {
+      this.$cont = $("<div class='progressbar'></div>");
+      this.$bar = $("<div class='bar'></div>");
+      this.$bar.appendTo(this.$cont);
+      this.$cont.appendTo(this.$parent_el);
+      this.destination_val = destination_val;
     };
+    /**
+     *
+     * Moves the bar forward
+     *
+     * @param how_much how much we move the bar
+     *
+     **/
 
-}();
+
+    this.Progress = function (how_much) {
+      how_much = how_much || 1;
+      this.progressed += how_much;
+      var percent = this.progressed / this.destination_val * 100; //var percent = this.$bar.get(0).style.width.replace("%","")*1;
+
+      this.$bar.css({
+        "width": percent + "%"
+      });
+    };
+    /**
+     *
+     * Makes a new assessment of the length of the task
+     *
+     **/
 
 
-//
+    this.AddToDestination = function (addedval) {
+      this.destination_val += addedval;
+      return this;
+    };
+    /**
+     *
+     * Removes the progress bar
+     *
+     **/
+
+
+    this.Destroy = function () {
+      this.$cont.fadeOut().remove();
+    };
+  };
+
+  return {
+    uuidv4: uuidv4,
+    SelectAll: SelectAll,
+    Message: Message,
+    ProgressBar: ProgressBar
+  };
+}(); //
 // https://stackoverflow.com/questions/16648076/sort-array-on-key-value
-Array.prototype.sortOn = function(key, direction){
-    var direction = direction || "desc";
-    if (direction == "asc"){
-        this.sort(function(a, b){
-            if(a[key] < b[key]){
-                return -1;
-            }else if(a[key] > b[key]){
-                return 1;
-            }
-            return 0;
-        });
-    }
-    else{
-        this.sort(function(a, b){
-            if(a[key] > b[key]){
-                return -1;
-            }else if(a[key] < b[key]){
-                return 1;
-            }
-            return 0;
-        });
-    }
-}
+
+
+Array.prototype.sortOn = function (key, direction) {
+  var direction = direction || "desc";
+
+  if (direction == "asc") {
+    this.sort(function (a, b) {
+      if (a[key] < b[key]) {
+        return -1;
+      } else if (a[key] > b[key]) {
+        return 1;
+      }
+
+      return 0;
+    });
+  } else {
+    this.sort(function (a, b) {
+      if (a[key] > b[key]) {
+        return -1;
+      } else if (a[key] < b[key]) {
+        return 1;
+      }
+
+      return 0;
+    });
+  }
+};
+"use strict";
 
 /**
  *
@@ -245,385 +260,373 @@ Array.prototype.sortOn = function(key, direction){
  * concordances etc.
  *
  */
-var Corpusdesktop = function(){
+var Corpusdesktop = function () {
+  //Object containing the jquery objects that can be presented
+  //on the corpus desktop. The keys will be unique ids, which
+  //will be linked to the corresponding "add to dekstop " link
+  var ElementList = {}; // Attempt to free up memory
+
+  var GarbageList = {}; //This variable reocords, which element is being dragged
+
+  var CurrentElement = undefined;
+  /**
+   *
+   *  Attaches events, specifically related to the corpus desktop
+   *
+   */
+
+  function AddDesktopEvents() {
+    $("#clead_dt_link").click(function () {
+      ClearElements();
+    });
+    $(".drop-target").on("dragover", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      console.log("over"); //$(this).addClass("drop-highlight").text("Siirrä tähän");
+    }).on("dragleave", function (event) {
+      console.log("left");
+      event.preventDefault();
+      event.stopPropagation(); //$(this).text("").removeClass("drop-highlight");
+    }).on("drop", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      var $cont = $(this).parent(); //if(!$cont.find(`div > input[value='${CurrentElement.id}']`).length){
+      //if this object has not been added yet on the desktop
+
+      var $dropped_object = CurrentElement.$container.clone(true);
+      $dropped_object.append($("<input type='hidden' value='".concat(CurrentElement.id, "'></input>")));
+      $dropped_object.find(".data-table-menu a").remove();
+
+      if ($cont.find(".data-table-container").length) {
+        $cont.find(".data-table-container:last-of-type").after($dropped_object);
+      } else {
+        $cont.prepend($dropped_object);
+      } //}
+
+    }); // Make the text examining windows draggable
+
+    $(".text_examiner").draggable();
+  }
+
+  ;
+  /**
+   *
+   * Clears the list of desktop elements
+   *
+   **/
+
+  function ClearElements() {
+    ElementList = {};
+    UpdateVisibleElementList();
+    $(".innercontent .data-table-container").remove();
+  }
+
+  ;
+  /**
+   *
+   * Updates the list of dekstop elements, from which the user 
+   * can choose the elements that will be displayed on the "corpus desktop"
+   * and can be e.g. compared with each other.
+   *
+   */
+
+  function UpdateVisibleElementList() {
+    $("#desktop_element_list").html("");
+    $.each(ElementList, function (id, element) {
+      var $li = $("<li draggable='true'>\n                    <input type='hidden' class='desktop_object_id' value='".concat(id, "'></input>\n                        ").concat(element.name, "\n                    </li>"));
+      $li.on("dragstart", function (event) {
+        //For firefox combatibility
+        event.originalEvent.dataTransfer.setData('text/plain', 'anything'); //Hide the dekstop menu
+        //$("aside").slideUp();
+
+        CurrentElement = ElementList[$(this).find(".desktop_object_id").val()];
+      });
+      $("#desktop_element_list").append($li);
+    });
+  }
+  /**
+   *
+   * Represents a basic building block of the elements that can be saved
+   * as a desktop element. This can be concordance lists, frequency lists etc.
+   *
+   **/
 
 
-    //Object containing the jquery objects that can be presented
-    //on the corpus desktop. The keys will be unique ids, which
-    //will be linked to the corresponding "add to dekstop " link
+  function DesktopObject() {
+    var self = this;
+    this.$container = $("<div class='data-table-container'></div>"); //Functionality related to data tables and other types of desktop objects:
 
-    var ElementList = {};
-    // Attempt to free up memory
-    var GarbageList = {};
-
-    //This variable reocords, which element is being dragged
-    var CurrentElement = undefined;
-
-    
+    this.id = Utilities.uuidv4();
+    this.$menu = $("<div class='data-table-menu'>\n            <input type='hidden' class='desktop_object_id' value='".concat(this.id, "'></input>"));
+    $a = $("<a href='javascript:void(0)'>Add to desktop</a>");
+    $a.click(function () {
+      self.AddToDesktop($(this).parent());
+    });
+    this.$menu.append($a);
+    this.name = "";
     /**
      *
-     *  Attaches events, specifically related to the corpus desktop
+     * Sets the name of the table
+     *
+     * @param name the name of the table
      *
      */
-    function AddDesktopEvents(){
-    
-        $("#clead_dt_link").click(function(){
-            ClearElements();
-        });
 
-        $(".drop-target")
-            .on("dragover",function(event){
-                event.preventDefault();  
-                event.stopPropagation();
-                console.log("over");
-                //$(this).addClass("drop-highlight").text("Siirrä tähän");
-            })
-            .on("dragleave",function(event){
-                console.log("left");
-                event.preventDefault();  
-                event.stopPropagation();
-                //$(this).text("").removeClass("drop-highlight");
-            })
-            .on("drop",function(event){
-                event.preventDefault();  
-                event.stopPropagation();
-                var $cont = $(this).parent();
-                //if(!$cont.find(`div > input[value='${CurrentElement.id}']`).length){
-                    //if this object has not been added yet on the desktop
-                    var $dropped_object = CurrentElement.$container.clone(true);
-                    $dropped_object.append($(`<input type='hidden' value='${CurrentElement.id}'></input>`))
-                    $dropped_object.find(".data-table-menu a").remove();
-                    if($cont.find(".data-table-container").length){
-                        $cont.find(".data-table-container:last-of-type").after($dropped_object);
-                    }
-                    else{
-                        $cont.prepend($dropped_object);
-                    }
-                //}
-            });
-
-        // Make the text examining windows draggable
-        $(".text_examiner").draggable();
+    this.SetName = function (name) {
+      this.name = name;
+      return this;
     };
-
     /**
      *
-     * Clears the list of desktop elements
+     * Adds this element to the list of desktop objects
+     * @param $parent_el the parent of the link that fired the event
+     *
+     */
+
+
+    this.AddToDesktop = function ($parent_el) {
+      ElementList[this.id] = this;
+      UpdateVisibleElementList();
+      var msg = new Utilities.Message("Added the table to desktop objects", $parent_el);
+      msg.Show(3000);
+      return this;
+    };
+  }
+
+  ;
+  /**
+   *
+   * A dekstop element formatted as an html table. Inherits from
+   * DesktopObject.
+   *
+   */
+
+  function Table() {
+    DesktopObject.call(this);
+    this.$table = $("<table></table>");
+    this.$head = $("<thead></thead>");
+    this.$body = $("<tbody></tbody>");
+    this.$header = undefined; //Save each column as a separate value to make sorting faster
+
+    this.columns = {}; //IMportant to keep order
+
+    this.column_names = [];
+    this.current_column = undefined;
+    /**
+     *
+     * Adds a specific css class for the table
+     *
+     * @param newclass the name of the css class 
      *
      **/
-    function ClearElements(){
-        ElementList = {};
-        UpdateVisibleElementList();
-        $(".innercontent .data-table-container").remove();
+
+    this.SetClass = function (newclass) {
+      this.$table.addClass(newclass);
+      return this;
     };
-
-
     /**
      *
-     * Updates the list of dekstop elements, from which the user 
-     * can choose the elements that will be displayed on the "corpus desktop"
-     * and can be e.g. compared with each other.
+     * Binds a specific action to the rows of the table.
      *
-     */
-    function UpdateVisibleElementList(){
-        $("#desktop_element_list").html("");
-        $.each(ElementList,function(id, element){
-            var $li = 
-                $(`<li draggable='true'>
-                    <input type='hidden' class='desktop_object_id' value='${id}'></input>
-                        ${element.name}
-                    </li>`);
-            $li.on("dragstart",function(event){ 
-                        //For firefox combatibility
-                         event.originalEvent.dataTransfer.setData('text/plain', 'anything');
-                        //Hide the dekstop menu
-                        //$("aside").slideUp();
-                        CurrentElement = ElementList[$(this).find(".desktop_object_id").val()];
-            });
-            $("#desktop_element_list").append($li);
-        });
-    
-    }
-
-
-    /**
-     *
-     * Represents a basic building block of the elements that can be saved
-     * as a desktop element. This can be concordance lists, frequency lists etc.
+     * @param callback a function that is called when a row of the table is clicked
+     * @param col_idx index of the column tha triggers the event
      *
      **/
-    function DesktopObject(){
-        var self = this;
-        this.$container = $("<div class='data-table-container'></div>");
-        //Functionality related to data tables and other types of desktop objects:
-        this.id = Utilities.uuidv4();
-        this.$menu = $(`<div class='data-table-menu'>
-            <input type='hidden' class='desktop_object_id' value='${this.id}'></input>`);
-        $a = $("<a href='javascript:void(0)'>Add to desktop</a>");
-        $a.click(function(){ self.AddToDesktop($(this).parent()); });
-        this.$menu.append($a);
-        this.name = "";
 
-        /**
-         *
-         * Sets the name of the table
-         *
-         * @param name the name of the table
-         *
-         */
-        this.SetName = function(name){
-            this.name = name;
-            return this;
-        }
 
-        /**
-         *
-         * Adds this element to the list of desktop objects
-         * @param $parent_el the parent of the link that fired the event
-         *
-         */
-        this.AddToDesktop = function($parent_el){
-            ElementList[this.id] = this;
-            UpdateVisibleElementList();
-            var msg = new Utilities.Message("Added the table to desktop objects", $parent_el);
-            msg.Show(3000);
-            return this;
-        }
-
+    this.AddRowAction = function (callback, col_idx) {
+      this.$table.find("tr td:nth-child(" + col_idx + ")").click(function () {
+        //Note: always send the launcher  as the first param
+        callback($(this));
+      });
     };
-
-
     /**
      *
-     * A dekstop element formatted as an html table. Inherits from
-     * DesktopObject.
+     * Construct the menu, by which actions can be performed related to one column.
+     * E.g. sorting, highlighting.
      *
-     */
-    function Table(){
-        DesktopObject.call(this);
-        this.$table = $("<table></table>");
-        this.$head = $("<thead></thead>");
-        this.$body = $("<tbody></tbody>");
-        this.$header = undefined;
-        //Save each column as a separate value to make sorting faster
-        this.columns = {};
-        //IMportant to keep order
-        this.column_names = [];
-        this.current_column = undefined;
+     **/
 
 
-        /**
-         *
-         * Adds a specific css class for the table
-         *
-         * @param newclass the name of the css class 
-         *
-         **/
-        this.SetClass = function(newclass){
-            this.$table.addClass(newclass);
-            return this;
-        };
+    this.BuildColumnActionMenu = function () {
+      var self = this;
+      this.$column_action_menu = $("<ul class='column_action_menu'></ul>");
+      this.$column_action_menu.append($("<li>Order by (ascending)</li>").click(function () {
+        self.OrderBy("asc", $(this));
+      }));
+      this.$column_action_menu.append($("<li>Order by (descending)</li>").click(function () {
+        self.OrderBy("desc", $(this));
+      }));
+      this.$column_action_menu.find("li").click(function () {
+        $(this).parents(".data-table-container").find(".column_action_menu").hide();
+        $(".arrow_box").removeClass("arrow_box");
+      });
+    };
+    /**
+     *
+     * Sets the header for this table.
+     *
+     **/
 
-        /**
-         *
-         * Binds a specific action to the rows of the table.
-         *
-         * @param callback a function that is called when a row of the table is clicked
-         * @param col_idx index of the column tha triggers the event
-         *
-         **/
-        this.AddRowAction = function(callback, col_idx){
-            this.$table.find("tr td:nth-child(" + col_idx + ")").click(function(){
-                //Note: always send the launcher  as the first param
-                callback($(this));
-            });
-        };
 
-        /**
-         *
-         * Construct the menu, by which actions can be performed related to one column.
-         * E.g. sorting, highlighting.
-         *
-         **/
-        this.BuildColumnActionMenu = function(){
-            var self = this;
-            this.$column_action_menu = $("<ul class='column_action_menu'></ul>");
-            this.$column_action_menu.append(
-                $("<li>Order by (ascending)</li>")
-                .click(function(){self.OrderBy("asc",$(this))}));
-            this.$column_action_menu.append($("<li>Order by (descending)</li>")
-                .click(function(){self.OrderBy("desc",$(this))}));
-            this.$column_action_menu.find("li").click(function(){
-                $(this).parents(".data-table-container").find(".column_action_menu").hide();
-                $(".arrow_box").removeClass("arrow_box");
-                });
+    this.SetHeader = function (column_names) {
+      var self = this;
+      var $tr = $("<tr></tr>");
+      $tr.append("<th>No.</th>");
+      $.each(column_names, function (idx, column_name) {
+        var $col_header = $("<th>".concat(column_name, "</th>"));
+        $col_header.click(function () {
+          self.ShowHeaderMenu($(this));
+        });
+        $tr.append($col_header);
+      });
+      this.$head.append($tr);
+      return this;
+    };
+    /**
+     *
+     * Shows a menu of different actions for each column header
+     *
+     **/
+
+
+    this.ShowHeaderMenu = function ($launcher) {
+      this.current_column = $launcher.index();
+      var $container = $launcher.parents(".data-table-container:eq(0)");
+      $column_action_menu = $container.find(".column_action_menu");
+
+      if ($launcher.hasClass("arrow_box")) {
+        $column_action_menu.hide();
+        $(".arrow_box").removeClass("arrow_box");
+        return this;
+      }
+
+      $column_action_menu.css({
+        "left": $launcher.offset().left - $container.offset().left + "px",
+        "top": "-" + ($launcher.height() + 9) + "px"
+      }).show();
+      $(".arrow_box").removeClass("arrow_box");
+      $launcher.addClass("arrow_box");
+      return this;
+    };
+    /**
+     *
+     * Orders the table by a specific column
+     *
+     * @param string direction asc or desc
+     * @param $launcher the element that fired the event
+     *
+     **/
+
+
+    this.OrderBy = function (direction, $launcher) {
+      var self = this;
+      var $table = $launcher.parents(".data-table-container").find("table");
+      var rows = $table.find("tbody tr").get();
+      rows.sort(function (a, b) {
+        var keyA = $(a).children('td').eq(self.current_column).text();
+        var keyB = $(b).children('td').eq(self.current_column).text();
+
+        if (!isNaN(keyA * 1)) {
+          keyA = keyA * 1;
+          keyB = keyB * 1;
+        } else {
+          keyA = $.trim(keyA).toUpperCase();
+          keyB = $.trim(keyB).toUpperCase();
         }
 
-        /**
-         *
-         * Sets the header for this table.
-         *
-         **/
-        this.SetHeader = function(column_names){
-            var self = this;
-            var $tr = $("<tr></tr>");
-            $tr.append("<th>No.</th>");
-            $.each(column_names,function(idx,column_name){
-                var $col_header = $(`<th>${column_name}</th>`);
-                $col_header.click(function(){self.ShowHeaderMenu($(this))});
-                $tr.append($col_header);
-            });
-            this.$head.append($tr);
-            return this;
-        };
+        if (direction == "asc") {
+          if (keyA < keyB) {
+            return -1;
+          }
 
+          if (keyB < keyA) {
+            return 1;
+          }
+        } else {
+          if (keyA < keyB) {
+            return 1;
+          }
 
-        /**
-         *
-         * Shows a menu of different actions for each column header
-         *
-         **/
-        this.ShowHeaderMenu = function($launcher){
-            this.current_column = $launcher.index();
-            var $container = $launcher.parents(".data-table-container:eq(0)");
-            $column_action_menu = $container.find(".column_action_menu");
-            if($launcher.hasClass("arrow_box")){
-                $column_action_menu.hide();
-                $(".arrow_box").removeClass("arrow_box");
-                return this;
-            }
-            $column_action_menu
-                .css({
-                    "left": ($launcher.offset().left - $container.offset().left) + "px",
-                    "top": "-" + ($launcher.height() + 9) + "px"})
-                .show();
-            $(".arrow_box").removeClass("arrow_box");
-            $launcher.addClass("arrow_box");
-            return this;
-        };
-        /**
-         *
-         * Orders the table by a specific column
-         *
-         * @param string direction asc or desc
-         * @param $launcher the element that fired the event
-         *
-         **/
-        this.OrderBy = function(direction, $launcher){
-            var self = this;
-            var $table = $launcher.parents(".data-table-container").find("table");
-            var rows = $table.find("tbody tr").get();
-            rows.sort(function(a,b){
-                var keyA = $(a).children('td').eq(self.current_column).text();
-                var keyB = $(b).children('td').eq(self.current_column).text();
-                if (!isNaN(keyA*1)){
-                    keyA = keyA*1;
-                    keyB = keyB*1;
-                }
-                else{
-                    keyA = $.trim(keyA).toUpperCase();
-                    keyB = $.trim(keyB).toUpperCase();
-                }
-                if ( direction == "asc" ){
-                    if( keyA < keyB ){
-                         return -1;
-                    }
-                    if( keyB < keyA ){
-                         return 1;
-                    }
-                }
-                else{
-                    if( keyA < keyB ){
-                         return 1;
-                    }
-                    if( keyB < keyA ) {
-                        return -1;
-                    }
-                }
-                return 0;
-            })
-            //console.log(rows);
-            $.each(rows,function(idx,row){
-                //jquery guide p. 292: append doesn't clone but moves!
-                //console.log(row.)
-                $table.children('tbody').append(row);
-            });
-        };
+          if (keyB < keyA) {
+            return -1;
+          }
+        }
 
-        /**
-         *
-         * Sets rows  in this table.
-         *
-         * it has a visile css class, which can be changed by the user.
-         *
-         * @param data_table the data to be included. In the format:
-         * Array of objects: [{column_name: value},{column_name: value}...];
-         *
-         *
-         **/
-        this.SetRows = function(data_table){
-            var self = this;
-            $.each(data_table,function(row_idx, row){
-                var $tr = $("<tr></tr>");
-                //NOTICE: the first column is always the row indices. By default,
-                $tr.append($(`<td class='row_name'>${row_idx + 1}</td>`));
-                $.each(row,function(column, value){
-                    //Add to the separate column array, too
-                    if(column in  self.columns){
-                    }
-                    else{
-                        self.columns[column] = [];
-                    }
-                    if(column in self.column_names){
-                    }
-                    else{
-                        self.column_names.push(column);
-                    }
-                    self.columns[column].push({"value":value,"idx":row_idx});
-                    //ACtual html representation
-                    $tr.append($(`<td>${value}</td>`));
-                });
-                self.$body.append($tr);
-            });
-            return this;
-        };
+        return 0;
+      }); //console.log(rows);
 
-
-        /**
-         *
-         * Combines the components of the table
-         *
-         */
-        this.BuildOutput = function(){
-            this.BuildColumnActionMenu();
-            this.$container
-                .append(this.$menu.prepend(this.$column_action_menu))
-                .append(this.$table
-                    .append(this.$head)
-                    .append(this.$body)
-                );
-            //Experimental:
-            GarbageList[this.id] = this;
-            return this;
-        };
-
-    
-    
-    }
-
-    Table.prototype = Object.create(DesktopObject.prototype);
-
-
-
-    return{
-        Table,
-        ElementList,
-        GarbageList,
-        AddDesktopEvents
+      $.each(rows, function (idx, row) {
+        //jquery guide p. 292: append doesn't clone but moves!
+        //console.log(row.)
+        $table.children('tbody').append(row);
+      });
     };
+    /**
+     *
+     * Sets rows  in this table.
+     *
+     * it has a visile css class, which can be changed by the user.
+     *
+     * @param data_table the data to be included. In the format:
+     * Array of objects: [{column_name: value},{column_name: value}...];
+     *
+     *
+     **/
 
+
+    this.SetRows = function (data_table) {
+      var self = this;
+      $.each(data_table, function (row_idx, row) {
+        var $tr = $("<tr></tr>"); //NOTICE: the first column is always the row indices. By default,
+
+        $tr.append($("<td class='row_name'>".concat(row_idx + 1, "</td>")));
+        $.each(row, function (column, value) {
+          //Add to the separate column array, too
+          if (column in self.columns) {} else {
+            self.columns[column] = [];
+          }
+
+          if (column in self.column_names) {} else {
+            self.column_names.push(column);
+          }
+
+          self.columns[column].push({
+            "value": value,
+            "idx": row_idx
+          }); //ACtual html representation
+
+          $tr.append($("<td>".concat(value, "</td>")));
+        });
+        self.$body.append($tr);
+      });
+      return this;
+    };
+    /**
+     *
+     * Combines the components of the table
+     *
+     */
+
+
+    this.BuildOutput = function () {
+      this.BuildColumnActionMenu();
+      this.$container.append(this.$menu.prepend(this.$column_action_menu)).append(this.$table.append(this.$head).append(this.$body)); //Experimental:
+
+      GarbageList[this.id] = this;
+      return this;
+    };
+  }
+
+  Table.prototype = Object.create(DesktopObject.prototype);
+  return {
+    Table: Table,
+    ElementList: ElementList,
+    GarbageList: GarbageList,
+    AddDesktopEvents: AddDesktopEvents
+  };
 }();
-
+"use strict";
 
 /**
  *
@@ -634,619 +637,589 @@ var Corpusdesktop = function(){
  * @param Array picked_texts codes of the texts belogning to the current subcorpus
  *
  **/
-var Loaders = function(){
+var Loaders = function () {
+  var picked_lang = "none";
+  var picked_texts = [];
+  var picked_corpus = "";
+  var languages_in_corpus = [];
+  /**
+   *
+   * Sets the value of the current language
+   *
+   * @param lang the language to be picked
+   *
+   **/
 
-        var picked_lang = "none";
-        var picked_texts = [];
-        var picked_corpus = "";
-        var languages_in_corpus = [];
+  function SetPickedLang(lang) {
+    if (lang !== 'none') {
+      picked_lang = lang;
+    }
 
-
-        /**
-         *
-         * Sets the value of the current language
-         *
-         * @param lang the language to be picked
-         *
-         **/
-        function SetPickedLang(lang){
-            if(lang !== 'none'){
-                picked_lang = lang;
-            }
-            return this;
-        }
-
-        /**
-         *
-         * Gets the value of the current language
-         *
-         **/
-        function GetPickedLang(){
-            return picked_lang;
-        }
-
-        /**
-         *
-         * Gets the languages in the current corpus
-         *
-         **/
-        function GetLanguagesInCorpus(){
-            return languages_in_corpus;
-        }
-
-        /**
-         *
-         * Gets the value of the current corpus
-         *
-         **/
-        function GetPickedCorpus(){
-            return picked_corpus;
-        }
-
-        /**
-         *
-         * Fetches the name of the current corpus
-         *
-         * @param callback do something with the corpus name after loading is ready
-         *
-         **/
-        function SetCurrentCorpus(callback){
-            $.get("php/ajax/get_corpus_information.php",
-                {action:"corpus_name"}, function(corpus_name){
-                    $(".corpus_select").text(corpus_name)
-                    picked_corpus = corpus_name;
-                    callback(corpus_name);
-                });
-        }
-
-        /**
-         *
-         * Sets the value of the currently picked texts
-         *
-         *
-         **/
-        function SetPickedTexts(){
-            picked_texts = [];
-            $("#text_picker_for_sobcorpus [type='checkbox']:checked").each(function(){
-                picked_texts.push({
-                    code: $(this).val(),
-                    title: $(this).parents("span").next("span").text()
-                    });
-            });
-            $(".texts_picked").text(picked_texts.length);
-            return this;
-        }
+    return this;
+  }
+  /**
+   *
+   * Gets the value of the current language
+   *
+   **/
 
 
-        /**
-         *
-         * Gets the currently picked texts
-         *
-         */
-        function GetPickedTexts(){
-            return picked_texts;
-        }
-
-        /**
-         *
-         * Gets the currently picked codes only
-         *
-         */
-        function GetPickedCodes(){
-            var codes = [];
-            for(i=0;i<picked_texts.length;i++){
-                codes.push(picked_texts[i].code);
-            }
-            return codes;
-        }
-
-        /**
-         *
-         * Gets the currently picked codes for each of the languages in the corpus
-         * This is still a hack, a more robust solution is needed.
-         * The function assumes an identical naming shceme for each text:
-         * the text has to end in _[lang], [lang] being a two-character language code
-         *
-         *
-         */
-        function GetPickedCodesInAllLanguages(){
-            var codes = GetPickedCodes();
-            var all_codes = {};
-            $.each(languages_in_corpus,function(idx,lang){
-                all_codes[lang] = [];
-            });
-            $.each(codes,function(idx,code){
-                $.each(languages_in_corpus,function(idx,lang){
-                    var pat = new RegExp("(_?)" + picked_lang + "$","g");
-                    all_codes[lang].push(code.replace(pat,"$1" + lang));
-                });
-            });
-            return all_codes;
-        }
-
-        /**
-         *
-         * Lists the languages available in a given corpus
-         *
-         * @param string corpus_name the name of the corpus in the database
-         *
-         **/
-        function ListLanguagesInThisCorpus(corpus_name){
-            $.getJSON("php/ajax/get_corpus_information.php",
-                {
-                    action:"languages", 
-                    corpus_name:picked_corpus, 
-                },
-                function(langlist){
-                    languages_in_corpus = langlist;
-                    var $sel = $("<select><option value='none'>Choose language</option></select>");
-                    //When the language is selected, print a list of the texts
-                    $.each(langlist,function(idx,el){
-                        $sel.append("<option>" + el + "</option>");
-                    });
-                    $sel.hide().fadeIn().appendTo($(".lang_select").html(""));
-                    $(".lang_select select").selectmenu();
-                    $(".lang_select select").on("selectmenuchange",function(){
-                            SetPickedLang($(this).val());
-                            UpdateSubCorpus()
-                    });
-                });
-        }
+  function GetPickedLang() {
+    return picked_lang;
+  }
+  /**
+   *
+   * Gets the languages in the current corpus
+   *
+   **/
 
 
+  function GetLanguagesInCorpus() {
+    return languages_in_corpus;
+  }
+  /**
+   *
+   * Gets the value of the current corpus
+   *
+   **/
 
-        /**
-         *
-         * Lists the texts available in a given corpus
-         *
-         *
-         **/
-        function UpdateSubCorpus(){
-            $.getJSON("php/ajax/get_corpus_information.php",
-                {
-                    action: "text_names", 
-                    lang: picked_lang,
-                    corpus_name:picked_corpus, 
-                },
-                function(textlist){
-                    var $ul = $("<ul>");
-                    var $a = $("<a href='javascript:void(0);' >Unselect all</a>");
-                    $a.click(function(){
-                        Utilities.SelectAll($(this));
-                        SetPickedTexts();
-                    });
-                    $ul.append($("<li class='sel_all_link'></li>").append($a));
-                    $.each(textlist,function(idx,el){
-                        var $gal = $("<span><input type='checkbox' checked='true' value='" 
-                            + el.code + "'></input></span>");
-                        var $name = $(`<span> <strong>${el.code}:</strong> <span class='el_title'>${el.title}</span> </span>`);
-                        var $li = $("<li>").append($gal).append($name);
-                        $ul.append($li);
-                    });
-                    $ul.appendTo($("#text_picker_for_sobcorpus").html(""));
-                    //Updating when picking the texts for the current subcorpus
-                    $("#text_picker_for_sobcorpus input[type='checkbox']").click(function(){SetPickedTexts();});
-                    SetPickedTexts();
-                }); } 
 
-    return {
+  function GetPickedCorpus() {
+    return picked_corpus;
+  }
+  /**
+   *
+   * Fetches the name of the current corpus
+   *
+   * @param callback do something with the corpus name after loading is ready
+   *
+   **/
 
-        ListLanguagesInThisCorpus,
-        SetCurrentCorpus,
-        GetPickedCorpus,
-        GetPickedTexts,
-        GetPickedCodes,
-        GetPickedLang,
-        GetLanguagesInCorpus,
-        GetPickedCodesInAllLanguages,
-    
-    };
 
+  function SetCurrentCorpus(callback) {
+    $.get("php/ajax/get_corpus_information.php", {
+      action: "corpus_name"
+    }, function (corpus_name) {
+      $(".corpus_select").text(corpus_name);
+      picked_corpus = corpus_name;
+      callback(corpus_name);
+    });
+  }
+  /**
+   *
+   * Sets the value of the currently picked texts
+   *
+   *
+   **/
+
+
+  function SetPickedTexts() {
+    picked_texts = [];
+    $("#text_picker_for_sobcorpus [type='checkbox']:checked").each(function () {
+      picked_texts.push({
+        code: $(this).val(),
+        title: $(this).parents("span").next("span").text()
+      });
+    });
+    $(".texts_picked").text(picked_texts.length);
+    return this;
+  }
+  /**
+   *
+   * Gets the currently picked texts
+   *
+   */
+
+
+  function GetPickedTexts() {
+    return picked_texts;
+  }
+  /**
+   *
+   * Gets the currently picked codes only
+   *
+   */
+
+
+  function GetPickedCodes() {
+    var codes = [];
+
+    for (i = 0; i < picked_texts.length; i++) {
+      codes.push(picked_texts[i].code);
+    }
+
+    return codes;
+  }
+  /**
+   *
+   * Gets the currently picked codes for each of the languages in the corpus
+   * This is still a hack, a more robust solution is needed.
+   * The function assumes an identical naming shceme for each text:
+   * the text has to end in _[lang], [lang] being a two-character language code
+   *
+   *
+   */
+
+
+  function GetPickedCodesInAllLanguages() {
+    var codes = GetPickedCodes();
+    var all_codes = {};
+    $.each(languages_in_corpus, function (idx, lang) {
+      all_codes[lang] = [];
+    });
+    $.each(codes, function (idx, code) {
+      $.each(languages_in_corpus, function (idx, lang) {
+        var pat = new RegExp("(_?)" + picked_lang + "$", "g");
+        all_codes[lang].push(code.replace(pat, "$1" + lang));
+      });
+    });
+    return all_codes;
+  }
+  /**
+   *
+   * Lists the languages available in a given corpus
+   *
+   * @param string corpus_name the name of the corpus in the database
+   *
+   **/
+
+
+  function ListLanguagesInThisCorpus(corpus_name) {
+    $.getJSON("php/ajax/get_corpus_information.php", {
+      action: "languages",
+      corpus_name: picked_corpus
+    }, function (langlist) {
+      languages_in_corpus = langlist;
+      var $sel = $("<select><option value='none'>Choose language</option></select>"); //When the language is selected, print a list of the texts
+
+      $.each(langlist, function (idx, el) {
+        $sel.append("<option>" + el + "</option>");
+      });
+      $sel.hide().fadeIn().appendTo($(".lang_select").html(""));
+      $(".lang_select select").selectmenu();
+      $(".lang_select select").on("selectmenuchange", function () {
+        SetPickedLang($(this).val());
+        UpdateSubCorpus();
+      });
+    });
+  }
+  /**
+   *
+   * Lists the texts available in a given corpus
+   *
+   *
+   **/
+
+
+  function UpdateSubCorpus() {
+    $.getJSON("php/ajax/get_corpus_information.php", {
+      action: "text_names",
+      lang: picked_lang,
+      corpus_name: picked_corpus
+    }, function (textlist) {
+      var $ul = $("<ul>");
+      var $a = $("<a href='javascript:void(0);' >Unselect all</a>");
+      $a.click(function () {
+        Utilities.SelectAll($(this));
+        SetPickedTexts();
+      });
+      $ul.append($("<li class='sel_all_link'></li>").append($a));
+      $.each(textlist, function (idx, el) {
+        var $gal = $("<span><input type='checkbox' checked='true' value='" + el.code + "'></input></span>");
+        var $name = $("<span> <strong>".concat(el.code, ":</strong> <span class='el_title'>").concat(el.title, "</span> </span>"));
+        var $li = $("<li>").append($gal).append($name);
+        $ul.append($li);
+      });
+      $ul.appendTo($("#text_picker_for_sobcorpus").html("")); //Updating when picking the texts for the current subcorpus
+
+      $("#text_picker_for_sobcorpus input[type='checkbox']").click(function () {
+        SetPickedTexts();
+      });
+      SetPickedTexts();
+    });
+  }
+
+  return {
+    ListLanguagesInThisCorpus: ListLanguagesInThisCorpus,
+    SetCurrentCorpus: SetCurrentCorpus,
+    GetPickedCorpus: GetPickedCorpus,
+    GetPickedTexts: GetPickedTexts,
+    GetPickedCodes: GetPickedCodes,
+    GetPickedLang: GetPickedLang,
+    GetLanguagesInCorpus: GetLanguagesInCorpus,
+    GetPickedCodesInAllLanguages: GetPickedCodesInAllLanguages
+  };
 }();
-
+"use strict";
 
 /**
  *
  * The actual functionality of the interface: what we can do with the corpora
  *
  **/
-
-var CorpusActions = function(){
+var CorpusActions = function () {
+  /**
+   *
+   * Basic characteristics about a collection of texts. E.g. frequency lists etc.
+   *
+   **/
+  var SubCorpusCharacteristics = {
+    /**
+     * Show options related to ngrams
+     *
+     */
+    DisplayNgramOptions: function DisplayNgramOptions() {
+      $("#ngrams_params_menu").slideToggle();
+      $(".DisplayNgramOptions").toggleClass("opened").toggleClass("closed");
+    },
 
     /**
      *
-     * Basic characteristics about a collection of texts. E.g. frequency lists etc.
+     * Print an ngram list
      *
-     **/
-    var SubCorpusCharacteristics = {
+     * @param must_include Ngrams have to include this word or lemma
+     * @param predifined_n if which grams is determined programmatically, then a number (2-5)
+     * @param predifined_lemmas lemmas or not, if defined programmatically
+     *
+     */
+    PrintNgramList: function PrintNgramList(params, desktop_name) {
+      var self = this;
+      $("#corpusaction").hide();
+      $(".my-lightbox:not(.lrd_menu)").hide();
+      params = params || {
+        //Default ajax parameters for ngrams
+        n: $("[name='ngram_n_number']").val() * 1 || 2,
+        lemmas: $("[name='ngram_lemma']").get(0).checked ? "yes" : "no"
+      };
+      params.action = "corpus_ngram_list";
+      params.codes = Loaders.GetPickedCodes();
+      params.lang = Loaders.GetPickedLang();
+      var msg = new Utilities.Message("Loading...", $(".container"));
+      var secs = 0;
+      var loadtime = setInterval(function () {
+        secs++;
+        msg.Update("Loading... (" + secs + " seconds )");
+      }, 1000);
+      msg.Show(99999);
+      $.getJSON("php/ajax/get_frequency_list.php", params, function (data) {
+        clearInterval(loadtime);
+        msg.Update("Loading took " + secs + " seconds.");
+        setTimeout(function () {
+          msg.Destroy();
+        }, 2000);
+        var freqlist = new Corpusdesktop.Table();
+        freqlist.SetName(desktop_name || "Ngrams (the whole subcorpus)").SetHeader(["Ngram", "Freq", "LL", "MI"]).SetRows(data.slice(0, 1000)).BuildOutput();
+        freqlist.$container.appendTo($("#texts_to_examine").html(""));
+        $(".text_examiner").fadeIn();
+      });
+    },
 
-        /**
-         * Show options related to ngrams
-         *
-         */
-        DisplayNgramOptions: function(){
-            $("#ngrams_params_menu").slideToggle();
-            $(".DisplayNgramOptions").toggleClass("opened").toggleClass("closed");
-        },
-    
-        /**
-         *
-         * Print an ngram list
-         *
-         * @param must_include Ngrams have to include this word or lemma
-         * @param predifined_n if which grams is determined programmatically, then a number (2-5)
-         * @param predifined_lemmas lemmas or not, if defined programmatically
-         *
-         */
-        PrintNgramList: function(params, desktop_name){
-            var self = this;
-            $("#corpusaction").hide();
-            $(".my-lightbox:not(.lrd_menu)").hide();
-            params = params || {
-                //Default ajax parameters for ngrams
-                n:   $("[name='ngram_n_number']").val()*1 || 2,
-                lemmas:  ($("[name='ngram_lemma']").get(0).checked ? "yes" : "no"),
-            }
-            params.action = "corpus_ngram_list";
-            params.codes = Loaders.GetPickedCodes();
-            params.lang = Loaders.GetPickedLang();
-            var msg = new Utilities.Message("Loading...", $(".container"));
-            var secs = 0;
-            var loadtime = setInterval(function(){
-                secs++;
-                msg.Update("Loading... (" + secs + " seconds )");
-            },1000);
-            msg.Show(99999);
-            $.getJSON("php/ajax/get_frequency_list.php", params,
-                function(data){
-                    clearInterval(loadtime);
-                    msg.Update("Loading took " + secs + " seconds.");
-                    setTimeout(function(){msg.Destroy()},2000);
-                    var freqlist = new Corpusdesktop.Table();
-                    freqlist
-                        .SetName(desktop_name || "Ngrams (the whole subcorpus)")
-                        .SetHeader(["Ngram","Freq", "LL","MI"])
-                        .SetRows(data.slice(0,1000)).BuildOutput();
-                    freqlist.$container.appendTo($("#texts_to_examine").html(""));
-                    $(".text_examiner").fadeIn();
-                }
-            );
-        },
-
-        /**
-         *
-         * Print a frequency list
-         *
-         */
-        PrintFrequencyList: function(){
-            $("#corpusaction").hide();
-            var self = this;
-            $(".my-lightbox").hide();
-            params = {
-                action:"corpus_frequency_list",
-                codes: Loaders.GetPickedCodes(),
-                lang: Loaders.GetPickedLang()
-            };
-            var msg = new Utilities.Message("Loading...", $(".container"));
-            msg.Show(9999999);
-            $.getJSON("php/ajax/get_frequency_list.php", params,
-                function(data){
-                    msg.Destroy();
-                    var freqlist = new Corpusdesktop.Table();
-                    freqlist
-                        .SetName("Frequencylist (the whole subcorpus)")
-                        .SetHeader(["Lemma","Freq","NB"])
-                        .SetRows(data).BuildOutput();
-                    freqlist.$container.appendTo($("#texts_to_examine").html(""));
-                    $(".text_examiner").fadeIn();
-                }
-            );
-        }
-
-        
+    /**
+     *
+     * Print a frequency list
+     *
+     */
+    PrintFrequencyList: function PrintFrequencyList() {
+      $("#corpusaction").hide();
+      var self = this;
+      $(".my-lightbox").hide();
+      params = {
+        action: "corpus_frequency_list",
+        codes: Loaders.GetPickedCodes(),
+        lang: Loaders.GetPickedLang()
+      };
+      var msg = new Utilities.Message("Loading...", $(".container"));
+      msg.Show(9999999);
+      $.getJSON("php/ajax/get_frequency_list.php", params, function (data) {
+        msg.Destroy();
+        var freqlist = new Corpusdesktop.Table();
+        freqlist.SetName("Frequencylist (the whole subcorpus)").SetHeader(["Lemma", "Freq", "NB"]).SetRows(data).BuildOutput();
+        freqlist.$container.appendTo($("#texts_to_examine").html(""));
+        $(".text_examiner").fadeIn();
+      });
     }
-    
-
     /**
      *
      * Determining what words are typical for  a certain document
      *
      **/
-    var ExamineTopics = {
 
+  };
+  var ExamineTopics = {
+    tf_idf_baseline: 0,
+    lrd_lemma: "",
+    current_n: 2,
 
-        tf_idf_baseline: 0,
-        lrd_lemma: "",
-        current_n:2,
+    /**
+     *
+     * Give the user a chance to determine parameters for the topic-counting function.
+     *
+     **/
+    DisplayOptions: function DisplayOptions() {
+      $("#topic_params_menu").slideToggle();
+      $(".DisplayOptions").toggleClass("opened").toggleClass("closed");
+    },
 
-        /**
-         *
-         * Give the user a chance to determine parameters for the topic-counting function.
-         *
-         **/
-        DisplayOptions: function(){
-            $("#topic_params_menu").slideToggle();
-            $(".DisplayOptions").toggleClass("opened").toggleClass("closed");
-        },
+    /**
+     *
+     * Display the list of the texts of the current subcorpus as links
+     *
+     * @param text_action What to do when the text name is clicked
+     *
+     **/
+    DisplayTexts: function DisplayTexts(text_action) {
+      $("#rnd_action").hide();
+      $(".start_rnd button").text("LRD");
+      var self = this;
+      text_action = text_action || this.DisplayWordsInText.bind(this);
+      $(".my-lightbox").hide();
+      var $ul = $("<ul>");
+      $.each(Loaders.GetPickedTexts(), function (idx, el) {
+        var $li = $("<li class='actionlist'>".concat(el.title, "</li>")).click(text_action);
+        var $input = $("<input type='hidden' name='code' value=".concat(el.code, "></input>"));
+        var $li_below = $("<li class='text_details'></li>");
+        $ul.append($li.append($input)).append($li_below);
+      });
+      $ul.appendTo($("#texts_to_examine").html(""));
+      $(".text_examiner").fadeIn();
+    },
 
-        /**
-         *
-         * Display the list of the texts of the current subcorpus as links
-         *
-         * @param text_action What to do when the text name is clicked
-         *
-         **/
-        DisplayTexts: function(text_action){
-            $("#rnd_action").hide();
-            $(".start_rnd button").text("LRD");
-            var self = this;
-            text_action  = text_action || this.DisplayWordsInText.bind(this);
-            $(".my-lightbox").hide();
-            var $ul = $("<ul>");
-            $.each(Loaders.GetPickedTexts(),function(idx,el){
-                var $li = $(`<li class='actionlist'>${el.title}</li>`).click(text_action);
-                var $input = $(`<input type='hidden' name='code' value=${el.code}></input>`);
-                var $li_below = $("<li class='text_details'></li>");
-                $ul.append($li.append($input)).append($li_below);
-            });
-            $ul.appendTo($("#texts_to_examine").html(""));
-            $(".text_examiner").fadeIn();
-        },
+    /**
+     *
+     * Opens a table of the key words in the selected text
+     *
+     * @param e the click event
+     *
+     **/
+    DisplayWordsInText: function DisplayWordsInText(e) {
+      if (!$(e.target).next().find("table").length) {
+        //If data not already loaded
+        this.ExamineThisText($(e.target));
+      } else {
+        $(e.target).toggleClass("opened").next().slideToggle();
+      }
+    },
 
-        /**
-         *
-         * Opens a table of the key words in the selected text
-         *
-         * @param e the click event
-         *
-         **/
-        DisplayWordsInText: function(e){
-            if( !$(e.target).next().find("table").length ){
-                //If data not already loaded
-                this.ExamineThisText($(e.target)); 
+    /**
+     *
+     * Launches the LRDtab functionality
+     *
+     * @param e the click event
+     *
+     **/
+    DisplayLRDTab: function DisplayLRDTab(e) {
+      if (!$(e.target).next().find("table").length) {
+        //If data not already loaded
+        this.LaunchLRDTab($(e.target));
+      } else {
+        $(e.target).toggleClass("opened").next().slideToggle();
+      }
+    },
+
+    /**
+     *
+     * Display the list of the texts of the current subcorpus as links. 
+     * Clicking each text starts the process for building a mutlilingual
+     * LRD table for the text
+     *
+     **/
+    DisplayTextsForTab: function DisplayTextsForTab() {
+      ExamineTopics.DisplayTexts(this.DisplayLRDTab.bind(this));
+    },
+
+    /**
+     *
+     * Examine the text in question
+     *
+     * @param $parent_li the li element above the link that fired the event
+     * @param params If the parameters have been preset by another function
+     * @param custom_callback call anothre callback insted of the default BuildTfIdfTable
+     * @param no_msg do not show a loading message, if this is true
+     *
+     **/
+    ExamineThisText: function ExamineThisText($parent_li, params, custom_callback, no_msg) {
+      var self = this;
+      var callback = custom_callback || this.BuildTfIdfTable.bind(this);
+      picked_code = $parent_li.find("input[name='code']").val();
+      params = params || {
+        action: "examine_text",
+        picked_code: picked_code,
+        codes: Loaders.GetPickedCodes(),
+        lang: Loaders.GetPickedLang()
+      };
+
+      if (!no_msg) {
+        this.msg = new Utilities.Message("Loading...", $parent_li);
+        this.msg.Show();
+      }
+
+      this.$parent_li = $parent_li;
+      return $.getJSON("php/ajax/get_frequency_list.php", params, callback);
+    },
+
+    /**
+     *
+     * Builds a table for representing tf_idf data
+     *
+     **/
+    BuildTfIdfTable: function BuildTfIdfTable(data) {
+      var $details_li = this.$parent_li.next();
+      this.msg.Destroy();
+      this.$parent_li.addClass("opened");
+      var freqlist = new Corpusdesktop.Table();
+      var normalize = true;
+
+      if (normalize) {
+        var newdata = [];
+        var tf_idf_baseline = $("[name='tf_idf_baseline']").val() * 1 || 0;
+        $.each(data, function (idx, row) {
+          if (row.nb * 1 > 0 && row.tf_idf >= tf_idf_baseline) {
+            newdata.push(row);
+          }
+        });
+      }
+
+      freqlist.SetName(picked_code).SetHeader(["Lemma", "Freq", "TF_IDF", "NB"]).SetRows(newdata).BuildOutput();
+      freqlist.$container.appendTo($details_li.hide());
+      freqlist.AddRowAction(this.ExamineThisRow.bind(this), 2);
+      $details_li.slideDown();
+    },
+
+    /**
+     *
+     * Builds a table for representing tf_idf data in a special table for
+     * analysis
+     *
+     **/
+    BuildLRDTable: function BuildLRDTable(data) {
+      var $details_li = this.$parent_li.next();
+      this.msg.Destroy();
+      this.$parent_li.addClass("opened");
+      var freqlist = new Corpusdesktop.Table();
+      var tabdata = [];
+      var langs = Loaders.GetLanguagesInCorpus();
+      var headerlangs = [];
+      var ngramrange = LRDtab.GetNgramRange();
+      console.log(data);
+      $.each(data[langs[0]], function (keyword_idx, keyword_data) {
+        tabdata.push({});
+      });
+      $.each(data, function (lang, langdata) {
+        headerlangs.push(lang);
+
+        for (var i = 0; i < LRDtab.GetNumberOfTopicWords(); i++) {
+          if (langdata[i + 1]) {
+            $ul = $("<ul class='ldrtab'></ul>");
+
+            for (var n = ngramrange[0]; n <= ngramrange[1]; n++) {
+              var ngram_data = langdata[i + 1][n];
+              $ul.append("<li><strong>".concat(n, "</strong></li>"));
+              $.each(ngram_data, function (idx, this_ngram) {
+                if (this_ngram) {
+                  $("<li class='LRD_ngram'>".concat(this_ngram.ngram, "\n                                                <input type='hidden' class='ngram_ll' value='").concat(this_ngram.LL, "'></input>\n                                                <input type='hidden' class='ngram_pmi' value='").concat(this_ngram.PMI, "'></input>\n                                            </li>")).appendTo($ul);
+                }
+              });
             }
-            else{
-                $(e.target).toggleClass("opened").next().slideToggle();
-            }
-        },
 
-        /**
-         *
-         * Launches the LRDtab functionality
-         *
-         * @param e the click event
-         *
-         **/
-        DisplayLRDTab: function(e){
-            if( !$(e.target).next().find("table").length ){
-                //If data not already loaded
-                this.LaunchLRDTab($(e.target)); 
-            }
-            else{
-                $(e.target).toggleClass("opened").next().slideToggle();
-            }
-        },
+            tabdata[i][lang] = $ul.get(0).outerHTML;
+          }
+        }
+      });
+      freqlist.SetName(this.$parent_li.text()).SetClass("lrd_table").SetHeader(headerlangs).SetRows(tabdata).BuildOutput();
+      freqlist.$container.appendTo($details_li.hide());
+      $(".LRD_ngram").click(LRDtab.ViewNgramDetails); //freqlist.AddRowAction(this.ExamineThisRow.bind(this), 2);
+      //ADD an action to inspect LL etc
 
-        /**
-         *
-         * Display the list of the texts of the current subcorpus as links. 
-         * Clicking each text starts the process for building a mutlilingual
-         * LRD table for the text
-         *
-         **/
-        DisplayTextsForTab: function(){
-            ExamineTopics.DisplayTexts(this.DisplayLRDTab.bind(this));
-        },
+      $details_li.slideDown();
+    },
 
-        /**
-         *
-         * Examine the text in question
-         *
-         * @param $parent_li the li element above the link that fired the event
-         * @param params If the parameters have been preset by another function
-         * @param custom_callback call anothre callback insted of the default BuildTfIdfTable
-         * @param no_msg do not show a loading message, if this is true
-         *
-         **/
-        ExamineThisText: function($parent_li, params, custom_callback, no_msg){
-            var self = this;
-            var callback = custom_callback || this.BuildTfIdfTable.bind(this);
-            picked_code = $parent_li.find("input[name='code']").val();
-            params = params || {
-                action:"examine_text",
-                picked_code: picked_code,
-                codes: Loaders.GetPickedCodes(),
-                lang: Loaders.GetPickedLang()
-            };
-            if(!no_msg){
-                this.msg = new Utilities.Message("Loading...", $parent_li);
-                this.msg.Show();
-            }
-            this.$parent_li = $parent_li;
-            return $.getJSON("php/ajax/get_frequency_list.php", params, callback);
-        },
+    /**
+     *
+     * ASKS for  the LRDtab function from the backend
+     *
+     * @param $parent_li the li element above the link that fired the event
+     *
+     **/
+    LaunchLRDTab: function LaunchLRDTab($parent_li) {
+      var sl = LRDtab.GetSourceLang(),
+          picked_code = $parent_li.find("input[name='code']").val(),
+          picked_lang = Loaders.GetPickedLang(),
+          codes = Loaders.GetPickedCodesInAllLanguages(),
+          self = this;
+      var pat = new RegExp("(_?)" + picked_lang + "$", "g");
+      this.msg = new Utilities.Message("Loading...", $parent_li);
+      this.msg.Show();
+      LRDtab.Run(this.ExamineThisText($parent_li, {
+        action: "examine_text",
+        picked_code: picked_code.replace(pat, "$1" + sl),
+        lang: sl,
+        codes: codes[sl]
+      }, function () {
+        self.msg.Update("Source language ready.");
+      }, true), this, picked_code);
+    },
 
-        /**
-         *
-         * Builds a table for representing tf_idf data
-         *
-         **/
-        BuildTfIdfTable: function(data){
-                    var $details_li = this.$parent_li.next();
-                    this.msg.Destroy();
-                    this.$parent_li.addClass("opened");
-                    var freqlist = new Corpusdesktop.Table();
-                    var normalize = true;
-                    if(normalize){
-                        var newdata = [];
-                        var tf_idf_baseline =  $("[name='tf_idf_baseline']").val()*1  || 0;
-                        $.each(data,function(idx,row){
-                            if(row.nb*1 > 0 
-                             && row.tf_idf >= tf_idf_baseline){
-                                newdata.push(row);
-                            }
-                        });
-                    }
-                    freqlist.SetName(picked_code).SetHeader(["Lemma","Freq","TF_IDF","NB"]).SetRows(newdata).BuildOutput();
-                    freqlist.$container.appendTo($details_li.hide());
-                    freqlist.AddRowAction(this.ExamineThisRow.bind(this), 2);
-                    $details_li.slideDown();
-        },
+    /**
+     *
+     * Examine the row (the lemma) in question. Prints out a list of ngrams containing this word
+     *
+     * @param $launcher the element that fired the event
+     *
+     **/
+    ExamineThisRow: function ExamineThisRow($launcher) {
+      var self = this;
+      $(".my-lightbox").hide();
+      $(".lrd_menu").fadeIn();
+      this.lrd_lemma = $launcher.text();
+    },
 
+    /**
+     *
+     * Choose, whether to use a verb-centered or a noun centered set of filters for ngrams
+     *
+     * @param $launcher the list element that fired the event
+     *
+     **/
+    ChooseParadigm: function ChooseParadigm($launcher) {
+      this.current_n = $launcher.attr("id").replace(/.*_(\d+)/g, "$1") * 1;
+      var $menu = $launcher.find("ul");
 
-        /**
-         *
-         * Builds a table for representing tf_idf data in a special table for
-         * analysis
-         *
-         **/
-        BuildLRDTable: function(data){
-                    var $details_li = this.$parent_li.next();
-                    this.msg.Destroy();
-                    this.$parent_li.addClass("opened");
-                    var freqlist = new Corpusdesktop.Table();
-                    var tabdata = [];
-                    var langs = Loaders.GetLanguagesInCorpus();
-                    var headerlangs = [];
-                    var ngramrange = LRDtab.GetNgramRange();
-                    console.log(data);
-                    $.each(data[langs[0]],function(keyword_idx, keyword_data){
-                        tabdata.push({});
-                    });
-                    $.each(data,function(lang, langdata){
-                        headerlangs.push(lang);
-                        for(var i = 0; i < LRDtab.GetNumberOfTopicWords(); i++){
-                            if(langdata[i+1]){
-                                $ul = $("<ul class='ldrtab'></ul>");
-                                for(var n = ngramrange[0]; n <= ngramrange[1]; n++){
-                                    var ngram_data = langdata[i+1][n];
-                                    $ul.append(`<li><strong>${n}</strong></li>`);
-                                    $.each(ngram_data,function(idx, this_ngram){
-                                        if(this_ngram){
-                                            $(`<li class='LRD_ngram'>${this_ngram.ngram}
-                                                <input type='hidden' class='ngram_ll' value='${this_ngram.LL}'></input>
-                                                <input type='hidden' class='ngram_pmi' value='${this_ngram.PMI}'></input>
-                                            </li>`).appendTo($ul);
-                                        }
-                                    });
-                                }
-                                tabdata[i][lang] = $ul.get(0).outerHTML;
-                            }
-                        }
-                    });
-                    freqlist.SetName(this.$parent_li.text())
-                            .SetClass("lrd_table")
-                            .SetHeader(headerlangs)
-                            .SetRows(tabdata)
-                            .BuildOutput();
-                    freqlist.$container.appendTo($details_li.hide());
-                    $(".LRD_ngram").click(LRDtab.ViewNgramDetails);
-                    //freqlist.AddRowAction(this.ExamineThisRow.bind(this), 2);
-                    //ADD an action to inspect LL etc
-                    $details_li.slideDown();
-        },
+      if (!$menu.length) {
+        var $ul = $("\n                    <ul>\n                        <li>Noun-centered</li>\n                        <li>Verb-centered</li>\n                    </ul>"); //$nounli.click()
 
-        /**
-         *
-         * ASKS for  the LRDtab function from the backend
-         *
-         * @param $parent_li the li element above the link that fired the event
-         *
-         **/
-        LaunchLRDTab: function($parent_li){
-            var sl = LRDtab.GetSourceLang(),
-                picked_code = $parent_li.find("input[name='code']").val(),
-                picked_lang = Loaders.GetPickedLang(),
-                codes = Loaders.GetPickedCodesInAllLanguages(),
-                self = this;
-            var pat = new RegExp("(_?)" + picked_lang + "$","g");
-            this.msg = new Utilities.Message("Loading...", $parent_li);
-            this.msg.Show();
-            LRDtab.Run(this.ExamineThisText($parent_li, {
-                action:"examine_text",
-                picked_code: picked_code.replace(pat,"$1" + sl),
-                lang: sl,
-                codes: codes[sl]
-                }, function(){self.msg.Update("Source language ready.")}, true),
-                this, picked_code);
-        },
+        $ul.appendTo($launcher).hide().slideDown();
+        var self = this;
+        $ul.find("li").click(function () {
+          self.PrintNgrams($(this).text());
+        });
+      } else {
+        $menu.slideToggle();
+      }
+    },
 
-        /**
-         *
-         * Examine the row (the lemma) in question. Prints out a list of ngrams containing this word
-         *
-         * @param $launcher the element that fired the event
-         *
-         **/
-        ExamineThisRow: function($launcher){
-            var self = this;
-            $(".my-lightbox").hide();
-            $(".lrd_menu").fadeIn();
-            this.lrd_lemma = $launcher.text();
-        },
-
-
-        /**
-         *
-         * Choose, whether to use a verb-centered or a noun centered set of filters for ngrams
-         *
-         * @param $launcher the list element that fired the event
-         *
-         **/
-        ChooseParadigm: function($launcher){
-            this.current_n = $launcher.attr("id").replace(/.*_(\d+)/g,"$1") * 1;
-            var $menu = $launcher.find("ul");
-            if(!$menu.length){
-                var $ul = $(`
-                    <ul>
-                        <li>Noun-centered</li>
-                        <li>Verb-centered</li>
-                    </ul>`);
-                //$nounli.click()
-                $ul.appendTo($launcher).hide().slideDown();
-                var self = this;
-                $ul.find("li").click(function(){
-                    self.PrintNgrams($(this).text());
-                });
-            
-            }else
-            {
-                $menu.slideToggle();
-            }
-            
-        },
-
-        /**
-         *
-         * Print ngram lists based on the words defined by tf_idf
-         *
-         * @param paradigm Noun-centered or Verb-centered
-         *
-         **/
-        PrintNgrams: function(paradigm){
-            CorpusActions.SubCorpusCharacteristics.PrintNgramList(
-                {
-                    n:this.current_n,
-                    lemmas:"no",
-                    must_include: this.lrd_lemma,
-                    included_word_lemma: true,
-                    ldr_paradigm: paradigm,
-                },
-                `${this.current_n}-grams with ${this.lrd_lemma}`
-            );
-        },
-
-    };
-
-
-    return {
-    
-        ExamineTopics,
-        SubCorpusCharacteristics
-    
-    };
-
-    }();
+    /**
+     *
+     * Print ngram lists based on the words defined by tf_idf
+     *
+     * @param paradigm Noun-centered or Verb-centered
+     *
+     **/
+    PrintNgrams: function PrintNgrams(paradigm) {
+      CorpusActions.SubCorpusCharacteristics.PrintNgramList({
+        n: this.current_n,
+        lemmas: "no",
+        must_include: this.lrd_lemma,
+        included_word_lemma: true,
+        ldr_paradigm: paradigm
+      }, "".concat(this.current_n, "-grams with ").concat(this.lrd_lemma));
+    }
+  };
+  return {
+    ExamineTopics: ExamineTopics,
+    SubCorpusCharacteristics: SubCorpusCharacteristics
+  };
+}();
+"use strict";
 
 /**
  *
@@ -1254,76 +1227,70 @@ var CorpusActions = function(){
  * stopwords etc.
  *
  **/
+var CorpusManagementActions = function () {
+  /**
+   *
+   * Managing stopwords for frequency lists etc.
+   *
+   **/
+  var ManageStopWords = {
+    /**
+     *
+     * Print a list of the current stopwords
+     *
+     * @param dontslide boolean whether or not to display the slide down animation
+     *
+     **/
+    PrintCurrentStopWords: function PrintCurrentStopWords(dontslide) {
+      var self = this;
+      var dontslide = dontslide || false;
+      $.getJSON("php/ajax/corpus_management.php", {
+        "action": "list_stopwords"
+      }, function (stopwords) {
+        var $ul = $("<ul class='datalist'></ul>");
+        var $add_new = $("<li>");
+        $add_new.append("<input type='text' placeholder='Add a new stopword'></input>").append($("<button> Add </button>").click(function () {
+          var stopword = $(this).prev().val();
+          self.AddNewStopWord(stopword);
+        }));
+        $ul.append($add_new);
+        $.each(stopwords, function (idx, word) {
+          $ul.append("<li>".concat(word, "</li>"));
+        });
+        var $li = $(".PrintCurrentStopWords:eq(0)").parent();
+        $li.find("ul").remove();
+        $li.append($ul);
 
-var CorpusManagementActions = function(){
+        if (!dontslide) {
+          $ul.hide().slideDown();
+        }
+      });
+    },
 
     /**
      *
-     * Managing stopwords for frequency lists etc.
+     * Adds a new stopword to the database
+     *
+     * @param stopword the word to be added
      *
      **/
-    var ManageStopWords = {
-    
-        /**
-         *
-         * Print a list of the current stopwords
-         *
-         * @param dontslide boolean whether or not to display the slide down animation
-         *
-         **/
-        PrintCurrentStopWords: function(dontslide){
-            var self = this;
-            var dontslide = dontslide || false;
-            $.getJSON("php/ajax/corpus_management.php", {"action":"list_stopwords"},
-                function(stopwords){
-                    var $ul = $("<ul class='datalist'></ul>");
-                    var $add_new = $("<li>");
-                    $add_new.append("<input type='text' placeholder='Add a new stopword'></input>")
-                            .append($("<button> Add </button>")
-                                    .click(function(){
-                                        var stopword = $(this).prev().val();
-                                        self.AddNewStopWord(stopword);
-                                    })
-                                    );
-                    $ul.append($add_new);
-                    $.each(stopwords,function(idx,word){
-                        $ul.append(`<li>${word}</li>`)
-                    });
-                    var $li = $(".PrintCurrentStopWords:eq(0)").parent();
-                    $li.find("ul").remove();
-                    $li.append($ul);
-                    if(!dontslide){
-                        $ul.hide().slideDown();
-                    }
-                }
-            );
-        },
-
-        /**
-         *
-         * Adds a new stopword to the database
-         *
-         * @param stopword the word to be added
-         *
-         **/
-        AddNewStopWord: function(stopword){
-            var self = this;
-            $.get("php/ajax/corpus_management.php",{"action":"insert_stopword","new_word":stopword},
-            function(){
-                self.PrintCurrentStopWords(true);
-            });
-        }
-
+    AddNewStopWord: function AddNewStopWord(stopword) {
+      var self = this;
+      $.get("php/ajax/corpus_management.php", {
+        "action": "insert_stopword",
+        "new_word": stopword
+      }, function () {
+        self.PrintCurrentStopWords(true);
+      });
     }
-
-
-
-    return {
-        ManageStopWords,
-    
-    };
-
+  };
+  return {
+    ManageStopWords: ManageStopWords
+  };
 }();
+"use strict";
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 /**
  * 
@@ -1343,553 +1310,564 @@ var CorpusManagementActions = function(){
  * @param lrd_paradigm how to filter the ngrams: Noun-centered or Verb-centerd
  *
  **/
-var LRDtab = function(){
+var LRDtab = function () {
+  var words_in_doc = {},
+      sl_keywords_ranked = [],
+      filtered_by_dict_keywords = [],
+      ngrams = [],
+      number_of_topicwords = 5,
+      ngram_range = [2, 3],
+      ngram_number = 5,
+      lrd_method = "LL",
+      lrd_paradigm = "Noun-centered",
+      source_lang = "en";
+  /**
+   *
+   * Gets the source language
+   *
+   **/
 
-    words_in_doc = {};
-    sl_keywords_ranked = [];
+  var GetSourceLang = function GetSourceLang() {
+    return source_lang;
+  };
+  /**
+   *
+   * Gets the number of topic words
+   *
+   **/
+
+
+  var GetNumberOfTopicWords = function GetNumberOfTopicWords() {
+    return number_of_topicwords;
+  };
+  /**
+   *
+   * Gets the range of ngram levels
+   *
+   **/
+
+
+  var GetNgramRange = function GetNgramRange() {
+    return ngram_range;
+  };
+  /**
+   *
+   * Defines, what method will be used for picking
+   * the top ngrams
+   *
+   *
+   **/
+
+
+  var SetLRDmethod = function SetLRDmethod() {
+    lrd_method = $(this).val();
+  };
+  /**
+   *
+   * Defines, what paradigm will be used for constructing the ngrams
+   *
+   *
+   **/
+
+
+  var SetLRDparadigm = function SetLRDparadigm() {
+    lrd_paradigm = $(this).val();
+  };
+  /**
+   *
+   * Defines, how many of the top words from the tf_idf list will be
+   * taken into account
+   *
+   * @param e event
+   * @param ui jquery ui object
+   *
+   **/
+
+
+  var SetNumberOfTopicWords = function SetNumberOfTopicWords(e, ui) {
+    $(e.target).parent().find(".slider_result").text(ui.value);
+    number_of_topicwords = ui.value;
+  };
+  /**
+   *
+   * Defines, how many of the top words from the tf_idf list will be
+   * taken into account
+   *
+   * @param e event
+   * @param ui jquery ui object
+   *
+   *
+   **/
+
+
+  var SetNgramRange = function SetNgramRange(e, ui) {
+    $(e.target).parent().find(".slider_result").text(ui.values.join(" - "));
+    ngram_range = ui.values;
+  };
+  /**
+   *
+   * Defines, how many ngrams (max) will be printed for each ngram level
+   *
+   * @param e event
+   * @param ui jquery ui object
+   *
+   **/
+
+
+  var SetNgramNumber = function SetNgramNumber(e, ui) {
+    $(e.target).parent().find(".slider_result").text(ui.value);
+    ngram_number = ui.value;
+  };
+  /**
+   *
+   * Gets the whole data table for ngrams
+   *
+   **/
+
+
+  var GetNgrams = function GetNgrams(num) {
+    return ngrams;
+  };
+  /**
+   *
+   * Shows a small box that contains information about the ngram
+   *
+   * @param e the event that was fired
+   *
+   **/
+
+
+  var ViewNgramDetails = function ViewNgramDetails(e) {
+    var id = "box_" + $(this).text();
+
+    if ($(e.target).is("a")) {
+      return 0;
+    }
+
+    if ($("#" + id).length) {
+      return 0;
+    }
+
+    var msg = new Utilities.Message("", $(this));
+    msg.Add($(this).text()).Add("LL: " + $(this).find(".ngram_ll").val()).Add("PMI: " + $(this).find(".ngram_pmi").val()).AddId(id).AddCloseButton();
+    msg.Show(99999);
+  };
+  /**
+   *
+   * Gets a list for the most frequent words in all the languages
+   * in order to reduce the number of ngrams to be queried in the 
+   * next stage
+   *
+   * @param picked_code code of the document under examination
+   *
+   **/
+
+
+  function GetWordLists(picked_code) {
+    var langs = Loaders.GetLanguagesInCorpus(),
+        picked_lang = Loaders.GetPickedLang(),
+        responses = [],
+        codes = Loaders.GetPickedCodesInAllLanguages(),
+        msg = new Utilities.Message("Querying word lists..."),
+        bar = new Utilities.ProgressBar(msg.$box);
+    msg.Show(9999);
+    bar.Initialize(langs.length);
+    $.each(langs, function (lidx, lang) {
+      if (lang != source_lang) {
+        var _$$getJSON;
+
+        var pat = new RegExp("(_?)" + picked_lang + "$", "g");
+        responses.push($.getJSON("php/ajax/get_frequency_list.php", (_$$getJSON = {
+          action: "corpus_frequency_list",
+          codes: codes[lang]
+        }, _defineProperty(_$$getJSON, "codes", [picked_code.replace(pat, "$1" + lang)]), _defineProperty(_$$getJSON, "lang", lang), _defineProperty(_$$getJSON, "bylang", "yes"), _$$getJSON), function () {
+          bar.Progress();
+        }));
+      }
+    });
+    return $.when.apply($, responses).done(function () {
+      $.each(arguments, function (idx, arg) {
+        msg.Destroy();
+        lang = Object.keys(arg[0])[0], words_in_doc[lang] = arg[0][lang];
+      });
+    });
+  }
+  /**
+   *
+   * Picks one language as a source and filters the other languages' keyword to
+   * produce a list of possible multilingual keywords
+   *
+   * @param sl_keywords array of the keywords in the source language
+   *
+   **/
+
+
+  function FilterByDictionary(sl_keywords) {
+    var all_langs = Loaders.GetLanguagesInCorpus(),
+        target_langs = [],
+        msg = new Utilities.Message("Looking up wiktionary to filter the key word lists...", $(".container")),
+        bar = new Utilities.ProgressBar(msg.$box);
     filtered_by_dict_keywords = [];
-    ngrams = [];
-    number_of_topicwords = 5;
-    ngram_range = [2,3];
-    ngram_number = 5;
-    lrd_method = "LL";
-    lrd_paradigm = "Noun-centered";
-    source_lang = "en",
+    bar.Initialize(number_of_topicwords);
+    msg.Show(999999);
+    $.each(all_langs, function (idx, lang) {
+      if (lang != source_lang) {
+        target_langs.push(lang);
+      }
+    });
+    var filtered = [];
+    $.each(sl_keywords, function (idx, word) {
+      //Search for translation for each of the key word in the language
+      //chosen as source (default: english)
+      console.log(word);
+      params = {
+        "action": "GetTranslations",
+        "source_word": word.lemma,
+        "langs": target_langs
+      };
+      filtered.push($.getJSON("php/ajax/get_frequency_list.php", params, function (data) {
+        bar.Progress();
+      }));
+    });
+    return $.when.apply($, filtered).done(function () {
+      ajax_args = arguments;
+      msg.Destroy();
 
+      for (var i = 0; i < ajax_args.length; i++) {
+        //Iterating through EACH keyword in the source language
+        var word = ajax_args[i][0],
+            source_word = Object.keys(word)[0],
+            has_at_least_one_translation = false,
+            this_keyword = {};
+        this_keyword[source_lang] = [source_word];
+        $.each(target_langs, function (lidx, lang) {
+          //Pick the translations for each target lang
+          //and make sure at least one language has some.
+          this_keyword[lang] = [];
 
-    /**
-     *
-     * Gets the source language
-     *
-     **/
-    GetSourceLang = function(){
-        return source_lang;
-    }
+          if (word[source_word][lang].length) {
+            has_at_least_one_translation = true;
+            this_keyword[lang] = word[source_word][lang];
+          }
+        });
 
-    /**
-     *
-     * Gets the number of topic words
-     *
-     **/
-    GetNumberOfTopicWords = function(){
-        return number_of_topicwords
-    }
-
-    /**
-     *
-     * Gets the range of ngram levels
-     *
-     **/
-    GetNgramRange = function(){
-        return ngram_range;
-    }
-
-    /**
-     *
-     * Defines, what method will be used for picking
-     * the top ngrams
-     *
-     *
-     **/
-    SetLRDmethod = function(){
-        lrd_method = $(this).val();
-    }
-
-    /**
-     *
-     * Defines, what paradigm will be used for constructing the ngrams
-     *
-     *
-     **/
-    SetLRDparadigm = function(){
-        lrd_paradigm = $(this).val();
-    }
-
-
-
-    /**
-     *
-     * Defines, how many of the top words from the tf_idf list will be
-     * taken into account
-     *
-     * @param e event
-     * @param ui jquery ui object
-     *
-     **/
-    SetNumberOfTopicWords = function(e, ui){
-        $(e.target).parent().find(".slider_result").text(ui.value);
-        number_of_topicwords = ui.value;
-    }
-
-    /**
-     *
-     * Defines, how many of the top words from the tf_idf list will be
-     * taken into account
-     *
-     * @param e event
-     * @param ui jquery ui object
-     *
-     *
-     **/
-    SetNgramRange = function(e, ui){
-        $(e.target).parent().find(".slider_result").text(ui.values.join(" - "));
-        ngram_range = ui.values;
-    }
-
-    /**
-     *
-     * Defines, how many ngrams (max) will be printed for each ngram level
-     *
-     * @param e event
-     * @param ui jquery ui object
-     *
-     **/
-    SetNgramNumber = function(e, ui){
-        $(e.target).parent().find(".slider_result").text(ui.value);
-        ngram_number = ui.value;
-    }
-
-    /**
-     *
-     * Gets the whole data table for ngrams
-     *
-     **/
-    GetNgrams = function(num){
-        return ngrams;
-    }
-
-    /**
-     *
-     * Shows a small box that contains information about the ngram
-     *
-     * @param e the event that was fired
-     *
-     **/
-    ViewNgramDetails = function(e){
-        var id = "box_" + $(this).text();
-        if($(e.target).is("a")){
-            return 0;
+        if (has_at_least_one_translation) {
+          filtered_by_dict_keywords.push(this_keyword);
+        } else {
+          //If no translation found, remove this word from the ranked keywords
+          sl_keywords_ranked.splice(i, 1);
         }
-        if($("#" + id).length){
-            return 0;
+      }
+
+      console.log(filtered_by_dict_keywords);
+    });
+  }
+  /**
+   *
+   * Gets ngrams for each of the key words  for each of the languages
+   *
+   *
+   **/
+
+
+  function SetNgrams() {
+    //CorpusActions.SubCorpusCharacteristics.PrintNgramList
+    var keyword_source = filtered_by_dict_keywords,
+        langs = Loaders.GetLanguagesInCorpus(),
+        all_ngrams = [],
+        codes = Loaders.GetPickedCodesInAllLanguages(),
+        msg = new Utilities.Message("Building the ngrams. This will take some time...", $(".container")),
+        bar = new Utilities.ProgressBar(msg.$box),
+        total_words = 0; //COUNT all the ngrams that have to be searched for
+    //and use that information for the progress bar
+
+    $.each(keyword_source, function (keyword_idx, this_keyword) {
+      $.each(langs, function (lang_idx, lang) {
+        $.each(this_keyword[lang], function (lemma_idx, lrd_lemma) {
+          if (lang == source_lang || words_in_doc[lang].indexOf(lrd_lemma) > -1) {
+            total_words += ngram_range[1] - ngram_range[0] + 1;
+          }
+        });
+      });
+    });
+    msg.Show(999999);
+    bar.Initialize(total_words); //Start fetching the ngrams from the backend
+
+    $.each(keyword_source, function (keyword_idx, this_keyword) {
+      $.each(langs, function (lang_idx, lang) {
+        if (this_keyword[lang].length) {
+          $.each(this_keyword[lang], function (lemma_idx, lrd_lemma) {
+            if (lang == source_lang || words_in_doc[lang].indexOf(lrd_lemma) > -1) {
+              //Only search for ngrams for words 
+              //that actually appear in the document
+              for (var n = ngram_range[0]; n <= ngram_range[1]; n++) {
+                var params = {
+                  n: n,
+                  lemmas: "no",
+                  must_include: lrd_lemma,
+                  included_word_lemma: true,
+                  ldr_paradigm: lrd_paradigm,
+                  codes: codes[lang],
+                  action: "lrd_ngram_list",
+                  lang: lang,
+                  lrd_rank: sl_keywords_ranked.indexOf(this_keyword[source_lang][0]) + 1,
+                  remove_hashes: "yes"
+                };
+                all_ngrams.push($.getJSON("php/ajax/get_frequency_list.php", params, function (data) {
+                  bar.Progress();
+                  console.log(data);
+                }));
+              }
+            }
+          });
         }
-        var msg = new Utilities.Message("",$(this));
-        msg.Add($(this).text())
-           .Add("LL: " + $(this).find(".ngram_ll").val())
-           .Add("PMI: " + $(this).find(".ngram_pmi").val())
-           .AddId(id)
-           .AddCloseButton();
-        msg.Show(99999);
-    };
+      });
+    });
+    return $.when.apply($, all_ngrams).done(function () {
+      bar.Destroy();
+      tabdata = {};
+
+      for (var i = 0; i < arguments.length; i++) {
+        var lang = Object.keys(arguments[i][0])[0],
+            word_rank = Object.keys(arguments[i][0][lang])[0] * 1,
+            n = Object.keys(arguments[i][0][lang][word_rank])[0];
+
+        if (!tabdata[lang]) {
+          tabdata[lang] = {};
+        }
+
+        if (!tabdata[lang][word_rank]) {
+          tabdata[lang][word_rank] = {};
+        }
+
+        if (!tabdata[lang][word_rank][n]) {
+          tabdata[lang][word_rank][n] = [];
+        }
+
+        var these_ngrams = arguments[i][0][lang][word_rank][n]; //FInally, sort by LL or PMI
+
+        these_ngrams.sortOn(lrd_method, "desc"); //By default, don't take every ngram 
+        //THIS filters out bad translations!
+
+        tabdata[lang][word_rank][n] = these_ngrams.slice(0, ngram_number);
+      } //Add missing languages as empty entries
 
 
-    /**
-     *
-     * Gets a list for the most frequent words in all the languages
-     * in order to reduce the number of ngrams to be queried in the 
-     * next stage
-     *
-     * @param picked_code code of the document under examination
-     *
-     **/
-    function GetWordLists(picked_code){
-        var langs = Loaders.GetLanguagesInCorpus(),
-            picked_lang = Loaders.GetPickedLang(),
-            responses = [],
-            codes = Loaders.GetPickedCodesInAllLanguages(),
-            msg = new Utilities.Message("Querying word lists..."),
-            bar = new Utilities.ProgressBar(msg.$box);
-        msg.Show(9999);
-        bar.Initialize(langs.length);
-        $.each(langs,function(lidx, lang){
-            if(lang != source_lang){
-                var pat = new RegExp("(_?)" + picked_lang + "$","g");
-                responses.push($.getJSON("php/ajax/get_frequency_list.php",
-                    {
-                    action: "corpus_frequency_list",
-                    codes:codes[lang],
-                    codes: [picked_code.replace(pat,"$1" + lang)],
-                    lang: lang,
-                    bylang: "yes"
-                    }, 
-                    function(){
-                        bar.Progress();
-                    }
-                ));
+      $.each(langs, function (l_idx, lang) {
+        if (lang != source_lang) {
+          if (!tabdata[lang]) {
+            tabdata[lang] = {};
+          }
+
+          for (i = 1; i <= sl_keywords_ranked.length; i++) {
+            if (!tabdata[lang][i]) {
+              tabdata[lang][i] = {};
             }
-        });
-        return $.when.apply($, responses).done(function(){
-            $.each(arguments,function(idx,arg){
-                msg.Destroy();
-                lang = Object.keys(arg[0])[0],
-                words_in_doc[lang] = arg[0][lang];
-            });
-        });
-    }
 
-    /**
-     *
-     * Picks one language as a source and filters the other languages' keyword to
-     * produce a list of possible multilingual keywords
-     *
-     * @param sl_keywords array of the keywords in the source language
-     *
-     **/
-    function FilterByDictionary(sl_keywords){
-        var all_langs = Loaders.GetLanguagesInCorpus(),
-            target_langs = [],
-            msg = new Utilities.Message("Looking up wiktionary to filter the key word lists...", $(".container")),
-            bar = new Utilities.ProgressBar(msg.$box);
-        filtered_by_dict_keywords = [];
-        bar.Initialize(number_of_topicwords);
-        msg.Show(999999);
-        $.each(all_langs,function(idx, lang){
-            if(lang != source_lang){
-                target_langs.push(lang);
+            for (var n = ngram_range[0]; n <= ngram_range[1]; n++) {
+              if (!tabdata[lang][i][n]) {
+                tabdata[lang][i][n] = "";
+              }
             }
-        });
-        var filtered = [];
-        $.each(sl_keywords,function(idx,word){
-            //Search for translation for each of the key word in the language
-            //chosen as source (default: english)
-            console.log(word);
-            params = {
-                "action": "GetTranslations" ,
-                "source_word": word.lemma,
-                "langs": target_langs
-            };
-            filtered.push($.getJSON("php/ajax/get_frequency_list.php",params,function(data){
-                bar.Progress()
-            }));
-        });
-        return $.when.apply($, filtered).done(function(){
-            ajax_args = arguments;
-            msg.Destroy();
-            for(var i = 0; i<ajax_args.length; i++){
-                //Iterating through EACH keyword in the source language
-                var word = ajax_args[i][0],
-                    source_word = Object.keys(word)[0],
-                    has_at_least_one_translation = false,
-                    this_keyword = {};
-                this_keyword[source_lang] = [source_word];
-                $.each(target_langs,function(lidx,lang){
-                    //Pick the translations for each target lang
-                    //and make sure at least one language has some.
-                    this_keyword[lang] = [];
-                    if(word[source_word][lang].length){
-                        has_at_least_one_translation = true;
-                        this_keyword[lang] = word[source_word][lang];
-                    }
-                });
-                if(has_at_least_one_translation){
-                   filtered_by_dict_keywords.push(this_keyword);
-                }
-                else{
-                    //If no translation found, remove this word from the ranked keywords
-                    sl_keywords_ranked.splice(i,1);
-                }
-            }
-            console.log(filtered_by_dict_keywords);
-        }); 
-    } 
-
-    /**
-     *
-     * Gets ngrams for each of the key words  for each of the languages
-     *
-     *
-     **/
-    function SetNgrams(){
-        //CorpusActions.SubCorpusCharacteristics.PrintNgramList
-        var keyword_source = filtered_by_dict_keywords,
-            langs = Loaders.GetLanguagesInCorpus(),
-            all_ngrams = [],
-            codes = Loaders.GetPickedCodesInAllLanguages(),
-            msg = new Utilities.Message("Building the ngrams. This will take some time...", $(".container")),
-            bar = new Utilities.ProgressBar(msg.$box),
-            total_words = 0;
-        //COUNT all the ngrams that have to be searched for
-        //and use that information for the progress bar
-        $.each(keyword_source, function(keyword_idx, this_keyword){
-            $.each(langs,function(lang_idx,lang){
-                $.each(this_keyword[lang], function(lemma_idx, lrd_lemma){
-                    if( lang == source_lang || words_in_doc[lang].indexOf(lrd_lemma)>-1){
-                        total_words += ngram_range[1] - ngram_range[0] + 1;
-                    }
-                });
-            });
-        });
-        msg.Show(999999);
-        bar.Initialize(total_words);
-        //Start fetching the ngrams from the backend
-        $.each(keyword_source,function(keyword_idx,this_keyword){
-            $.each(langs,function(lang_idx,lang){
-                if(this_keyword[lang].length){
-                    $.each(this_keyword[lang], function(lemma_idx, lrd_lemma){
-                        if( lang == source_lang || words_in_doc[lang].indexOf(lrd_lemma)>-1){
-                            //Only search for ngrams for words 
-                            //that actually appear in the document
-                            for(var n = ngram_range[0]; n <= ngram_range[1]; n++){
-                                var params = {
-                                    n:n,
-                                    lemmas:"no",
-                                    must_include: lrd_lemma,
-                                    included_word_lemma: true,
-                                    ldr_paradigm: lrd_paradigm,
-                                    codes: codes[lang],
-                                    action: "lrd_ngram_list",
-                                    lang: lang,
-                                    lrd_rank: sl_keywords_ranked.indexOf(this_keyword[source_lang][0])+1,
-                                    remove_hashes: "yes",
-                                };
-                                all_ngrams.push($.getJSON("php/ajax/get_frequency_list.php", params,
-                                    function(data){
-                                        bar.Progress();
-                                        console.log(data);
-                                    }
-                                ));
-                            }
-                        }
-                    });
-                }
-            });
-        });
-        return $.when.apply($, all_ngrams).done(function(){
-            bar.Destroy();
-            tabdata = {};
-            for(var i = 0; i < arguments.length; i++ ){
-                var lang = Object.keys(arguments[i][0])[0],
-                    word_rank = Object.keys(arguments[i][0][lang])[0]*1,
-                    n = Object.keys(arguments[i][0][lang][word_rank])[0];
-                if(!tabdata[lang]){
-                    tabdata[lang] = {};
-                }
-                if(!tabdata[lang][word_rank]){
-                    tabdata[lang][word_rank] = {};
-                }
-                if(!tabdata[lang][word_rank][n]){
-                    tabdata[lang][word_rank][n] = [];
-                }
-                var these_ngrams = arguments[i][0][lang][word_rank][n];
-                //FInally, sort by LL or PMI
-                these_ngrams.sortOn(lrd_method,"desc");
-                //By default, don't take every ngram 
-                //THIS filters out bad translations!
-                tabdata[lang][word_rank][n] = these_ngrams.slice(0,ngram_number);
-            }
-            //Add missing languages as empty entries
-            $.each(langs,function(l_idx, lang){
-                if(lang != source_lang){
-                   if(!tabdata[lang]){
-                       tabdata[lang] = {};
-                   }
-                   for(i=1; i <= sl_keywords_ranked.length; i++){
-                       if(!tabdata[lang][i]){
-                           tabdata[lang][i] = {};
-                       }
-                        for(var n = ngram_range[0]; n <= ngram_range[1]; n++){
-                           if(!tabdata[lang][i][n]){
-                               tabdata[lang][i][n] = "";
-                           }
-                        }
-                   }
-                }
-            });
-            console.log(tabdata);
-            ngrams = tabdata;
-            msg.Destroy();
-        });
-    }
+          }
+        }
+      });
+      console.log(tabdata);
+      ngrams = tabdata;
+      msg.Destroy();
+    });
+  }
+  /**
+   *
+   * Run the lrdTAB functionality
+   *
+   * @param sl_wordlist_response the ajax response from the keyword list for the source language
+   * @param ExamineTopicsObject the object that called this function
+   * @param picked_code the code of the document under examination
+   *
+   **/
 
 
-    /**
-     *
-     * Run the lrdTAB functionality
-     *
-     * @param sl_wordlist_response the ajax response from the keyword list for the source language
-     * @param ExamineTopicsObject the object that called this function
-     * @param picked_code the code of the document under examination
-     *
-     **/
-    function Run(sl_wordlist_response, ExamineTopicsObject, picked_code){
-        $.when(sl_wordlist_response).done(function(){
-            sl_keywords_ranked = [];
-            ExamineTopicsObject.msg.Destroy();
-            var sl_keywords = arguments[0];
-            sl_keywords.sortOn("tf_idf","desc");
-            sl_keywords  = sl_keywords.slice(0,number_of_topicwords);
-            $.each(sl_keywords, function(kw_idx, keyword){
-                sl_keywords_ranked.push(keyword.lemma);
-            });
-            $.when(GetWordLists(picked_code)).done(function(){
-                $.when(FilterByDictionary(sl_keywords)).done(function(){
-                    $.when(SetNgrams()).done(function(){
-                        console.log("GINISHED");
-                        ExamineTopicsObject.BuildLRDTable(ngrams);
-                    });
-                });
-            });
+  function Run(sl_wordlist_response, ExamineTopicsObject, picked_code) {
+    $.when(sl_wordlist_response).done(function () {
+      sl_keywords_ranked = [];
+      ExamineTopicsObject.msg.Destroy();
+      var sl_keywords = arguments[0];
+      sl_keywords.sortOn("tf_idf", "desc");
+      sl_keywords = sl_keywords.slice(0, number_of_topicwords);
+      $.each(sl_keywords, function (kw_idx, keyword) {
+        sl_keywords_ranked.push(keyword.lemma);
+      });
+      $.when(GetWordLists(picked_code)).done(function () {
+        $.when(FilterByDictionary(sl_keywords)).done(function () {
+          $.when(SetNgrams()).done(function () {
+            console.log("GINISHED");
+            ExamineTopicsObject.BuildLRDTable(ngrams);
+          });
         });
-    }
+      });
+    });
+  }
+  /**
+   *
+   * Initializes the parameters the user can use to adjust
+   *
+   *
+   **/
 
-    /**
-     *
-     * Initializes the parameters the user can use to adjust
-     *
-     *
-     **/
-    function InitializeControls(){
-    
-        $("#LRDtab_method").selectmenu();
-        $("#LRDtab_method").on("selectmenuchange", SetLRDmethod);
-        $("#LRDtab_paradigm").selectmenu();
-        $("#LRDtab_paradigm").on("selectmenuchange", SetLRDparadigm);
-        $("#LRDtab_ngramnumber").slider(
-            {
-            min:1,
-            max:20,
-            value: ngram_number,
-            change: SetNgramNumber,
-            })
-            .parent().find(".slider_result").text(ngram_number);
-        $("#LRDtab_nwords").slider(
-            {
-            min:2,
-            max:20,
-            value: number_of_topicwords,
-            change: SetNumberOfTopicWords
-            })
-            .parent().find(".slider_result").text(number_of_topicwords);
-        $("#LRDtab_ngramrange").slider(
-            {
-            range:true,
-            values:ngram_range,
-            min:2,
-            max:10,
-            change: SetNgramRange
-            })
-            .parent().find(".slider_result").text(ngram_range.join(" - ")); ;
-    }
 
-    return {
-    
-        Run,
-        InitializeControls,
-        ViewNgramDetails,
-        GetNumberOfTopicWords,
-        GetNgramRange,
-        GetSourceLang,
-    
-    }
+  function InitializeControls() {
+    $("#LRDtab_method").selectmenu();
+    $("#LRDtab_method").on("selectmenuchange", SetLRDmethod);
+    $("#LRDtab_paradigm").selectmenu();
+    $("#LRDtab_paradigm").on("selectmenuchange", SetLRDparadigm);
+    $("#LRDtab_ngramnumber").slider({
+      min: 1,
+      max: 20,
+      value: ngram_number,
+      change: SetNgramNumber
+    }).parent().find(".slider_result").text(ngram_number);
+    $("#LRDtab_nwords").slider({
+      min: 2,
+      max: 20,
+      value: number_of_topicwords,
+      change: SetNumberOfTopicWords
+    }).parent().find(".slider_result").text(number_of_topicwords);
+    $("#LRDtab_ngramrange").slider({
+      range: true,
+      values: ngram_range,
+      min: 2,
+      max: 10,
+      change: SetNgramRange
+    }).parent().find(".slider_result").text(ngram_range.join(" - "));
+    ;
+  }
 
+  return {
+    Run: Run,
+    InitializeControls: InitializeControls,
+    ViewNgramDetails: ViewNgramDetails,
+    GetNumberOfTopicWords: GetNumberOfTopicWords,
+    GetNgramRange: GetNgramRange,
+    GetSourceLang: GetSourceLang
+  };
 }();
+"use strict";
 
 /**
  *
  * Adds the basic functionality to the interface by attaching the relevant events
  *
  **/
-$(document).ready(function(){
-    //Load the name of the corpus. When done, load the list of languages available
-    Loaders.SetCurrentCorpus(Loaders.ListLanguagesInThisCorpus)
-    //Displaying the current subcorpus
-    $(".current_subcorpus").click(function(){$(".textpicker").fadeToggle()});
-    //Open the actions subwindow
-    $(".select_action button").click(function(){
-        if(!$("#corpusaction").is(":visible")){
-            $(this).text("Hide actionmenu");
-        }
-        else{
-            $(this).text("Select action");
-        }
-        $("#corpusaction").slideToggle()
-    });
-    $(".select_other_function button").click(function(){
-        if(!$("#other_functions_menu").is(":visible")){
-            $(this).text("Hide functionmenu");
-        }
-        else{
-            $(this).text("Other functions");
-        }
-        $("#other_functions_menu").slideToggle()
-    });
-    $(".start_rnd button").click(function(){
-        if(!$("#rnd_action").is(":visible")){
-            $(this).text("Hide LRD");
-        }
-        else{
-            $(this).text("LRD");
-        }
-        $("#rnd_action").slideToggle()
-    });
-    //Defining possible actions on corpora
-    $("#corpusaction a, #corpusaction button, #rnd_action button").click(function(){
-        $(".select_action button").text("Select action");
-        var actions = $(this).attr("class").replace(/ *(opened|closed) */g,"").split(" ");
-        console.log(actions);
-        if(actions.length == 2){
-            CorpusActions[actions[0]][actions[1]]();
-        }
-        else{
-            CorpusActions[actions[0]]();
-        }
-    });
-    //Defining possible corpus management actions 
-    $("#other_functions_menu a").click(function(){
-        var actions = $(this).attr("class").split(" ");
-        if(actions.length == 2){
-            CorpusManagementActions[actions[0]][actions[1]]();
-        }
-        else{
-            CorpusManagementActions[actions[0]]();
-        }
-    });
-    //Basic lightbox hiding functionality
-    $(".boxclose").click(function(){
-        $(this).parents(".my-lightbox").fadeOut();
-        console.log("closed...");
-        //Attempt: freeing up memory
-        $.each(Corpusdesktop.GarbageList,function(id,el){
-            if (id in Corpusdesktop.ElementList){
-            }
-            else{
-                //If the object hasn't been added to the desktop, delete it
-                Corpusdesktop.GarbageList[id] = undefined;
-                console.log("deleted " + id);
-            }
-        });
-    });
-    //Corpus desktop
-    $("#show_desktop_objects_link").click(function(){
-        $("aside").slideToggle();
-    })
-    //Events for the corpus desktop
-    Corpusdesktop.AddDesktopEvents();
+$(document).ready(function () {
+  //Load the name of the corpus. When done, load the list of languages available
+  Loaders.SetCurrentCorpus(Loaders.ListLanguagesInThisCorpus); //Displaying the current subcorpus
 
-    //Events for tf_idf
-    $(".lrd_menu li").click(function() {
-            CorpusActions.ExamineTopics.ChooseParadigm($(this));
-        }
-    );
-    LRDtab.InitializeControls();
+  $(".current_subcorpus").click(function () {
+    $(".textpicker").fadeToggle();
+  }); //Open the actions subwindow
 
-                    //For some quick, dirty tests:
-                    //var params = {
-                    //    n:2,
-                    //    lemmas:"no",
-                    //    must_include: "{{skip}}",
-                    //    included_word_lemma: true,
-                    //    ldr_paradigm: "Verb-centered",
-                    //    codes: ["un_cert_able_seamen_1946_fi"],
-                    //    action: "lrd_ngram_list",
-                    //    lrd_rank: 1,
-                    //    lang: "fi"
-                    //};
-                    //    console.log(params);
-                    //        $.getJSON("php/ajax/get_frequency_list.php",
-                    //            params
-                    //            ,function(data){
-                    //                console.log(data);
-                    //                console.log("!!!!MORO");
-                    //            });
+  $(".select_action button").click(function () {
+    if (!$("#corpusaction").is(":visible")) {
+      $(this).text("Hide actionmenu");
+    } else {
+      $(this).text("Select action");
+    }
+
+    $("#corpusaction").slideToggle();
+  });
+  $(".select_other_function button").click(function () {
+    if (!$("#other_functions_menu").is(":visible")) {
+      $(this).text("Hide functionmenu");
+    } else {
+      $(this).text("Other functions");
+    }
+
+    $("#other_functions_menu").slideToggle();
+  });
+  $(".start_rnd button").click(function () {
+    if (!$("#rnd_action").is(":visible")) {
+      $(this).text("Hide LRD");
+    } else {
+      $(this).text("LRD");
+    }
+
+    $("#rnd_action").slideToggle();
+  }); //Defining possible actions on corpora
+
+  $("#corpusaction a, #corpusaction button, #rnd_action button").click(function () {
+    $(".select_action button").text("Select action");
+    var actions = $(this).attr("class").replace(/ *(opened|closed) */g, "").split(" ");
+    console.log(actions);
+
+    if (actions.length == 2) {
+      CorpusActions[actions[0]][actions[1]]();
+    } else {
+      CorpusActions[actions[0]]();
+    }
+  }); //Defining possible corpus management actions 
+
+  $("#other_functions_menu a").click(function () {
+    var actions = $(this).attr("class").split(" ");
+
+    if (actions.length == 2) {
+      CorpusManagementActions[actions[0]][actions[1]]();
+    } else {
+      CorpusManagementActions[actions[0]]();
+    }
+  }); //Basic lightbox hiding functionality
+
+  $(".boxclose").click(function () {
+    $(this).parents(".my-lightbox").fadeOut();
+    console.log("closed..."); //Attempt: freeing up memory
+
+    $.each(Corpusdesktop.GarbageList, function (id, el) {
+      if (id in Corpusdesktop.ElementList) {} else {
+        //If the object hasn't been added to the desktop, delete it
+        Corpusdesktop.GarbageList[id] = undefined;
+        console.log("deleted " + id);
+      }
+    });
+  }); //Corpus desktop
+
+  $("#show_desktop_objects_link").click(function () {
+    $("aside").slideToggle();
+  }); //Events for the corpus desktop
+
+  Corpusdesktop.AddDesktopEvents(); //Events for tf_idf
+
+  $(".lrd_menu li").click(function () {
+    CorpusActions.ExamineTopics.ChooseParadigm($(this));
+  });
+  LRDtab.InitializeControls(); //For some quick, dirty tests:
+  //var params = {
+  //    n:2,
+  //    lemmas:"no",
+  //    must_include: "{{skip}}",
+  //    included_word_lemma: true,
+  //    ldr_paradigm: "Verb-centered",
+  //    codes: ["un_cert_able_seamen_1946_fi"],
+  //    action: "lrd_ngram_list",
+  //    lrd_rank: 1,
+  //    lang: "fi"
+  //};
+  //    console.log(params);
+  //        $.getJSON("php/ajax/get_frequency_list.php",
+  //            params
+  //            ,function(data){
+  //                console.log(data);
+  //                console.log("!!!!MORO");
+  //            });
 });
+"use strict";
+
+// The "render()" function will render JSX markup and
+// place the resulting content into a DOM node. The "React"
+// object isn't explicitly used here, but it's used
+// by the transpiled JSX source.
+//import React from 'react';
+//import { render } from 'react-dom';
+// Renders the JSX markup. Notice the XML syntax
+// mixed with JavaScript? This is replaced by the
+// transpiler before it reaches the browser.
+ReactDOM.render(React.createElement("p", null, "Hello, ", React.createElement("strong", null, "JSX")), document.getElementById('app'));

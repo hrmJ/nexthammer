@@ -7,6 +7,8 @@
 <link href="js/build/vendor/jquery-ui-1.12.1.custom/jquery-ui.min.css" rel="stylesheet" type="text/css">
 <script src="js/build/vendor/jquery-3.2.1.min.js"></script>
 <script src="js/build/vendor/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
+
+
 <script src="js/build/main.js?id=[@js_id]"></script>
 </head>
 <body>
@@ -147,14 +149,19 @@
 
             <main class='drop-target'>
 
+                <div id="app">moro</div>
+
                     [@maincontent]
             </main>
         </div>
     </div>
 
+
 </div>
 
 
+<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
 </body>
 
 </html>

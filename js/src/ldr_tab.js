@@ -18,16 +18,16 @@
  **/
 var LRDtab = function(){
 
-    words_in_doc = {};
-    sl_keywords_ranked = [];
-    filtered_by_dict_keywords = [];
-    ngrams = [];
-    number_of_topicwords = 5;
-    ngram_range = [2,3];
-    ngram_number = 5;
-    lrd_method = "LL";
-    lrd_paradigm = "Noun-centered";
-    source_lang = "en",
+    var words_in_doc = {},
+        sl_keywords_ranked = [],
+        filtered_by_dict_keywords = [],
+        ngrams = [],
+        number_of_topicwords = 5,
+        ngram_range = [2,3],
+        ngram_number = 5,
+        lrd_method = "LL",
+        lrd_paradigm = "Noun-centered",
+        source_lang = "en";
 
 
     /**
@@ -35,7 +35,7 @@ var LRDtab = function(){
      * Gets the source language
      *
      **/
-    GetSourceLang = function(){
+    var GetSourceLang = function(){
         return source_lang;
     }
 
@@ -44,7 +44,7 @@ var LRDtab = function(){
      * Gets the number of topic words
      *
      **/
-    GetNumberOfTopicWords = function(){
+    var GetNumberOfTopicWords = function(){
         return number_of_topicwords
     }
 
@@ -53,7 +53,7 @@ var LRDtab = function(){
      * Gets the range of ngram levels
      *
      **/
-    GetNgramRange = function(){
+    var GetNgramRange = function(){
         return ngram_range;
     }
 
@@ -64,7 +64,7 @@ var LRDtab = function(){
      *
      *
      **/
-    SetLRDmethod = function(){
+    var SetLRDmethod = function(){
         lrd_method = $(this).val();
     }
 
@@ -74,7 +74,7 @@ var LRDtab = function(){
      *
      *
      **/
-    SetLRDparadigm = function(){
+    var SetLRDparadigm = function(){
         lrd_paradigm = $(this).val();
     }
 
@@ -89,7 +89,7 @@ var LRDtab = function(){
      * @param ui jquery ui object
      *
      **/
-    SetNumberOfTopicWords = function(e, ui){
+    var SetNumberOfTopicWords = function(e, ui){
         $(e.target).parent().find(".slider_result").text(ui.value);
         number_of_topicwords = ui.value;
     }
@@ -104,7 +104,7 @@ var LRDtab = function(){
      *
      *
      **/
-    SetNgramRange = function(e, ui){
+    var SetNgramRange = function(e, ui){
         $(e.target).parent().find(".slider_result").text(ui.values.join(" - "));
         ngram_range = ui.values;
     }
@@ -117,7 +117,7 @@ var LRDtab = function(){
      * @param ui jquery ui object
      *
      **/
-    SetNgramNumber = function(e, ui){
+    var SetNgramNumber = function(e, ui){
         $(e.target).parent().find(".slider_result").text(ui.value);
         ngram_number = ui.value;
     }
@@ -127,7 +127,7 @@ var LRDtab = function(){
      * Gets the whole data table for ngrams
      *
      **/
-    GetNgrams = function(num){
+    var GetNgrams = function(num){
         return ngrams;
     }
 
@@ -138,7 +138,7 @@ var LRDtab = function(){
      * @param e the event that was fired
      *
      **/
-    ViewNgramDetails = function(e){
+    var ViewNgramDetails = function(e){
         var id = "box_" + $(this).text();
         if($(e.target).is("a")){
             return 0;

@@ -6,7 +6,8 @@ var
     concat = require('gulp-concat'),
     deporder = require('gulp-deporder'),
     sass = require('gulp-ruby-sass'),
-    autoprefixer = require('gulp-autoprefixer');
+    autoprefixer = require('gulp-autoprefixer'),
+    babel = require('gulp-babel');
 
 
 
@@ -17,6 +18,15 @@ var
 //    var jsbuild = gulp.src(jsfiles).pipe(deporder()).pipe(concat('main.js'));
 //    return jsbuild.pipe(gulp.dest(folder.build));
 //});
+//
+gulp.task("jsx", function(){
+    return gulp.src("jsx/**/*")
+        .pipe(babel({
+            plugins: ['transform-react-jsx']
+        }))
+        .pipe(concat('react.js'))
+        .pipe(gulp.dest("js/src/"));
+});
 
 
 gulp.task("js",function(){
@@ -26,9 +36,15 @@ gulp.task("js",function(){
                    'js/src/corpus_actions.js',
                    'js/src/corpus_management_actions.js',
                    'js/src/ldr_tab.js',
-                   'js/src/interface_events.js'];
-    var jsbuild = gulp.src(jsfiles).pipe(deporder()).pipe(concat('main.js'));
-    //var jsbuild = gulp.src("corpustools/topics_interface/js/src/*.js").pipe(deporder()).pipe(concat('main.js'));
+                   'js/src/interface_events.js',
+                   'js/src/react.js',
+                    ];
+    var jsbuild = gulp.src(jsfiles)
+        .pipe(babel({
+                    presets: ['@babel/env']
+                }))
+        .pipe(deporder())
+        .pipe(concat('main.js'));
     return jsbuild.pipe(gulp.dest('js/build/'));
 });
 
@@ -55,10 +71,11 @@ gulp.task("css",function(){
 
 gulp.task("watch",function(){
 
+    gulp.watch("jsx/**/*",["jsx"]);
     gulp.watch("js/src/*.js",["js"]);
     gulp.watch("sass/**/*",["css"]);
 
 });
 
-gulp.task('run',['js','css']);
+gulp.task('run',['jsx', 'js','css']);
 gulp.task('default',['run','watch']);
