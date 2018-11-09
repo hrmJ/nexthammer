@@ -33,9 +33,10 @@ For develpoment
 
 README in progress, moving to webpack and trying to document that....
 
-In addition to the steps in the previous section [gulp.js](https://gulpjs.com/)
-is needed for combining the js and converting sass files to css.
+Running webpack development server on LXC:
+1. Stop nginx
+2. `webpack-dev-server --host 0.0.0.0 --public 10.0.3.121:8080 --watch-poll` (use the lxc container's ip)
+3. access via http://10.0.3.121:8080/
 
-1. Install `node` and `npm`
-2. run `npm install` in the nexthammer folder
+At the moment the php just symlinked to dist... TODO: move it there?
 

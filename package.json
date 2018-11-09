@@ -2,13 +2,13 @@
   "name": "Texthammer",
   "version": "1.0.0",
   "description": "A corpus interface",
-  "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.1.5",
     "@babel/preset-env": "^7.1.5",
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "css-loader": "^1.0.1",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
+    "file-loader": "^2.0.0",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^4.0.0",
     "gulp-babel": "^8.0.0",
@@ -19,6 +19,7 @@
     "html-webpack-plugin": "^3.2.0",
     "jquery": "^3.3.1",
     "jquery-ui": "^1.12.1",
+    "lodash-es": "^4.17.11",
     "mini-css-extract-plugin": "^0.4.4",
     "node-sass": "^4.10.0",
     "sass-loader": "^7.1.0",
@@ -40,5 +41,8 @@
   "bugs": {
     "url": ""
   },
-  "homepage": ""
+  "homepage": "",
+  "dependencies": {
+    "file-loader": "^2.0.0"
+  }
 }

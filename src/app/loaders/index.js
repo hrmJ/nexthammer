@@ -7,7 +7,7 @@
  * @param Array picked_texts codes of the texts belogning to the current subcorpus
  *
  **/
-var Loaders = function(){
+const Loaders = function(){
 
         var picked_lang = "none";
         var picked_texts = [];
@@ -107,7 +107,7 @@ var Loaders = function(){
          */
         function GetPickedCodes(){
             var codes = [];
-            for(i=0;i<picked_texts.length;i++){
+            for(var i=0;i<picked_texts.length;i++){
                 codes.push(picked_texts[i].code);
             }
             return codes;
@@ -200,7 +200,8 @@ var Loaders = function(){
                     //Updating when picking the texts for the current subcorpus
                     $("#text_picker_for_sobcorpus input[type='checkbox']").click(function(){SetPickedTexts();});
                     SetPickedTexts();
-                }); } 
+                }); 
+        } 
 
     return {
 
@@ -217,3 +218,5 @@ var Loaders = function(){
 
 }();
 
+
+export default Loaders;

@@ -21,22 +21,30 @@ module.exports = {
         filename: 'bundle.js'
     },
     module: {
-        rules: [{
-            test: /\.scss$/,
+        rules: [
+        {
+            test: /\.s*css$/,
             use: [
                 "style-loader", // creates style nodes from JS strings
                 "css-loader", // translates CSS into CommonJS
                 "sass-loader" // compiles Sass to CSS, using Node Sass by default
             ]
-        }]
+        },
+        {
+            test: /\.(jpg|png)$/,
+            loader: 'file-loader'
+        },
+        ]
     },
     plugins: [
         //new ExtractTextPlugin("styles.css"),
         new HtmlWebpackPlugin(htmlOptions),
         new webpack.ProvidePlugin({
-          $: "jquery",
-          jQuery: "jquery"
-        })
+             $: "jquery",
+             jQuery: "jquery",
+             "window.jQuery": "jquery'",
+             "window.$": "jquery"
+         })
     ],
     devServer: {
         contentBase: './src'
