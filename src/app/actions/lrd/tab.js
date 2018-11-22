@@ -1,3 +1,6 @@
+
+import Loaders from '../../loaders';
+import Utilities from '../../utilities';
 /**
  * 
  * Gives the user multilingual tables of ngrams. The ngrams are sorted
@@ -17,6 +20,7 @@
  *
  **/
 const LRDtab = function(){
+
 
     var words_in_doc = {},
         sl_keywords_ranked = [],
@@ -171,7 +175,8 @@ const LRDtab = function(){
             responses = [],
             codes = Loaders.GetPickedCodesInAllLanguages(),
             msg = new Utilities.Message("Querying word lists..."),
-            bar = new Utilities.ProgressBar(msg.$box);
+            bar = new Utilities.ProgressBar(msg.$box),
+            lang = undefined;
         msg.Show(9999);
         bar.Initialize(langs.length);
         $.each(langs,function(lidx, lang){
@@ -212,7 +217,9 @@ const LRDtab = function(){
         var all_langs = Loaders.GetLanguagesInCorpus(),
             target_langs = [],
             msg = new Utilities.Message("Looking up wiktionary to filter the key word lists...", $(".container")),
-            bar = new Utilities.ProgressBar(msg.$box);
+            bar = new Utilities.ProgressBar(msg.$box),
+            filtered = [],
+            params = {};
         filtered_by_dict_keywords = [];
         bar.Initialize(number_of_topicwords);
         msg.Show(999999);
@@ -221,7 +228,7 @@ const LRDtab = function(){
                 target_langs.push(lang);
             }
         });
-        var filtered = [];
+
         $.each(sl_keywords,function(idx,word){
             //Search for translation for each of the key word in the language
             //chosen as source (default: english)
@@ -236,7 +243,7 @@ const LRDtab = function(){
             }));
         });
         return $.when.apply($, filtered).done(function(){
-            ajax_args = arguments;
+            var ajax_args = arguments;
             msg.Destroy();
             for(var i = 0; i<ajax_args.length; i++){
                 //Iterating through EACH keyword in the source language
@@ -329,7 +336,7 @@ const LRDtab = function(){
         });
         return $.when.apply($, all_ngrams).done(function(){
             bar.Destroy();
-            tabdata = {};
+            var tabdata = {};
             for(var i = 0; i < arguments.length; i++ ){
                 var lang = Object.keys(arguments[i][0])[0],
                     word_rank = Object.keys(arguments[i][0][lang])[0]*1,

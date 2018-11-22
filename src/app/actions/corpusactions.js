@@ -1,6 +1,7 @@
 import Loaders from '../loaders';
 import Utilities from '../utilities';
 import Corpusdesktop from '../corpusdesktop';
+import LRDtab from './lrd/tab.js';
 
 /**
  *
@@ -280,7 +281,7 @@ const CorpusActions = function(){
                         headerlangs.push(lang);
                         for(var i = 0; i < LRDtab.GetNumberOfTopicWords(); i++){
                             if(langdata[i+1]){
-                                $ul = $("<ul class='ldrtab'></ul>");
+                                var $ul = $("<ul class='ldrtab'></ul>");
                                 for(var n = ngramrange[0]; n <= ngramrange[1]; n++){
                                     var ngram_data = langdata[i+1][n];
                                     $ul.append(`<li><strong>${n}</strong></li>`);

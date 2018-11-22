@@ -9,6 +9,6 @@
         }
     ],
 	"autoload":{
-        "psr-4":{"Texthammer\\":"php"}
+        "psr-4":{"Texthammer\\":"dist/php"}
 	}
 }

@@ -1,11 +1,12 @@
 <?php
 
-require '../../vendor/autoload.php';
+require '../../../vendor/autoload.php';
 //General imports:
 require_once '../session_functions.php';
 
 //Specially for topics:
-require_once '../statistical_functions_for_topics.php'; require_once '../small_utilities.php';
+require_once '../statistical_functions_for_topics.php'; 
+require_once '../small_utilities.php';
 require_once '../corpus_objects/corpus_object.php';
 require_once '../corpus_objects/document.php';
 require_once '../corpus_objects/corpus.php';
