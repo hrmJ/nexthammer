@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Corpusobjects\Corpus;
 
 class CorpusController extends Controller
 {
@@ -12,6 +13,8 @@ class CorpusController extends Controller
      *
      */
     public function index(){
+
+        $x = new Corpus();
     
         return ['response' => 
             [
