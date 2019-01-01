@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Corpusobjects;
+use Utilities;
 
 /**
  *
@@ -107,16 +108,6 @@ class CorpusObject{
         return $this;
     }
 
-    /**
-     * 
-     * Sets the path to the config file
-     * 
-     */
-    public function SetConfigPath($path){
-        $this->configpath = $path;
-        return $this;
-    }
-
 
     /**
      * Get the corpuscon; just for testing.
@@ -163,7 +154,7 @@ class CorpusObject{
      * 
      */
     public function SetConnectionToMain(){
-        $this->maincon = open_connection("dbmain", $this->configpath);
+        $this->maincon = Utilities::open_connection("dbmain");
         return $this;
     }
 

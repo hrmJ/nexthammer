@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "af07775aa33590d9cf2f4656053d923c",
+    "content-hash": "90c1f6e225b8bf2e31b47768f4ee35da",
     "packages": [
         {
             "name": "dingo/api",

@@ -14,11 +14,11 @@ class CorpusController extends Controller
      */
     public function index(){
 
-        $x = new Corpus();
-    
+        //Just a mock for now...
+
         return ['response' => 
             [
-                'title' => 'just a test'
+                'title' => 'pest_inter',
             ]
         ];
     }

@@ -1,6 +1,18 @@
 <?php
+/** 
+ * A class representing the current (sub)corpus
+ *
+ * PHP version 7.2
+ *
+ * @category Nexthammer
+ * @package  Nexthammer
+ * @author   Juho Härme <juho.harme@gmail.com>
+ * @license  https://opensource.org/licenses/MIT MIT
+ * @link     ?
+ */
 
 namespace App\Corpusobjects;
+use Utilities;
 
 /**
  *
@@ -104,7 +116,7 @@ class Corpus extends CorpusObject{
          * 
          */
         public function SetConnectionToCorpus(){
-            $this->corpuscon = open_connection($this->corpusname, $this->configpath);
+            $this->corpuscon = Utilities::open_connection($this->corpusname);
             return $this;
         }
 

@@ -105,7 +105,7 @@ $app->router->group([
 });
 
 
-//$app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
+$app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 
 
 return $app;
