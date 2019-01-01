@@ -16,7 +16,9 @@ $api = app('Dingo\Api\Routing\Router');
 
 $api->version('v1', ['prefix' => 'api/v1'], function($api){
     $api->get('corpora', "App\Http\Controllers\CorpusController@index");
-    $api->get('lists/frequencylist', "App\Http\Controllers\ListController@frequencyList");
+    $api->get('corpora/{name}/languages', "App\Http\Controllers\CorpusController@listLanguages");
+    $api->get('corpora/{name}/{lang}/frequencylist', "App\Http\Controllers\CorpusController@frequencylist");
+    //$api->get('lists/frequencylist/{corpus}', "App\Http\Controllers\ListController@frequencyList");
 });
 
 $router->get('/', function () use ($router) {

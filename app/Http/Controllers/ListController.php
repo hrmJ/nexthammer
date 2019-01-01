@@ -28,33 +28,8 @@ use Utilities;
 class ListController extends Controller
 {
 
-    /**
-     * Sets the controller
-     */
-    public function __construct()
-    {
-        $corpusname = "pest_inter";
-        $corpus = new Corpus();
-        $corpus->SetCorpusName($corpusname)
-            ->SetConnectionToCorpus()
-            ->SetConnectionToMain()
-            ->SetStopWords();
-    }
 
 
-    /**
-     * Gets a frequency list for a certain subcorpus
-     *
-     * @return response as a json array
-     */
-    public function frequencyList()
-    {
-        return ['response' => 
-            [
-                'testing...'
-            ]
-        ];
-    }
 }
 
 ?>

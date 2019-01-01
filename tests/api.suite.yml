@@ -1,0 +1,8 @@
+actor: ApiTester
+modules:
+    enabled:
+        - Asserts
+        - Helper\Functional
+        - REST:
+            url: http://nexthammer.test/api/v1/
+            depends: PhpBrowser

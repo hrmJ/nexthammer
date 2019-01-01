@@ -13,6 +13,7 @@
 
 namespace App\Corpusobjects;
 use Utilities;
+use Statistics;
 
 /**
  *
@@ -281,7 +282,7 @@ class Corpus extends CorpusObject{
         $coef_of_succes = 0.95;
         $fail_score = 0.05;
         foreach($this->noun_frequencies as $lemma => $freq){
-            $nb = NaiveBayes($this->total_words, $freq,  $coef_of_succes, $fail_score);
+            $nb = Statistics::NaiveBayes($this->total_words, $freq,  $coef_of_succes, $fail_score);
             $this->data[] = Array(
                 "lemma" => $lemma,
                 "freq" => $freq,

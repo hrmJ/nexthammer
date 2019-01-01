@@ -2,6 +2,10 @@
 
 namespace App\Corpusobjects;
 
+use InPattern;
+use Utilities;
+
+
 /**
  *
  * One text in the corpus
@@ -221,7 +225,7 @@ class Document extends CorpusObject{
      */
     public function SetNounFrequencyByLemma($filtershort=true){
         if(!$this->noun_frequencies){
-            $noun_pattern = new InPattern(PickNoun($this->lang), 3);
+            $noun_pattern = new InPattern(Utilities::PickNoun($this->lang), 3);
             $stopword_pattern = new InPattern($this->corpus->GetStopwords(), 
                 3 + sizeof($noun_pattern->list));
             $query = "SELECT lemma, count(*) FROM lemma_{$this->lang} 
@@ -238,7 +242,7 @@ class Document extends CorpusObject{
             $this->noun_frequencies = Array();
                
             foreach($freqs as $row){
-                if (FilterThisWord($row["lemma"]) or !$filtershort){ 
+                if (Utilities::FilterThisWord($row["lemma"]) or !$filtershort){ 
                     //Filtering out short words and other unwanted words
                     $this->noun_frequencies[$row["lemma"]] = $row["count"]*1;
                 }
