@@ -1,0 +1,39 @@
+{
+  "name": "nexthammer",
+  "version": "1.0.0",
+  "description": "A corpus frontend",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hrmJ/nexthammer.git"
+  },
+  "keywords": [
+    "corpora",
+    "linguistics"
+  ],
+  "author": "Juho Härme",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hrmJ/nexthammer/issues"
+  },
+  "homepage": "https://github.com/hrmJ/nexthammer#readme",
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.2.3",
+    "@babel/preset-env": "^7.2.3",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.5",
+    "webpack": "^4.28.3",
+    "webpack-cli": "^3.2.0"
+  },
+  "dependencies": {
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0"
+  }
+}
