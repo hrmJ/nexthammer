@@ -1,11 +1,12 @@
 const webpack = require('webpack');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     entry: {
-        app: './react/index.jsx'
+        app: './src/index.jsx'
     },
     output: {
-        filename: './public/bundle.js'
+        filename: 'bundle.js'
     },
     module: {
         rules: [
@@ -25,5 +26,9 @@ module.exports = {
             
             }
         ]
-    }
+    },
+    plugins: [
+        new CopyWebpackPlugin(['src/index.html'])
+    ],
+    mode: "development"
 };
