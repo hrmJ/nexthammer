@@ -1,14 +1,12 @@
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
-import {createStore} from 'redux'
-import TopBar from './layout/topbar.jsx'
-import appReducer from  './redux/reducers/app'
+import TopBar from './layout/topbar'
+import ActionMenu from './layout/actionmenu'
+import CorpusMenu from './layout/corpusmenu'
 import corpusReducer from  './redux/reducers/corpus'
-import {pickLanguage} from './redux/actions'
 
 
-//const store = createStore();
-//
+
 export default class Main extends Component{
 
     state = {
@@ -22,21 +20,35 @@ export default class Main extends Component{
     
     }
 
-    constructor(){
-        super();
-        //const newState = appReducer(this.state, pickLanguage("en"))
-        let store = createStore(appReducer, this.state)
-        const unsubscribe = store.subscribe(() => {
-            console.log("STATE changed:", store.getState())
-        })
+    constructor(props){
+        super(props);
+        //this.state = props.store.getState(this.state)
+    }
 
-        console.log(store.getState())
-        store.dispatch(pickLanguage("en"))
+    componentDidMount() {
+
+        const { store } = this.props
+        this.unsubscribe = store.subscribe( () => {
+            this.setState({ ...store.getState() })
+        })
+    
+    }
+
+    componentWillUnmount ( ) {
+        this.unsubscribe()
     }
 
     render() {
+        console.log(this.state.corpus.name)
         return (
-            <main> <TopBar />  </main>
+            <main>
+                <TopBar store={this.props.store} />  
+                <ActionMenu 
+                />
+                <CorpusMenu 
+                    corpusname={this.state.corpus.name}
+                />
+            </main>
         )
     }
 
