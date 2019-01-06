@@ -24,9 +24,14 @@ export default class Main extends Component{
 
     constructor(){
         super();
-        const newState = appReducer(this.state, pickLanguage("en"))
-        console.log(newState)
+        //const newState = appReducer(this.state, pickLanguage("en"))
+        let store = createStore(appReducer, this.state)
+        const unsubscribe = store.subscribe(() => {
+            console.log("STATE changed:", store.getState())
+        })
 
+        console.log(store.getState())
+        store.dispatch(pickLanguage("en"))
     }
 
     render() {
