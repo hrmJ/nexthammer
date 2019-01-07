@@ -5,20 +5,10 @@ import ActionMenu from './layout/actionmenu'
 import CorpusMenu from './layout/corpusmenu'
 import corpusReducer from  './redux/reducers/corpus'
 
-
+import {createStore} from 'redux';
 
 export default class Main extends Component{
 
-    state = {
-    
-        corpus : {
-            name: "pest_inter",
-            available_languages: ["fi", "ru", "en", "sv", "fr"],
-            active_language: "fi",
-            picked_codes: []
-        }
-    
-    }
 
     constructor(props){
         super(props);
@@ -27,10 +17,11 @@ export default class Main extends Component{
 
     componentDidMount() {
 
-        const { store } = this.props
-        this.unsubscribe = store.subscribe( () => {
-            this.setState({ ...store.getState() })
-        })
+        //const { store } = this.props
+        //this.unsubscribe = store.subscribe( () => {
+        //    console.log("A change!");
+        //    this.setState({ ...store.getState() })
+        //})
     
     }
 
@@ -39,15 +30,13 @@ export default class Main extends Component{
     }
 
     render() {
-        console.log(this.state.corpus.name)
+
         return (
             <main>
-                <TopBar store={this.props.store} />  
-                <ActionMenu 
-                />
-                <CorpusMenu 
-                    corpusname={this.state.corpus.name}
-                />
+            current lang: {this.props.corpus.active_language}
+                <TopBar />  
+                <ActionMenu />
+                <CorpusMenu {...this.props} />
             </main>
         )
     }
