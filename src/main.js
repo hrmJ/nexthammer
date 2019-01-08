@@ -1,8 +1,8 @@
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
-import TopBar from './layout/topbar'
-import ActionMenu from './layout/actionmenu'
-import CorpusMenu from './layout/corpusmenu'
+import TopBar from './components/topbar'
+import ActionMenu from './components/actionmenu'
+import CorpusMenu from './components/corpusmenu'
 import corpusReducer from  './redux/reducers/corpus'
 
 import {createStore} from 'redux';
@@ -35,8 +35,8 @@ export default class Main extends Component{
             <main>
             current lang: {this.props.corpus.active_language}
                 <TopBar />  
-                <ActionMenu />
                 <CorpusMenu {...this.props} />
+                <ActionMenu {...this.props} />
             </main>
         )
     }
