@@ -2,7 +2,7 @@ import React from 'react'
 
 /**
  *
- * The basic template for launchable actions
+ * The basic template for launchable tasks
  *
  */
 export default ( { name, action, children } ) => (
