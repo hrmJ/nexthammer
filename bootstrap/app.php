@@ -51,6 +51,9 @@ $app->singleton(
 
 //$app->register(Zeek\LumenDingoAdapter\Providers\LumenDingoAdapterServiceProvider::class);
 
+//For CORS
+$app->register('Nord\Lumen\Cors\CorsServiceProvider');
+
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
@@ -61,6 +64,14 @@ $app->singleton(
 | route or middleware that'll be assigned to some specific routes.
 |
 */
+
+$app->middleware([
+	'Nord\Lumen\Cors\CorsMiddleware',
+]);
+
+//$app->middleware([
+//    App\Http\Middleware\CORSMiddleware::class
+//]);
 
 // $app->middleware([
 //     App\Http\Middleware\ExampleMiddleware::class
@@ -106,6 +117,7 @@ $app->router->group([
 
 
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
+//$app->register(Zeek\LumenDingoAdapter\Providers\LumenDingoAdapterServiceProvider::class);
 
 
 return $app;

@@ -1,5 +1,5 @@
 import React from  'react'
-import {pickLanguage} from '../redux/actions.js'
+import {pickLanguage} from '../redux/actions'
 
 export default ( {corpus, dispatch}) => (
 

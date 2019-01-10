@@ -96,9 +96,7 @@ class CorpusController extends Controller
         //    $corpus->DelimitDataByString("#","lemma")->SimplifyDataByVariable("lemma");
         //    echo json_encode([$_GET["lang"] => $corpus->GetData()]);
         //}
-        return ['response' => $this->corpus->GetData()];
-        //return ["x" => $this->corpus->documents];
-        return ["x" => "lkjlk"];
+        return $this->corpus->GetData();
     }
 
 
